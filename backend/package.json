@@ -1,0 +1,41 @@
+{
+  "name": "obiflow",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "ts-node ./src/server.ts",
+    "dev": "nodemon ./src/server.ts",
+    "build": "rm -rf ./dist ; tsc",
+    "start:prod": "node ./dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cookie": "^9.1.0",
+    "@fastify/cors": "^8.4.0",
+    "@fastify/csrf-protection": "^6.3.0",
+    "@fastify/env": "^4.2.0",
+    "@fastify/swagger": "^8.11.0",
+    "@fastify/swagger-ui": "^1.10.1",
+    "@prisma/client": "^5.4.2",
+    "@sinclair/typebox": "^0.31.18",
+    "bcrypt": "^5.1.1",
+    "fastify": "^4.23.2",
+    "fastify-plugin": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.1",
+    "@types/node": "^20.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.52.0",
+    "fastify-tsconfig": "^2.0.0",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3",
+    "prisma": "^5.4.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  }
+}
