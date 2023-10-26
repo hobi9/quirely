@@ -25,7 +25,7 @@ const authControllers = (fastify: FastifyInstance) => {
 
     if (usersInDb.length) {
       reply.code(409);
-      return {};
+      return { error: 'Email or username already taken' };
     }
 
     const passwordHash = await bcrypt.hash(password, await bcrypt.genSalt());

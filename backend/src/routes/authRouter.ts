@@ -1,6 +1,10 @@
 import Cookie from '@fastify/cookie';
 import Csrf from '@fastify/csrf-protection';
-import { UserRegistrationData, UserRegistrationSchema } from '../schemas/authSchema';
+import {
+  UserRegistrationData,
+  UserRegistrationSchema,
+  UserResponseSchema,
+} from '../schemas/authSchema';
 import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcrypt';
@@ -17,16 +21,18 @@ const authRouter = async (fastify: FastifyInstance) => {
   });
 
   fastify.register(Csrf);
+  fastify.decorate('bcrypt', bcrypt);
 
   const controllers = authControllers(fastify);
-
-  fastify.decorate('bcrypt', bcrypt);
 
   fastify.post<{ Body: UserRegistrationData }>(
     '/register',
     {
       schema: {
         body: UserRegistrationSchema,
+        response: {
+          201: UserResponseSchema,
+        },
       },
     },
     controllers.registerUser,

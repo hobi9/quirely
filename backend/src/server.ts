@@ -2,7 +2,11 @@ import Fastify from 'fastify';
 import App from './app';
 
 const fastify = Fastify({
-  logger: true,
+  logger: {
+    transport: {
+      target: 'pino-pretty',
+    },
+  },
 });
 
 fastify.register(App);
