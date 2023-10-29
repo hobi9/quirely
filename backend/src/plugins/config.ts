@@ -20,15 +20,6 @@ declare module 'fastify' {
   }
 }
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface ProcessEnv {
-      NODE_ENV: 'test' | 'development' | 'production';
-    }
-  }
-}
-
 const configPlugin: FastifyPluginAsync = fp(async (fastify) => {
   await loadDotenv();
   fastify.register(Env, {

@@ -10,7 +10,7 @@ import {
 import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcrypt';
-import JwtConfig from '../plugins/jwtConfig';
+import Auth from '../plugins/authPlugin';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -24,7 +24,7 @@ const authRouter = async (fastify: FastifyInstance) => {
   });
 
   fastify.register(Csrf);
-  fastify.register(JwtConfig);
+  await fastify.register(Auth);
 
   fastify.decorate('bcrypt', bcrypt);
 

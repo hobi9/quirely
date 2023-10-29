@@ -1,10 +1,10 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { UserLoginData, UserRegistrationData } from '../schemas/authSchema';
 import crypto from 'crypto';
-import { TOKEN_COOKIE_KEY } from '../utils/constants';
+import { TOKEN_COOKIE_NAME } from '../utils/constants';
 
 const authControllers = (fastify: FastifyInstance) => {
-  const { prisma, bcrypt } = fastify;
+  const { prisma, bcrypt, jwt } = fastify;
 
   const registerUser = async (request: FastifyRequest<{ Body: UserRegistrationData }>, reply: FastifyReply) => {
     const { email, username, password } = request.body;
@@ -71,8 +71,8 @@ const authControllers = (fastify: FastifyInstance) => {
       return { error: 'Invalid username or password.' };
     }
 
-    const accessToken = await reply.jwtSign({ id: user.id }, { expiresIn: '10m' });
-    const refreshToken = await reply.jwtSign({ id: user.id }, { expiresIn: '7d' });
+    const accessToken = await jwt.sign({ id: user.id }, { expiresIn: '10m' });
+    const refreshToken = await jwt.sign({ id: user.id }, { expiresIn: '7d' });
 
     await prisma.token.upsert({
       where: {
@@ -89,7 +89,7 @@ const authControllers = (fastify: FastifyInstance) => {
       },
     });
 
-    reply.setCookie(TOKEN_COOKIE_KEY, accessToken, {
+    reply.setCookie(TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,
       sameSite: true,
       secure: true,
