@@ -1,7 +1,39 @@
-import { config } from '../schemas/configSchema';
+import { Static, Type } from '@sinclair/typebox';
+import { FastifyPluginAsync } from 'fastify';
+import fp from 'fastify-plugin';
+import Env from '@fastify/env';
 
+const loadDotenv = async () => {
+  if (process.env.NODE_ENV === 'production') return;
+  const dotenv = await import('dotenv');
+  dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+};
+
+const configSchema = Type.Object({
+  DATABASE_URL: Type.String(),
+  COOKIE_SECRET: Type.String(),
+  JWT_SECRET: Type.String(),
+});
 declare module 'fastify' {
   interface FastifyInstance {
-    config: config;
+    config: Static<typeof configSchema> & { NODE_ENV: string };
   }
 }
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV: 'test' | 'development' | 'production';
+    }
+  }
+}
+
+const configPlugin: FastifyPluginAsync = fp(async (fastify) => {
+  await loadDotenv();
+  fastify.register(Env, {
+    schema: configSchema,
+  });
+});
+
+export default configPlugin;

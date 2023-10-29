@@ -1,6 +1,8 @@
 import Cookie from '@fastify/cookie';
 import Csrf from '@fastify/csrf-protection';
 import {
+  UserLoginData,
+  UserLoginSchema,
   UserRegistrationData,
   UserRegistrationSchema,
   UserResponseSchema,
@@ -8,6 +10,7 @@ import {
 import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcrypt';
+import JwtConfig from '../plugins/jwtConfig';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -17,10 +20,12 @@ declare module 'fastify' {
 
 const authRouter = async (fastify: FastifyInstance) => {
   fastify.register(Cookie, {
-    secret: 'test',
+    secret: fastify.config.COOKIE_SECRET,
   });
 
   fastify.register(Csrf);
+  fastify.register(JwtConfig);
+
   fastify.decorate('bcrypt', bcrypt);
 
   const controllers = authControllers(fastify);
@@ -36,6 +41,19 @@ const authRouter = async (fastify: FastifyInstance) => {
       },
     },
     controllers.registerUser,
+  );
+
+  fastify.post<{ Body: UserLoginData }>(
+    '/login',
+    {
+      schema: {
+        body: UserLoginSchema,
+        response: {
+          200: UserResponseSchema,
+        },
+      },
+    },
+    controllers.login,
   );
 };
 
