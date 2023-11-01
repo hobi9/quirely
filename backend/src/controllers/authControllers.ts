@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { UserLoginData, UserRegistrationData } from '../schemas/authSchema';
 import crypto from 'crypto';
+import { TOKEN_COOKIE_NAME } from '../utils/constants';
 
 const authControllers = (fastify: FastifyInstance) => {
   const { prisma, bcrypt } = fastify;
@@ -30,7 +31,7 @@ const authControllers = (fastify: FastifyInstance) => {
       return { error: 'Email or username already taken.' };
     }
 
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         username,
         password: passwordHash,
@@ -39,10 +40,8 @@ const authControllers = (fastify: FastifyInstance) => {
       },
     });
 
-    // TODO: don't return the user but just retun the status code.
     // TODO: add email verification.
-    reply.code(201);
-    return user;
+    reply.code(201).send();
   };
 
   const login = async (request: FastifyRequest<{ Body: UserLoginData }>, reply: FastifyReply) => {
@@ -76,9 +75,28 @@ const authControllers = (fastify: FastifyInstance) => {
     return user;
   };
 
+  const signout = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.user;
+
+    await prisma.token.update({
+      where: {
+        userId: id,
+      },
+      data: {
+        accessToken: null,
+        refreshToken: null,
+      },
+    });
+
+    reply.clearCookie(TOKEN_COOKIE_NAME, { path: '/api' });
+
+    return reply.code(204).send();
+  };
+
   return {
     registerUser,
     login,
+    signout,
   };
 };
 

@@ -22,7 +22,7 @@ declare module 'fastify' {
 
 const configPlugin: FastifyPluginAsync = fp(async (fastify) => {
   await loadDotenv();
-  fastify.register(Env, {
+  await fastify.register(Env, {
     schema: configSchema,
   });
 });

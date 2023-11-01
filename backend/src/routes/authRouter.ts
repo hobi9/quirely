@@ -19,11 +19,12 @@ declare module 'fastify' {
 }
 
 const authRouter = async (fastify: FastifyInstance) => {
-  fastify.register(Cookie, {
+  await fastify.register(Cookie, {
     secret: fastify.config.COOKIE_SECRET,
   });
 
-  fastify.register(Csrf);
+  await fastify.register(Csrf);
+
   await fastify.register(Auth);
 
   fastify.decorate('bcrypt', bcrypt);
@@ -34,10 +35,8 @@ const authRouter = async (fastify: FastifyInstance) => {
     '/register',
     {
       schema: {
+        tags: ['Auth'],
         body: UserRegistrationSchema,
-        response: {
-          201: UserResponseSchema,
-        },
       },
     },
     controllers.registerUser,
@@ -47,6 +46,7 @@ const authRouter = async (fastify: FastifyInstance) => {
     '/login',
     {
       schema: {
+        tags: ['Auth'],
         body: UserLoginSchema,
         response: {
           200: UserResponseSchema,
@@ -54,6 +54,17 @@ const authRouter = async (fastify: FastifyInstance) => {
       },
     },
     controllers.login,
+  );
+
+  fastify.post<{ Body: UserLoginData }>(
+    '/signout',
+    {
+      onRequest: fastify.isAuthenticated,
+      schema: {
+        tags: ['Auth'],
+      },
+    },
+    controllers.signout,
   );
 };
 

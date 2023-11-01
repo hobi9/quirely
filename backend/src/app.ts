@@ -8,15 +8,15 @@ import Config from './plugins/config';
 
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
-  fastify.register(Swagger);
-  fastify.register(SwaggerUi);
-  fastify.register(Cors, {
+  await fastify.register(Swagger);
+  await fastify.register(SwaggerUi);
+  await fastify.register(Cors, {
     origin: true,
   }); // TODO: add options
 
-  fastify.register(Prisma);
+  await fastify.register(Prisma);
 
-  fastify.register(authRouter, { prefix: '/api/v1/auth' });
+  await fastify.register(authRouter, { prefix: '/api/v1/auth' });
 };
 
 export default app;

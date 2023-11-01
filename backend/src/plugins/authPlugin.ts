@@ -11,15 +11,9 @@ declare module '@fastify/jwt' {
   }
 }
 
-interface JwtError extends Error {
-  code: string;
-  message: string;
-  data: { id: number };
-}
-
 declare module 'fastify' {
   interface FastifyInstance {
-    isAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    isAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>;
     refreshTokens: (id: number, reply: FastifyReply) => Promise<void>;
   }
 }
@@ -47,7 +41,7 @@ const jwtConfig = fp(async (fastify) => {
   };
 
   const refreshTokens = async (id: number, reply: FastifyReply) => {
-    const accessToken = jwt.sign({ id }, { expiresIn: '1s' });
+    const accessToken = jwt.sign({ id }, { expiresIn: '15m' });
     const refreshToken = jwt.sign({ id }, { expiresIn: '7d' });
     await prisma.token.upsert({
       where: {
@@ -86,27 +80,24 @@ const jwtConfig = fp(async (fastify) => {
 
       request.user = user;
     } catch (err) {
-      const error = err as JwtError;
-      if (error.code !== 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED') {
-        return reply.code(401).send({ error: 'Invalid token.' });
+      if (typeof err === 'object' && err && 'code' in err && err.code !== 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED') {
+        return reply.code(401).send();
+      }
+
+      const { id } = await request.jwtDecode<{ id: number }>();
+      const user = await findUserById(id);
+
+      // checking for revoked tokens
+      if (!user || !user.token?.accessToken || !user.token.refreshToken) {
+        return reply.code(401).send();
       }
 
       // acces token is expired we validate the refresh token
-      const { id } = await request.jwtDecode<{ id: number }>();
-      const user = await findUserById(id);
-      if (!user || !user.token?.accessToken) {
-        return reply.code(401).send({ error: 'Invalid token.' });
-      }
-
       const refreshToken = user.token.refreshToken;
-      if (!refreshToken) {
-        return reply.code(401).send({ error: 'Invalid token.' });
-      }
-
       try {
         jwt.verify(refreshToken);
       } catch (error) {
-        return reply.code(401).send({ error: 'Invalid token.' });
+        return reply.code(401).send();
       }
 
       // refresh token is valid, we create a new pair
