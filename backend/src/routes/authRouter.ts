@@ -11,6 +11,7 @@ import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcrypt';
 import Auth from '../plugins/authPlugin';
+import { Type } from '@sinclair/typebox';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -23,7 +24,13 @@ const authRouter = async (fastify: FastifyInstance) => {
     secret: fastify.config.COOKIE_SECRET,
   });
 
-  await fastify.register(Csrf);
+  await fastify.register(Csrf, {
+    sessionPlugin: '@fastify/cookie',
+    cookieOpts: {
+      signed: true,
+      path: '/api',
+    },
+  });
 
   await fastify.register(Auth);
 
@@ -59,12 +66,27 @@ const authRouter = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: UserLoginData }>(
     '/signout',
     {
-      onRequest: fastify.isAuthenticated,
+      onRequest: [fastify.isAuthenticated, fastify.csrfProtection],
       schema: {
         tags: ['Auth'],
       },
     },
     controllers.signout,
+  );
+
+  fastify.get(
+    '/csrf-refresh',
+    {
+      schema: {
+        tags: ['Auth'],
+        response: {
+          200: Type.Object({
+            csrfToken: Type.String(),
+          }),
+        },
+      },
+    },
+    controllers.csrfRefresh,
   );
 };
 

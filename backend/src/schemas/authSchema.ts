@@ -4,6 +4,7 @@ export const UserRegistrationSchema = Type.Object({
   username: Type.String({
     minLength: 6,
     maxLength: 50,
+    pattern: '^[a-zA-Z0-9_-]+$',
   }),
   email: Type.String({
     format: 'email',
