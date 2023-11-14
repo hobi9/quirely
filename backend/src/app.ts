@@ -5,6 +5,10 @@ import Cors from '@fastify/cors';
 import authRouter from './routes/authRouter';
 import Prisma from './plugins/prisma';
 import Config from './plugins/config';
+import Cookie from '@fastify/cookie';
+import Csrf from '@fastify/csrf-protection';
+import Auth from './plugins/authPlugin';
+import workspaceRouter from './routes/workspaceRouter';
 
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
@@ -16,7 +20,22 @@ const app = async (fastify: FastifyInstance) => {
 
   await fastify.register(Prisma);
 
+  await fastify.register(Cookie, {
+    secret: fastify.config.COOKIE_SECRET,
+  });
+
+  await fastify.register(Csrf, {
+    sessionPlugin: '@fastify/cookie',
+    cookieOpts: {
+      signed: true,
+      path: '/api',
+    },
+  });
+
+  await fastify.register(Auth);
+
   await fastify.register(authRouter, { prefix: '/api/v1/auth' });
+  await fastify.register(workspaceRouter, { prefix: '/api/v1/workspaces' });
 };
 
 export default app;

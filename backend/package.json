@@ -1,7 +1,7 @@
 {
   "name": "quirely_backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend for Quirely, a collaborative platform.",
   "scripts": {
     "dev": "NODE_ENV=development nodemon ./src/server.ts",
     "push:dev": "dotenv -e .env.development prisma db push",
@@ -9,8 +9,9 @@
     "prod": "node ./dist/server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "obi",
   "license": "ISC",
+  "main": "./src/server.ts",
   "dependencies": {
     "@fastify/cookie": "^9.1.0",
     "@fastify/cors": "^8.4.0",

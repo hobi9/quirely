@@ -1,16 +1,13 @@
-import Cookie from '@fastify/cookie';
-import Csrf from '@fastify/csrf-protection';
 import {
   UserLoginData,
   UserLoginSchema,
   UserRegistrationData,
   UserRegistrationSchema,
-  UserResponseSchema,
+  UserSchema,
 } from '../schemas/authSchema';
 import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcrypt';
-import Auth from '../plugins/authPlugin';
 import { Type } from '@sinclair/typebox';
 
 declare module 'fastify' {
@@ -20,20 +17,6 @@ declare module 'fastify' {
 }
 
 const authRouter = async (fastify: FastifyInstance) => {
-  await fastify.register(Cookie, {
-    secret: fastify.config.COOKIE_SECRET,
-  });
-
-  await fastify.register(Csrf, {
-    sessionPlugin: '@fastify/cookie',
-    cookieOpts: {
-      signed: true,
-      path: '/api',
-    },
-  });
-
-  await fastify.register(Auth);
-
   fastify.decorate('bcrypt', bcrypt);
 
   const controllers = authControllers(fastify);
@@ -44,6 +27,9 @@ const authRouter = async (fastify: FastifyInstance) => {
       schema: {
         tags: ['Auth'],
         body: UserRegistrationSchema,
+        response: {
+          201: Type.Null(),
+        },
       },
     },
     controllers.registerUser,
@@ -56,7 +42,7 @@ const authRouter = async (fastify: FastifyInstance) => {
         tags: ['Auth'],
         body: UserLoginSchema,
         response: {
-          200: UserResponseSchema,
+          200: UserSchema,
         },
       },
     },
