@@ -93,8 +93,8 @@ const authControllers = (fastify: FastifyInstance) => {
     return reply.code(204).send();
   };
 
-  const csrfRefresh = async (request: FastifyRequest, reply: FastifyReply) => {
-    const csrfToken = await reply.generateCsrf();
+  const csrfRefresh = async (_request: FastifyRequest, reply: FastifyReply) => {
+    const csrfToken = reply.generateCsrf();
     return { csrfToken };
   };
 

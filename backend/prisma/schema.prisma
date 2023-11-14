@@ -8,22 +8,37 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique @db.VarChar(254)
-  username  String    @unique @db.VarChar(50)
-  password  String
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  token     Token?
+  id                   Int         @id @default(autoincrement())
+  email                String      @unique @db.VarChar(254)
+  username             String      @unique @db.VarChar(50)
+  password             String
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime?   @updatedAt @map("updated_at")
+  token                Token?
+  ownedWorkspaces      Workspace[] @relation("owners_workspaces")
+  associatedWorkspaces Workspace[] @relation("members_workspaces")
 
   @@map("users")
 }
 
 model Token {
-  userId       Int     @unique @map("user_id")
+  userId       Int     @id @map("user_id")
   user         User    @relation(fields: [userId], references: [id])
   accessToken  String? @map("access_token")
   refreshToken String? @map("refresh_token")
 
   @@map("tokens")
+}
+
+model Workspace {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String?
+  ownerId     Int       @map("owner_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+  members     User[]    @relation("members_workspaces")
+  owner       User      @relation("owners_workspaces", fields: [ownerId], references: [id])
+
+  @@map("workspaces")
 }
