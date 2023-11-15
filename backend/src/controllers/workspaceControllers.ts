@@ -42,8 +42,48 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     return workspace;
   };
 
+  const getWorkspaces = async (request: FastifyRequest) => {
+    const { user } = request;
+
+    const workspaces = await prisma.workspace.findMany({
+      where: {
+        members: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+    });
+
+    return workspaces;
+  };
+
+  const getWorkspaceById = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
+    const { user, params } = request;
+
+    const workspace = await prisma.workspace.findUnique({
+      where: {
+        id: params.id,
+        members: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+    });
+
+    if (!workspace) {
+      reply.code(404);
+      return { error: 'Workspace not found.' };
+    }
+
+    return workspace;
+  };
+
   return {
     createWorkspace,
+    getWorkspaces,
+    getWorkspaceById,
   };
 };
 
