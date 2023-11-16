@@ -50,6 +50,21 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
     },
     controllers.getWorkspaceById,
   );
+
+  fastify.delete<{ Params: { id: number } }>(
+    '/:id',
+    {
+      onRequest: [isAuthenticated, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        params: Type.Object({ id: Type.Number() }),
+        response: {
+          204: Type.Null(),
+        },
+      },
+    },
+    controllers.deleteWorkspace,
+  );
 };
 
 export default workspaceRouter;

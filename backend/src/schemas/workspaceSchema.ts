@@ -4,7 +4,7 @@ export const WorkspaceSchema = Type.Object({
   id: Type.Number(),
   name: Type.String({
     maxLength: 100,
-    pattern: '^.*\\S.*$', // Adjust the regular expression as needed
+    pattern: '^.*\\S.*$',
   }),
   description: Type.Optional(Type.String()),
   ownerId: Type.Number(),

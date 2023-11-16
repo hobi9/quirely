@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { WorkspaceCreationData } from '../schemas/workspaceSchema';
+import { Prisma } from '@prisma/client';
 
 const workspaceControllers = (fastify: FastifyInstance) => {
   const { prisma } = fastify;
@@ -80,10 +81,35 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     return workspace;
   };
 
+  const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
+    const { user, params } = request;
+
+    try {
+      await prisma.workspace.delete({
+        where: {
+          id: params.id,
+          members: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        reply.code(404);
+        return { error: 'Workspace not found.' };
+      }
+      throw err;
+    }
+    return reply.code(204).send();
+  };
+
   return {
     createWorkspace,
     getWorkspaces,
     getWorkspaceById,
+    deleteWorkspace,
   };
 };
 

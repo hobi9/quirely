@@ -17,6 +17,7 @@ declare module 'fastify' {
 }
 
 const authRouter = async (fastify: FastifyInstance) => {
+  const { isAuthenticated, csrfProtection } = fastify;
   fastify.decorate('bcrypt', bcrypt);
 
   const controllers = authControllers(fastify);
@@ -52,7 +53,7 @@ const authRouter = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: UserLoginData }>(
     '/signout',
     {
-      onRequest: [fastify.isAuthenticated, fastify.csrfProtection],
+      onRequest: [isAuthenticated, csrfProtection],
       schema: {
         tags: ['Auth'],
       },
@@ -63,6 +64,7 @@ const authRouter = async (fastify: FastifyInstance) => {
   fastify.get(
     '/csrf-refresh',
     {
+      onRequest: isAuthenticated,
       schema: {
         tags: ['Auth'],
         response: {
