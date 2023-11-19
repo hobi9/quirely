@@ -76,6 +76,20 @@ const authRouter = async (fastify: FastifyInstance) => {
     },
     controllers.csrfRefresh,
   );
+
+  fastify.get(
+    '/me',
+    {
+      onRequest: isAuthenticated,
+      schema: {
+        tags: ['Auth'],
+        response: {
+          200: UserSchema,
+        },
+      },
+    },
+    controllers.me,
+  );
 };
 
 export default authRouter;

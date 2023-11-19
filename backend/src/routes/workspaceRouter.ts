@@ -36,6 +36,20 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
     controllers.getWorkspaces,
   );
 
+  fastify.get(
+    '/pending',
+    {
+      onRequest: isAuthenticated,
+      schema: {
+        tags: ['Workspace'],
+        response: {
+          200: Type.Array(WorkspaceSchema),
+        },
+      },
+    },
+    controllers.getPendingWorkspaces,
+  );
+
   fastify.get<{ Params: { id: number } }>(
     '/:id',
     {
@@ -64,6 +78,22 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       },
     },
     controllers.deleteWorkspace,
+  );
+
+  fastify.patch<{ Params: { id: number }; Querystring: { accept: boolean } }>(
+    '/:id',
+    {
+      onRequest: [isAuthenticated, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        params: Type.Object({ id: Type.Number() }),
+        querystring: Type.Object({ accept: Type.Boolean() }),
+        response: {
+          200: Type.Null(),
+        },
+      },
+    },
+    controllers.confirmInvitation,
   );
 };
 

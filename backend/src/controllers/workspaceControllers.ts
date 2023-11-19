@@ -22,7 +22,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
       return { error: 'Members emails mismatch.' };
     }
 
-    members.unshift(user);
+    members.push(user);
 
     const workspace = await prisma.workspace.create({
       data: {
@@ -30,8 +30,8 @@ const workspaceControllers = (fastify: FastifyInstance) => {
         description,
         ownerId: user.id,
         members: {
-          connect: members.map(({ id }) => {
-            return { id };
+          create: members.map(({ id }) => {
+            return { accepted: id === user.id || null, member: { connect: { id } } };
           }),
         },
         updatedAt: null,
@@ -50,7 +50,8 @@ const workspaceControllers = (fastify: FastifyInstance) => {
       where: {
         members: {
           some: {
-            id: user.id,
+            memberId: user.id,
+            accepted: true,
           },
         },
       },
@@ -67,7 +68,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
         id: params.id,
         members: {
           some: {
-            id: user.id,
+            memberId: user.id,
           },
         },
       },
@@ -90,7 +91,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
           id: params.id,
           members: {
             some: {
-              id: user.id,
+              memberId: user.id,
             },
           },
         },
@@ -105,11 +106,70 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     return reply.code(204).send();
   };
 
+  const confirmInvitation = async (
+    request: FastifyRequest<{ Params: { id: number }; Querystring: { accept: boolean } }>,
+    reply: FastifyReply,
+  ) => {
+    const { user, params, query } = request;
+
+    const memberWorkspace = await prisma.membersOnWorkspaces.findUnique({
+      where: {
+        memberId_workspaceId: {
+          memberId: user.id,
+          workspaceId: params.id,
+        },
+      },
+    });
+
+    if (!memberWorkspace) {
+      reply.code(404);
+      return { error: 'Workspace not found.' };
+    }
+
+    if (memberWorkspace.accepted !== null) {
+      reply.code(409);
+      return { error: 'You have already confirmed this workspace.' };
+    }
+
+    await prisma.membersOnWorkspaces.update({
+      where: {
+        memberId_workspaceId: {
+          memberId: user.id,
+          workspaceId: params.id,
+        },
+      },
+      data: {
+        accepted: query.accept,
+      },
+    });
+
+    return reply.code(200).send();
+  };
+
+  const getPendingWorkspaces = async (request: FastifyRequest) => {
+    const { user } = request;
+
+    const workspaces = await prisma.workspace.findMany({
+      where: {
+        members: {
+          some: {
+            memberId: user.id,
+            accepted: null,
+          },
+        },
+      },
+    });
+
+    return workspaces;
+  };
+
   return {
     createWorkspace,
     getWorkspaces,
     getWorkspaceById,
     deleteWorkspace,
+    confirmInvitation,
+    getPendingWorkspaces,
   };
 };
 

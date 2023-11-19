@@ -93,6 +93,10 @@ const authControllers = (fastify: FastifyInstance) => {
     return reply.code(204).send();
   };
 
+  const me = async (request: FastifyRequest) => {
+    return request.user;
+  };
+
   const csrfRefresh = async (_request: FastifyRequest, reply: FastifyReply) => {
     const csrfToken = reply.generateCsrf();
     return { csrfToken };
@@ -103,6 +107,7 @@ const authControllers = (fastify: FastifyInstance) => {
     login,
     signout,
     csrfRefresh,
+    me,
   };
 };
 

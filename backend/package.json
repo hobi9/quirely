@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend for Quirely, a collaborative platform.",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon ./src/server.ts",
+    "dev": "ENV=development nodemon ./src/server.ts",
     "push:dev": "dotenv -e .env.development prisma db push",
     "build": "rm -rf ./dist ; tsc",
     "prod": "node ./dist/server.js"

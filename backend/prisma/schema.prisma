@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id                   Int         @id @default(autoincrement())
-  email                String      @unique @db.VarChar(254)
-  username             String      @unique @db.VarChar(50)
+  id                   Int                   @id @default(autoincrement())
+  email                String                @unique @db.VarChar(254)
+  username             String                @unique @db.VarChar(50)
   password             String
-  createdAt            DateTime    @default(now()) @map("created_at")
-  updatedAt            DateTime?   @updatedAt @map("updated_at")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime?             @updatedAt @map("updated_at")
   token                Token?
-  ownedWorkspaces      Workspace[] @relation("owners_workspaces")
-  associatedWorkspaces Workspace[] @relation("members_workspaces")
+  ownedWorkspaces      Workspace[]
+  associatedWorkspaces MembersOnWorkspaces[]
 
   @@map("users")
 }
@@ -31,14 +31,25 @@ model Token {
 }
 
 model Workspace {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(100)
+  id          Int                   @id @default(autoincrement())
+  name        String                @db.VarChar(100)
   description String?
-  ownerId     Int       @map("owner_id")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime? @updatedAt @map("updated_at")
-  members     User[]    @relation("members_workspaces")
-  owner       User      @relation("owners_workspaces", fields: [ownerId], references: [id])
+  ownerId     Int                   @map("owner_id")
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime?             @updatedAt @map("updated_at")
+  members     MembersOnWorkspaces[]
+  owner       User                  @relation(fields: [ownerId], references: [id])
 
   @@map("workspaces")
+}
+
+model MembersOnWorkspaces {
+  memberId    Int       @map("member_id")
+  member      User      @relation(fields: [memberId], references: [id])
+  workspaceId Int       @map("workspace_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  accepted    Boolean?
+
+  @@id([memberId, workspaceId])
+  @@map("members_workspaces")
 }

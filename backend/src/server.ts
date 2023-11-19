@@ -1,12 +1,24 @@
 import Fastify from 'fastify';
 import App from './app';
 
-const fastify = Fastify({
-  logger: {
+const envToLogger = {
+  development: {
     transport: {
       target: 'pino-pretty',
+      options: {
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname',
+      },
     },
   },
+  production: true,
+  test: false,
+} as const;
+
+const environment = process.env.ENV as keyof typeof envToLogger;
+
+const fastify = Fastify({
+  logger: envToLogger[environment],
 });
 
 fastify.register(App);
