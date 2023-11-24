@@ -55,9 +55,24 @@ const workspaceControllers = (fastify: FastifyInstance) => {
           },
         },
       },
+      include: {
+        members: {
+          include: {
+            member: true,
+          },
+        },
+        owner: true,
+      },
     });
 
-    return workspaces;
+    const enhancedWorkspaces = workspaces.map((workspace) => {
+      const members = workspace.members
+        .filter(({ accepted }) => accepted || workspace.ownerId === user.id)
+        .map(({ member, accepted }) => ({ ...member, accepted }));
+      return { ...workspace, members };
+    });
+
+    return enhancedWorkspaces;
   };
 
   const getWorkspaceById = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
@@ -69,8 +84,17 @@ const workspaceControllers = (fastify: FastifyInstance) => {
         members: {
           some: {
             memberId: user.id,
+            accepted: true,
           },
         },
+      },
+      include: {
+        members: {
+          include: {
+            member: true,
+          },
+        },
+        owner: true,
       },
     });
 
@@ -79,7 +103,11 @@ const workspaceControllers = (fastify: FastifyInstance) => {
       return { error: 'Workspace not found.' };
     }
 
-    return workspace;
+    const members = workspace.members
+      .filter(({ accepted }) => accepted || workspace.ownerId === user.id)
+      .map(({ member, accepted }) => ({ ...member, accepted }));
+
+    return { ...workspace, members };
   };
 
   const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
@@ -89,11 +117,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
       await prisma.workspace.delete({
         where: {
           id: params.id,
-          members: {
-            some: {
-              memberId: user.id,
-            },
-          },
+          ownerId: user.id,
         },
       });
     } catch (err) {
@@ -157,6 +181,9 @@ const workspaceControllers = (fastify: FastifyInstance) => {
             accepted: null,
           },
         },
+      },
+      include: {
+        owner: true,
       },
     });
 

@@ -19,6 +19,7 @@ export const UserSchema = Type.Object({
 
 export const UserRegistrationSchema = Type.Omit(UserSchema, ['id']);
 export const UserLoginSchema = Type.Omit(UserSchema, ['id', 'email']);
+export const SanitizedUserSchema = Type.Omit(UserSchema, ['password']);
 
 // Create a type alias representing the structure of user registration data
 export type UserRegistrationData = Static<typeof UserRegistrationSchema>;

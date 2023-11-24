@@ -12,8 +12,12 @@ import workspaceRouter from './routes/workspaceRouter';
 
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
-  await fastify.register(Swagger);
-  await fastify.register(SwaggerUi);
+
+  if (fastify.config.ENV !== 'production') {
+    await fastify.register(Swagger);
+    await fastify.register(SwaggerUi);
+  }
+
   await fastify.register(Cors, {
     origin: true,
   }); // TODO: add options

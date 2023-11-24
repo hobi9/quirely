@@ -1,4 +1,9 @@
-import { WorkspaceCreationData, WorkspaceCreationSchema, WorkspaceSchema } from '../schemas/workspaceSchema';
+import {
+  EnhancedWorkspaceSchema,
+  WorkspaceCreationData,
+  WorkspaceCreationSchema,
+  WorkspaceSchema,
+} from '../schemas/workspaceSchema';
 import { FastifyInstance } from 'fastify';
 import workspaceControllers from '../controllers/workspaceControllers';
 import { Type } from '@sinclair/typebox';
@@ -29,7 +34,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       schema: {
         tags: ['Workspace'],
         response: {
-          200: Type.Array(WorkspaceSchema),
+          200: Type.Array(EnhancedWorkspaceSchema),
         },
       },
     },
@@ -58,7 +63,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
         tags: ['Workspace'],
         params: Type.Object({ id: Type.Number() }),
         response: {
-          200: WorkspaceSchema,
+          200: EnhancedWorkspaceSchema,
         },
       },
     },

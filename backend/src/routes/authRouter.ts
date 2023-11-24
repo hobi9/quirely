@@ -1,9 +1,9 @@
 import {
+  SanitizedUserSchema,
   UserLoginData,
   UserLoginSchema,
   UserRegistrationData,
   UserRegistrationSchema,
-  UserSchema,
 } from '../schemas/authSchema';
 import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
@@ -43,7 +43,7 @@ const authRouter = async (fastify: FastifyInstance) => {
         tags: ['Auth'],
         body: UserLoginSchema,
         response: {
-          200: UserSchema,
+          200: SanitizedUserSchema,
         },
       },
     },
@@ -84,7 +84,7 @@ const authRouter = async (fastify: FastifyInstance) => {
       schema: {
         tags: ['Auth'],
         response: {
-          200: UserSchema,
+          200: SanitizedUserSchema,
         },
       },
     },

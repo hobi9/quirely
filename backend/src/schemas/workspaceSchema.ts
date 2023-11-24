@@ -1,4 +1,5 @@
 import { Type, Static } from '@sinclair/typebox';
+import { SanitizedUserSchema } from './authSchema';
 
 export const WorkspaceSchema = Type.Object({
   id: Type.Number(),
@@ -7,13 +8,27 @@ export const WorkspaceSchema = Type.Object({
     pattern: '^.*\\S.*$',
   }),
   description: Type.Optional(Type.String()),
-  ownerId: Type.Number(),
 });
 
 export const WorkspaceCreationSchema = Type.Intersect([
-  Type.Omit(WorkspaceSchema, ['id', 'ownerId']),
+  Type.Omit(WorkspaceSchema, ['id']),
   Type.Object({
     membersMails: Type.Optional(Type.Array(Type.String({ format: 'email' }))),
+  }),
+]);
+
+export const EnhancedWorkspaceSchema = Type.Intersect([
+  WorkspaceSchema,
+  Type.Object({
+    members: Type.Array(
+      Type.Intersect([
+        SanitizedUserSchema,
+        Type.Object({
+          accepted: Type.Union([Type.Boolean(), Type.Null()]),
+        }),
+      ]),
+    ),
+    owner: SanitizedUserSchema,
   }),
 ]);
 
