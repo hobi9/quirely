@@ -43,20 +43,13 @@ const jwtConfig = fp(async (fastify) => {
   const refreshTokens = async (id: number, reply: FastifyReply) => {
     const accessToken = jwt.sign({ id }, { expiresIn: '15m' });
     const refreshToken = jwt.sign({ id }, { expiresIn: '7d' });
+
     await prisma.token.upsert({
-      where: {
-        userId: id,
-      },
-      update: {
-        accessToken,
-        refreshToken,
-      },
-      create: {
-        userId: id,
-        accessToken,
-        refreshToken,
-      },
+      where: { userId: id },
+      update: { accessToken, refreshToken },
+      create: { userId: id, accessToken, refreshToken },
     });
+
     reply.setCookie(TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,
       sameSite: true,
@@ -75,7 +68,7 @@ const jwtConfig = fp(async (fastify) => {
 
       const user = await findUserById(id);
       if (!user || !user.token?.accessToken) {
-        return reply.code(401).send({ error: 'Invalid token.' });
+        return reply.code(401).send();
       }
 
       request.user = user;
