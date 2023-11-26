@@ -67,7 +67,7 @@ const authRouter = async (fastify: FastifyInstance) => {
     controllers.login,
   );
 
-  fastify.post<{ Body: UserLoginData }>(
+  fastify.post(
     '/signout',
     {
       onRequest: [isAuthenticated, csrfProtection],

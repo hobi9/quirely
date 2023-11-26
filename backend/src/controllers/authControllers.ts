@@ -79,7 +79,7 @@ const authControllers = (fastify: FastifyInstance) => {
 
     await prisma.user.update({
       where: { id },
-      data: { isVerified: true },
+      data: { isVerified: true, token: { update: { data: { confirmationToken: null } } } },
     });
 
     reply.code(200).send();
