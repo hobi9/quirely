@@ -36,6 +36,23 @@ const authRouter = async (fastify: FastifyInstance) => {
     controllers.registerUser,
   );
 
+  fastify.get<{ Params: { id: number; token: string } }>(
+    '/:id/:token',
+    {
+      schema: {
+        tags: ['Auth'],
+        params: Type.Object({
+          id: Type.Number(),
+          token: Type.String(),
+        }),
+        response: {
+          200: Type.Null(),
+        },
+      },
+    },
+    controllers.verifyEmail,
+  );
+
   fastify.post<{ Body: UserLoginData }>(
     '/login',
     {

@@ -2,10 +2,10 @@ import { Type, Static } from '@sinclair/typebox';
 
 export const UserSchema = Type.Object({
   id: Type.Number(),
-  username: Type.String({
-    minLength: 6,
-    maxLength: 50,
-    pattern: '^[a-zA-Z0-9_-]+$',
+  fullName: Type.String({
+    pattern: '^.*\\S.*$',
+    minLength: 2,
+    maxLength: 100,
   }),
   email: Type.String({
     format: 'email',
@@ -18,7 +18,7 @@ export const UserSchema = Type.Object({
 });
 
 export const UserRegistrationSchema = Type.Omit(UserSchema, ['id']);
-export const UserLoginSchema = Type.Omit(UserSchema, ['id', 'email']);
+export const UserLoginSchema = Type.Omit(UserSchema, ['id', 'fullName']);
 export const SanitizedUserSchema = Type.Omit(UserSchema, ['password']);
 
 // Create a type alias representing the structure of user registration data

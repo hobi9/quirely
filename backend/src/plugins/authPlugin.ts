@@ -31,12 +31,8 @@ const jwtConfig = fp(async (fastify) => {
 
   const findUserById = async (id: number) => {
     return prisma.user.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        token: true,
-      },
+      where: { id },
+      include: { token: true },
     });
   };
 
@@ -71,6 +67,10 @@ const jwtConfig = fp(async (fastify) => {
         return reply.code(401).send();
       }
 
+      if (!user.isVerified) {
+        return reply.code(403).send({ error: 'Email not verified' });
+      }
+
       request.user = user;
     } catch (err) {
       if (typeof err === 'object' && err && 'code' in err && err.code !== 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED') {
@@ -95,6 +95,10 @@ const jwtConfig = fp(async (fastify) => {
 
       // refresh token is valid, we create a new pair
       await refreshTokens(id, reply);
+
+      if (!user.isVerified) {
+        return reply.code(403).send({ error: 'Email not verified' });
+      }
 
       request.user = user;
     }

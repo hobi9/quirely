@@ -9,6 +9,11 @@ const configSchema = Type.Object({
   JWT_SECRET: Type.String(),
   ENV: Type.Union([Type.Literal('production'), Type.Literal('development'), Type.Literal('test')]),
   NODE_ENV: Type.Literal('production'),
+  EMAIL_HOST: Type.String(),
+  EMAIL_PORT: Type.Number(),
+  EMAIL_USER: Type.String(),
+  EMAIL_PASSWORD: Type.String(),
+  CLIENT_BASE_URL: Type.String(),
 });
 
 declare module 'fastify' {

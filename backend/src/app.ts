@@ -9,6 +9,7 @@ import Cookie from '@fastify/cookie';
 import Csrf from '@fastify/csrf-protection';
 import Auth from './plugins/authPlugin';
 import workspaceRouter from './routes/workspaceRouter';
+import Mailer from './plugins/mailer';
 
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
@@ -36,6 +37,7 @@ const app = async (fastify: FastifyInstance) => {
     },
   });
 
+  await fastify.register(Mailer);
   await fastify.register(Auth);
 
   await fastify.register(authRouter, { prefix: '/api/v1/auth' });

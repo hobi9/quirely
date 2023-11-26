@@ -4,53 +4,92 @@ import crypto from 'crypto';
 import { TOKEN_COOKIE_NAME } from '../utils/constants';
 
 const authControllers = (fastify: FastifyInstance) => {
-  const { prisma, bcrypt } = fastify;
+  const {
+    prisma,
+    bcrypt,
+    sendMail,
+    config: { CLIENT_BASE_URL },
+  } = fastify;
 
   const registerUser = async (request: FastifyRequest<{ Body: UserRegistrationData }>, reply: FastifyReply) => {
-    const { email, username, password } = request.body;
+    const { email, fullName, password } = request.body;
 
     const passwordHash = await bcrypt.hash(password, await bcrypt.genSalt());
 
-    const usersInDb = await prisma.user.findMany({
-      where: {
-        OR: [
-          {
-            email,
-          },
-          {
-            username,
-          },
-        ],
-      },
+    const userInDb = await prisma.user.findUnique({
+      where: { email },
     });
 
-    const userExists = usersInDb.length > 0;
-
-    if (userExists) {
+    if (userInDb) {
       reply.code(409);
-      return { error: 'Email or username already taken.' };
+      return { error: 'User with the given email already exists.' };
     }
 
-    await prisma.user.create({
+    const createdUser = await prisma.user.create({
       data: {
-        username,
+        fullName: fullName.trim(),
         password: passwordHash,
         email,
         updatedAt: null,
       },
     });
 
-    // TODO: add email verification.
+    const confirmationToken = crypto.randomBytes(32).toString('hex');
+
+    await prisma.token.create({
+      data: { userId: createdUser.id, confirmationToken },
+    });
+
+    new Promise(
+      (resolve) =>
+        setTimeout(async () => {
+          await prisma.token.update({
+            where: { userId: createdUser.id },
+            data: { confirmationToken: null },
+          });
+          resolve(null);
+        }, 600000), // 5 minutes
+    );
+
+    const message = `Verify your email at ${CLIENT_BASE_URL}/${createdUser.id}/${confirmationToken}`;
+
+    await sendMail({
+      email,
+      subject: 'Quirely - Verify email',
+      message,
+    });
+
     reply.code(201).send();
   };
 
+  const verifyEmail = async (
+    request: FastifyRequest<{ Params: { id: number; token: string } }>,
+    reply: FastifyReply,
+  ) => {
+    const { id, token } = request.params;
+
+    const userTokens = await prisma.token.findUnique({
+      where: { userId: id },
+    });
+
+    if (!userTokens || token !== userTokens.confirmationToken) {
+      reply.code(400);
+      return { error: 'Invalid link' };
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data: { isVerified: true },
+    });
+
+    reply.code(200).send();
+  };
+
   const login = async (request: FastifyRequest<{ Body: UserLoginData }>, reply: FastifyReply) => {
-    const { username, password } = request.body;
+    const { email, password } = request.body;
 
     const user = await prisma.user.findUnique({
-      where: {
-        username,
-      },
+      where: { email },
     });
 
     if (!user) {
@@ -59,14 +98,14 @@ const authControllers = (fastify: FastifyInstance) => {
       await bcrypt.compare(password, randomString);
 
       reply.code(401);
-      return { error: 'Invalid username or password.' };
+      return { error: 'Invalid email or password.' };
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
       reply.code(401);
-      return { error: 'Invalid username or password.' };
+      return { error: 'Invalid email or password.' };
     }
 
     await fastify.refreshTokens(user.id, reply);
@@ -108,6 +147,7 @@ const authControllers = (fastify: FastifyInstance) => {
     signout,
     csrfRefresh,
     me,
+    verifyEmail,
   };
 };
 
