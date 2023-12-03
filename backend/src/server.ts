@@ -15,7 +15,7 @@ const envToLogger = {
   test: false,
 } as const;
 
-const environment = process.env.ENV as keyof typeof envToLogger;
+const environment = process.env.ENV;
 
 const fastify = Fastify({
   logger: envToLogger[environment],

@@ -48,7 +48,7 @@ const jwtConfig = fp(async (fastify) => {
 
     reply.setCookie(TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,
-      sameSite: true,
+      sameSite: 'none',
       secure: true,
       signed: true,
       path: '/api',

@@ -37,7 +37,7 @@ const authRouter = async (fastify: FastifyInstance) => {
   );
 
   fastify.get<{ Params: { id: number; token: string } }>(
-    '/:id/:token',
+    '/verify/:id/:token',
     {
       schema: {
         tags: ['Auth'],
