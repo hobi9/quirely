@@ -60,7 +60,7 @@ const authRouter = async (fastify: FastifyInstance) => {
         tags: ['Auth'],
         body: UserLoginSchema,
         response: {
-          200: SanitizedUserSchema,
+          200: Type.Null(),
         },
       },
     },
