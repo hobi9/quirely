@@ -1,7 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import clsx from 'clsx';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 
 const SignUpSchema = z
   .object({
@@ -11,8 +12,8 @@ const SignUpSchema = z
     confirmPassword: z.string().min(8).max(254),
   })
   .refine(({ password, confirmPassword }) => password === confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
   });
 
 type SignUpData = z.infer<typeof SignUpSchema>;
@@ -25,10 +26,11 @@ const SignUp = () => {
   } = useForm<SignUpData>({
     resolver: zodResolver(SignUpSchema),
   });
+  const navigate = useNavigate();
 
   const submitForm: SubmitHandler<SignUpData> = (data) => {
     console.log(data);
-    return;
+    navigate('/signin');
   };
 
   return (
@@ -48,11 +50,11 @@ const SignUp = () => {
             <input
               placeholder='Full name'
               className={clsx(
-                "p-1 border-b-2 focus:outline-none",
-                errors.fullName && "border-red-200",
+                'p-1 border-b-2 focus:outline-none',
+                errors.fullName && 'border-red-200',
               )}
               aria-invalid={!!errors.fullName}
-              {...register("fullName")}
+              {...register('fullName')}
             />
           </div>
         </div>
@@ -63,11 +65,11 @@ const SignUp = () => {
             <input
               placeholder='Email'
               className={clsx(
-                "p-1 border-b-2 focus:outline-none",
-                errors.email && "border-red-200",
+                'p-1 border-b-2 focus:outline-none',
+                errors.email && 'border-red-200',
               )}
               aria-invalid={!!errors.email}
-              {...register("email")}
+              {...register('email')}
             />
           </div>
 
@@ -77,10 +79,10 @@ const SignUp = () => {
               type='password'
               placeholder='Password'
               className={clsx(
-                "p-1 border-b-2 focus:outline-none",
-                errors.password && "border-red-200",
+                'p-1 border-b-2 focus:outline-none',
+                errors.password && 'border-red-200',
               )}
-              {...register("password")}
+              {...register('password')}
               aria-invalid={!!errors.password}
             />
           </div>
@@ -91,12 +93,12 @@ const SignUp = () => {
             </p>
             <input
               type='password'
-              placeholder='Configm password'
+              placeholder='Confirm password'
               className={clsx(
-                "p-1 border-b-2 focus:outline-none",
-                errors.password && "border-red-200",
+                'p-1 border-b-2 focus:outline-none',
+                errors.password && 'border-red-200',
               )}
-              {...register("confirmPassword")}
+              {...register('confirmPassword')}
               aria-invalid={!!errors.password}
             />
           </div>
@@ -110,9 +112,9 @@ const SignUp = () => {
         </div>
         <p className='mt-1 text-sm text-center'>
           Already have an account?
-          <a href='#' className='text-blue-800 hover:underline ml-1'>
+          <Link to='/signin' className='text-blue-800 hover:underline ml-1'>
             Login!
-          </a>
+          </Link>
         </p>
       </form>
     </section>

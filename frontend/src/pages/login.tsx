@@ -1,7 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import clsx from 'clsx';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -18,10 +19,12 @@ const Login = () => {
   } = useForm<LoginData>({
     resolver: zodResolver(LoginSchema),
   });
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
   const submitForm: SubmitHandler<LoginData> = (data) => {
     console.log(data);
-    return;
+    navigate(state?.from || '/');
   };
 
   return (
@@ -42,11 +45,11 @@ const Login = () => {
               id='email'
               placeholder='Email'
               className={clsx(
-                "p-1 border-b-2 focus:outline-none",
-                errors.email && "border-red-200",
+                'p-1 border-b-2 focus:outline-none',
+                errors.email && 'border-red-200',
               )}
               aria-invalid={!!errors.email}
-              {...register("email")}
+              {...register('email')}
             />
           </div>
 
@@ -57,10 +60,10 @@ const Login = () => {
               type='password'
               placeholder='Password'
               className={clsx(
-                "p-1 border-b-2 focus:outline-none",
-                errors.password && "border-red-200",
+                'p-1 border-b-2 focus:outline-none',
+                errors.password && 'border-red-200',
               )}
-              {...register("password")}
+              {...register('password')}
               aria-invalid={!!errors.password}
             />
           </div>
@@ -74,9 +77,9 @@ const Login = () => {
         </div>
         <p className='mt-1 text-sm text-center'>
           No account?
-          <a href='#' className='text-blue-800 hover:underline ml-1'>
+          <Link to='/signup' className='text-blue-800 hover:underline ml-1'>
             Create one!
-          </a>
+          </Link>
         </p>
       </form>
     </section>
