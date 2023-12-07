@@ -110,7 +110,7 @@ const authControllers = (fastify: FastifyInstance) => {
 
     await fastify.refreshTokens(user.id, reply);
 
-    return reply.code(200);
+    return reply.code(200).send();
   };
 
   const signout = async (request: FastifyRequest, reply: FastifyReply) => {

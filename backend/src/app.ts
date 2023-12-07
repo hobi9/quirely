@@ -35,6 +35,8 @@ const app = async (fastify: FastifyInstance) => {
     cookieOpts: {
       signed: true,
       path: '/api',
+      sameSite: 'none',
+      secure: true,
     },
   });
 

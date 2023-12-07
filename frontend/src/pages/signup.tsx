@@ -30,25 +30,25 @@ const SignUp = () => {
 
   const submitForm: SubmitHandler<SignUpData> = (data) => {
     console.log(data);
-    navigate('/signin');
+    navigate('/login');
   };
 
   return (
-    <section className='flex items-center justify-center flex-col h-screen gap-5'>
+    <section className="flex items-center justify-center flex-col h-screen gap-5">
       {/*TODO: replace with an image*/}
-      <h1 className='text-6xl text-center'>Quirely</h1>
+      <h1 className="text-6xl text-center">Quirely</h1>
       <form
         onSubmit={handleSubmit(submitForm)}
-        className='border p-9 mt-4 min-w-[35rem]'
+        className="border p-9 mt-4 min-w-[35rem]"
       >
-        <h1 className='text-3xl'>Sign up</h1>
-        <p className='text-sm'>to join Quirely</p>
+        <h1 className="text-3xl">Sign up</h1>
+        <p className="text-sm">to join Quirely</p>
 
-        <div className='flex flex-col gap-6 mt-5'>
-          <div className='flex flex-col gap-0.5'>
-            <p className='text-xs text-red-500'>{errors.fullName?.message}</p>
+        <div className="flex flex-col gap-6 mt-5">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs text-red-500">{errors.fullName?.message}</p>
             <input
-              placeholder='Full name'
+              placeholder="Full name"
               className={clsx(
                 'p-1 border-b-2 focus:outline-none',
                 errors.fullName && 'border-red-200',
@@ -59,11 +59,11 @@ const SignUp = () => {
           </div>
         </div>
 
-        <div className='flex flex-col gap-4 mt-5'>
-          <div className='flex flex-col gap-0.5'>
-            <p className='text-xs text-red-500'>{errors.email?.message}</p>
+        <div className="flex flex-col gap-4 mt-5">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs text-red-500">{errors.email?.message}</p>
             <input
-              placeholder='Email'
+              placeholder="Email"
               className={clsx(
                 'p-1 border-b-2 focus:outline-none',
                 errors.email && 'border-red-200',
@@ -73,11 +73,11 @@ const SignUp = () => {
             />
           </div>
 
-          <div className='flex flex-col gap-0.5 '>
-            <p className='text-xs text-red-500'>{errors.password?.message}</p>
+          <div className="flex flex-col gap-0.5 ">
+            <p className="text-xs text-red-500">{errors.password?.message}</p>
             <input
-              type='password'
-              placeholder='Password'
+              type="password"
+              placeholder="Password"
               className={clsx(
                 'p-1 border-b-2 focus:outline-none',
                 errors.password && 'border-red-200',
@@ -87,13 +87,13 @@ const SignUp = () => {
             />
           </div>
 
-          <div className='flex flex-col gap-0.5 '>
-            <p className='text-xs text-red-500'>
+          <div className="flex flex-col gap-0.5 ">
+            <p className="text-xs text-red-500">
               {errors.confirmPassword?.message}
             </p>
             <input
-              type='password'
-              placeholder='Confirm password'
+              type="password"
+              placeholder="Confirm password"
               className={clsx(
                 'p-1 border-b-2 focus:outline-none',
                 errors.password && 'border-red-200',
@@ -104,15 +104,15 @@ const SignUp = () => {
           </div>
 
           <button
-            className='text-center text-white bg-black p-1 hover:text-black 
-               hover:bg-white hover:outline-1 hover:outline-black hover:outline'
+            className="text-center text-white bg-black p-1 hover:text-black 
+               hover:bg-white hover:outline-1 hover:outline-black hover:outline"
           >
             Sign Up
           </button>
         </div>
-        <p className='mt-1 text-sm text-center'>
+        <p className="mt-1 text-sm text-center">
           Already have an account?
-          <Link to='/signin' className='text-blue-800 hover:underline ml-1'>
+          <Link to="/signin" className="text-blue-800 hover:underline ml-1">
             Login!
           </Link>
         </p>

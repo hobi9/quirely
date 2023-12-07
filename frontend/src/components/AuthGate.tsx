@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { AuthContext } from './AuthProvider';
 
 type Props = {
   required?: true;
@@ -11,15 +13,15 @@ const AuthGate = ({ required, notRequired, children }: Props) => {
     throw new Error('Invalid state, required or notRequired must be set.');
   }
 
-  const auth = false;
+  const auth = useContext(AuthContext);
   const location = useLocation();
 
-  if (required && !auth) {
+  if (required && !auth?.user) {
     return (
-      <Navigate to={'/signin'} state={{ from: location.pathname }} replace />
+      <Navigate to={'/login'} state={{ from: location.pathname }} replace />
     );
   }
-  if (notRequired && auth) {
+  if (notRequired && auth?.user) {
     return <Navigate to={'/'} replace />;
   }
   return <>{children}</>;

@@ -3,3 +3,6 @@ export type User = {
   fullName: string;
   email: string;
 };
+
+export type UserRegistration = Omit<User, 'id'> & { password: string };
+export type UserLogin = Omit<UserRegistration, 'fullName'>;
