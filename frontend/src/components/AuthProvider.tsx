@@ -1,5 +1,6 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useEffect } from 'react';
 import { User } from '../types/user';
+import { getCurrentUser } from '../services/authService';
 
 type AuthContext = {
   user: User | null;
@@ -12,18 +13,23 @@ type Props = {
 
 export const AuthContext = createContext<AuthContext | null>(null);
 
-export const AuthContextProvider = ({ children }: Props) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const userProfle = localStorage.getItem('user');
-    if (userProfle) {
-      return JSON.parse(userProfle) as User;
-    }
-    return null;
-  });
+export const AuthProvider = ({ children }: Props) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeUser = async () => {
+      const fetchedUser = await getCurrentUser();
+      setUser(fetchedUser);
+      setIsLoading(false);
+    };
+
+    initializeUser();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      {children}
+      {isLoading ? <div></div> : children}
     </AuthContext.Provider>
   );
 };

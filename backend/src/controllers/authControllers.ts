@@ -126,7 +126,7 @@ const authControllers = (fastify: FastifyInstance) => {
       },
     });
 
-    reply.clearCookie(TOKEN_COOKIE_NAME, { path: '/api' });
+    reply.clearCookie(TOKEN_COOKIE_NAME, { path: '/' });
 
     return reply.code(204).send();
   };

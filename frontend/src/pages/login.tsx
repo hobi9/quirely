@@ -29,8 +29,7 @@ const Login = () => {
     console.log(data);
     await signin(data);
     const user = await getCurrentUser();
-    localStorage.setItem('user', JSON.stringify(user));
-    auth?.setUser(user);
+    auth!.setUser(user);
     navigate(state?.from || '/');
   };
 

@@ -4,11 +4,11 @@ import SignUp from './pages/signup';
 import AuthGate from './components/AuthGate';
 import { useEffect } from 'react';
 import { getCsrf } from './services/authService';
-import { AuthContextProvider } from './components/AuthProvider';
+import { AuthProvider } from './components/AuthProvider';
 
 const App = () => {
   return (
-    <AuthContextProvider>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route
@@ -37,7 +37,7 @@ const App = () => {
           />
         </Routes>
       </BrowserRouter>
-    </AuthContextProvider>
+    </AuthProvider>
   );
 };
 

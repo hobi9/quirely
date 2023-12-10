@@ -48,10 +48,10 @@ const jwtConfig = fp(async (fastify) => {
 
     reply.setCookie(TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'strict',
       secure: true,
       signed: true,
-      path: '/api',
+      path: '/',
       maxAge: 604800, //one week
     });
   };

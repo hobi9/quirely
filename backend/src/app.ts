@@ -14,31 +14,34 @@ import Mailer from './plugins/mailer';
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
 
-  if (fastify.config.ENV !== 'production') {
+  const { CLIENT_BASE_URL, COOKIE_SECRET, ENV } = fastify.config;
+
+  if (ENV !== 'production') {
     await fastify.register(Swagger);
     await fastify.register(SwaggerUi);
   }
 
   await fastify.register(Cors, {
-    origin: true,
+    origin: CLIENT_BASE_URL,
     credentials: true,
-  }); // TODO: add options
+  });
 
   await fastify.register(Prisma);
 
   await fastify.register(Cookie, {
-    secret: fastify.config.COOKIE_SECRET,
+    secret: COOKIE_SECRET,
   });
 
   await fastify.register(Csrf, {
     sessionPlugin: '@fastify/cookie',
     cookieOpts: {
       signed: true,
-      path: '/api',
-      sameSite: 'none',
+      path: '/',
+      sameSite: 'strict',
       secure: true,
+      httpOnly: true,
     },
-  });
+  }); //TODO: fix before deploing
 
   await fastify.register(Mailer);
   await fastify.register(Auth);
