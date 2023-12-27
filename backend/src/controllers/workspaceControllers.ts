@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { WorkspaceCreationData } from '../schemas/workspaceSchema';
-import { Prisma } from '@prisma/client';
 
 const workspaceControllers = (fastify: FastifyInstance) => {
   const { prisma } = fastify;
@@ -9,20 +8,22 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     const { user } = request;
     const { membersMails = [], name, description } = request.body;
 
+    const uniqueMails = [...new Set(...membersMails, user.email)];
+
     const members = await prisma.user.findMany({
       where: {
         email: {
-          in: membersMails,
+          in: uniqueMails,
         },
       },
     });
 
-    if (members.length !== membersMails.length) {
-      reply.code(409);
-      return { error: 'Members emails mismatch.' };
+    if (members.length !== uniqueMails.length) {
+      return reply.sendValidationError<WorkspaceCreationData>(409, {
+        message: 'Members emails mismatch.',
+        field: 'membersMails',
+      });
     }
-
-    members.push(user);
 
     const workspace = await prisma.workspace.create({
       data: {
@@ -39,8 +40,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     });
 
     // TODO: this api should send email containing an invite to the workspace.
-    reply.code(201);
-    return workspace;
+    return reply.code(201).send(workspace);
   };
 
   const getWorkspaces = async (request: FastifyRequest) => {
@@ -99,8 +99,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     });
 
     if (!workspace) {
-      reply.code(404);
-      return { error: 'Workspace not found.' };
+      return reply.sendValidationError(404, { message: 'Workspace not found.' });
     }
 
     const members = workspace.members
@@ -113,20 +112,26 @@ const workspaceControllers = (fastify: FastifyInstance) => {
   const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
     const { user, params } = request;
 
-    try {
-      await prisma.workspace.delete({
-        where: {
-          id: params.id,
-          ownerId: user.id,
-        },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-        reply.code(404);
-        return { error: 'Workspace not found.' };
-      }
-      throw err;
+    const workspace = await prisma.workspace.findUnique({
+      where: {
+        id: params.id,
+      },
+    });
+
+    if (!workspace) {
+      return reply.sendError(404, 'Workspace not found.');
     }
+
+    if (user.id !== workspace.ownerId) {
+      return reply.sendError(409, 'You are not the owner of the workspace.');
+    }
+
+    await prisma.workspace.delete({
+      where: {
+        id: params.id,
+      },
+    });
+
     return reply.code(204).send();
   };
 
@@ -146,13 +151,11 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     });
 
     if (!memberWorkspace) {
-      reply.code(404);
-      return { error: 'Workspace not found.' };
+      return reply.sendError(404, 'Workspace not found.');
     }
 
     if (memberWorkspace.accepted !== null) {
-      reply.code(409);
-      return { error: 'You have already confirmed this workspace.' };
+      return reply.sendError(409, 'You have already confirmed this workspace.');
     }
 
     await prisma.membersOnWorkspaces.update({

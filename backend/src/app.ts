@@ -10,6 +10,7 @@ import Csrf from '@fastify/csrf-protection';
 import Auth from './plugins/authPlugin';
 import workspaceRouter from './routes/workspaceRouter';
 import Mailer from './plugins/mailer';
+import MiscDecorators from './plugins/decorators';
 
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
@@ -20,6 +21,8 @@ const app = async (fastify: FastifyInstance) => {
     await fastify.register(Swagger);
     await fastify.register(SwaggerUi);
   }
+
+  await await fastify.register(MiscDecorators);
 
   await fastify.register(Cors, {
     origin: CLIENT_BASE_URL,

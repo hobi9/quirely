@@ -1,30 +1,29 @@
 import { useContext } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { AuthContext } from './AuthProvider';
 
 type Props = {
   required?: true;
-  notRequired?: true;
-  children: React.ReactNode;
+  anonymous?: true;
 };
 
-const AuthGate = ({ required, notRequired, children }: Props) => {
-  if (!required && !notRequired) {
-    throw new Error('Invalid state, required or notRequired must be set.');
+const AuthGate = ({ required, anonymous }: Props) => {
+  if (!required && !anonymous) {
+    throw new Error('Invalid state, required or anonymous must be set.');
   }
 
-  const auth = useContext(AuthContext);
+  const auth = useContext(AuthContext)!;
   const location = useLocation();
 
-  if (required && !auth?.user) {
+  if (required && !auth.user) {
     return (
       <Navigate to={'/login'} state={{ from: location.pathname }} replace />
     );
   }
-  if (notRequired && auth?.user) {
+  if (anonymous && auth.user) {
     return <Navigate to={'/'} replace />;
   }
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 export default AuthGate;

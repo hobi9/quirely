@@ -5,7 +5,6 @@ export const WorkspaceSchema = Type.Object({
   id: Type.Number(),
   name: Type.String({
     maxLength: 100,
-    pattern: '^.*\\S.*$',
   }),
   description: Type.Optional(Type.String()),
 });

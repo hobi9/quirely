@@ -6,23 +6,28 @@ import { TOKEN_COOKIE_NAME } from '../utils/constants';
 const authControllers = (fastify: FastifyInstance) => {
   const {
     prisma,
-    bcrypt,
     sendMail,
+    genSalt,
+    compareHash,
+    hash,
     config: { CLIENT_BASE_URL },
   } = fastify;
 
   const registerUser = async (request: FastifyRequest<{ Body: UserRegistrationData }>, reply: FastifyReply) => {
     const { email, fullName, password } = request.body;
 
-    const passwordHash = await bcrypt.hash(password, await bcrypt.genSalt());
+    const salt = await genSalt(10);
+    const passwordHash = await hash(password, salt);
 
     const userInDb = await prisma.user.findUnique({
       where: { email },
     });
 
     if (userInDb) {
-      reply.code(409);
-      return { error: 'User with the given email already exists.' };
+      return reply.sendValidationError<UserRegistrationData>(409, {
+        message: 'User with the given email already exists.',
+        field: 'email',
+      });
     }
 
     const createdUser = await prisma.user.create({
@@ -51,15 +56,13 @@ const authControllers = (fastify: FastifyInstance) => {
         }, 600000), // 5 minutes
     );
 
-    const message = `Verify your email at ${CLIENT_BASE_URL}/${createdUser.id}/${confirmationToken}`;
-
     await sendMail({
       email,
       subject: 'Quirely - Verify email',
-      message,
+      message: `Verify your email at ${CLIENT_BASE_URL}/${createdUser.id}/${confirmationToken}`,
     });
 
-    reply.code(201).send();
+    return reply.code(201).send();
   };
 
   const verifyEmail = async (
@@ -73,8 +76,7 @@ const authControllers = (fastify: FastifyInstance) => {
     });
 
     if (!userTokens || token !== userTokens.confirmationToken) {
-      reply.code(400);
-      return { error: 'Invalid link' };
+      return reply.sendError(400, 'Invalid link');
     }
 
     await prisma.user.update({
@@ -95,17 +97,14 @@ const authControllers = (fastify: FastifyInstance) => {
     if (!user) {
       // instead of returning early we compare with a random string in order to prevent timing attacks
       const randomString = crypto.randomBytes(24).toString('hex');
-      await bcrypt.compare(password, randomString);
-
-      reply.code(401);
-      return { error: 'Invalid email or password.' };
+      await compareHash(password, randomString);
+      return reply.sendValidationError<UserLoginData>(400, { message: 'Invalid email or password.', field: 'email' });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await compareHash(password, user.password);
 
     if (!isValidPassword) {
-      reply.code(401);
-      return { error: 'Invalid email or password.' };
+      return reply.sendValidationError<UserLoginData>(400, { message: 'Invalid email or password.', field: 'email' });
     }
 
     await fastify.refreshTokens(user.id, reply);
@@ -132,7 +131,12 @@ const authControllers = (fastify: FastifyInstance) => {
   };
 
   const me = async (request: FastifyRequest) => {
-    return request.user;
+    try {
+      const { id } = await request.jwtVerify<{ id: number }>();
+      return prisma.user.findUnique({ where: { id } });
+    } catch (err) {
+      return null;
+    }
   };
 
   const csrfRefresh = async (_request: FastifyRequest, reply: FastifyReply) => {

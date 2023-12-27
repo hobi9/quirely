@@ -4,5 +4,8 @@ export type User = {
   email: string;
 };
 
-export type UserRegistration = Omit<User, 'id'> & { password: string };
-export type UserLogin = Omit<UserRegistration, 'fullName'>;
+export type UserRegistration = Omit<User, 'id'> & {
+  password: string;
+  confirmPassword: string;
+};
+export type UserLogin = Omit<UserRegistration, 'fullName' | 'confirmPassword'>;

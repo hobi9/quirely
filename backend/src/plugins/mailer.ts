@@ -39,10 +39,6 @@ const mailerPlugin: FastifyPluginAsync = fp(async (fastify) => {
   };
 
   fastify.decorate('sendMail', sendMail);
-
-  fastify.addHook('onClose', async (server) => {
-    await server.prisma.$disconnect();
-  });
 });
 
 export default mailerPlugin;

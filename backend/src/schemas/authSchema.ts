@@ -3,7 +3,6 @@ import { Type, Static } from '@sinclair/typebox';
 export const UserSchema = Type.Object({
   id: Type.Number(),
   fullName: Type.String({
-    pattern: '^.*\\S.*$',
     minLength: 2,
     maxLength: 100,
   }),

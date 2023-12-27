@@ -7,18 +7,11 @@ import {
 } from '../schemas/authSchema';
 import authControllers from '../controllers/authControllers';
 import { FastifyInstance } from 'fastify';
-import bcrypt from 'bcrypt';
-import { Type } from '@sinclair/typebox';
 
-declare module 'fastify' {
-  interface FastifyInstance {
-    bcrypt: typeof bcrypt;
-  }
-}
+import { Type } from '@sinclair/typebox';
 
 const authRouter = async (fastify: FastifyInstance) => {
   const { isAuthenticated, csrfProtection } = fastify;
-  fastify.decorate('bcrypt', bcrypt);
 
   const controllers = authControllers(fastify);
 
@@ -97,11 +90,10 @@ const authRouter = async (fastify: FastifyInstance) => {
   fastify.get(
     '/me',
     {
-      onRequest: isAuthenticated,
       schema: {
         tags: ['Auth'],
         response: {
-          200: SanitizedUserSchema,
+          200: Type.Union([SanitizedUserSchema, Type.Null()]),
         },
       },
     },

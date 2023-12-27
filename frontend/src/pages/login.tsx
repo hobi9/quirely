@@ -7,6 +7,8 @@ import { getCurrentUser, signin } from '../services/authService';
 import { UserLogin } from '../types/user';
 import { useContext } from 'react';
 import { AuthContext } from '../components/AuthProvider';
+import { isAxiosError } from 'axios';
+import { ServerError } from '../types/misc';
 
 const LoginSchema: z.ZodType<UserLogin> = z.object({
   email: z.string().email(),
@@ -17,7 +19,8 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setError,
+    formState: { errors, isSubmitting },
   } = useForm<UserLogin>({
     resolver: zodResolver(LoginSchema),
   });
@@ -26,10 +29,23 @@ const Login = () => {
   const auth = useContext(AuthContext);
 
   const submitForm: SubmitHandler<UserLogin> = async (data) => {
-    console.log(data);
-    await signin(data);
+    try {
+      await signin(data);
+    } catch (error) {
+      if (isAxiosError<ServerError<UserLogin>>(error)) {
+        const { field, message } = error.response!.data;
+        if (field) {
+          setError(field, {
+            type: 'server',
+            message,
+          });
+        }
+      }
+      //TODO: add toaster or some kind of notification
+      return;
+    }
     const user = await getCurrentUser();
-    auth!.setUser(user);
+    auth!.setUser(user!);
     navigate(state?.from || '/');
   };
 
@@ -75,6 +91,7 @@ const Login = () => {
           </div>
 
           <button
+            disabled={isSubmitting}
             className="text-center text-white bg-black p-1 hover:text-black 
                   hover:bg-white hover:outline-1 hover:outline-black hover:outline"
           >
@@ -83,7 +100,7 @@ const Login = () => {
         </div>
         <p className="mt-1 text-sm text-center">
           No account?
-          <Link to="/signup" className="text-blue-800 hover:underline ml-1">
+          <Link to="/register" className="text-blue-800 hover:underline ml-1">
             Create one!
           </Link>
         </p>

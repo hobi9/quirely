@@ -3,8 +3,12 @@ import clsx from 'clsx';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { UserRegistration } from '../types/user';
+import { signUp } from '../services/authService';
+import { isAxiosError } from 'axios';
+import { ServerError } from '../types/misc';
 
-const SignUpSchema = z
+const SignUpSchema: z.ZodType<UserRegistration> = z
   .object({
     fullName: z.string().min(2).max(100),
     email: z.string().email(),
@@ -16,20 +20,34 @@ const SignUpSchema = z
     path: ['confirmPassword'],
   });
 
-type SignUpData = z.infer<typeof SignUpSchema>;
-
 const SignUp = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<SignUpData>({
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<UserRegistration>({
     resolver: zodResolver(SignUpSchema),
   });
   const navigate = useNavigate();
 
-  const submitForm: SubmitHandler<SignUpData> = (data) => {
-    console.log(data);
+  const submitForm: SubmitHandler<UserRegistration> = async (data) => {
+    try {
+      await signUp(data);
+    } catch (error) {
+      if (isAxiosError<ServerError<UserRegistration>>(error)) {
+        const { field, message } = error.response!.data;
+        if (field) {
+          setError(field, {
+            type: 'server',
+            message,
+          });
+        }
+      }
+      //TODO: add toaster or some kind of notification
+      return;
+    }
+
     navigate('/login');
   };
 
@@ -104,6 +122,7 @@ const SignUp = () => {
           </div>
 
           <button
+            disabled={isSubmitting}
             className="text-center text-white bg-black p-1 hover:text-black 
                hover:bg-white hover:outline-1 hover:outline-black hover:outline"
           >
@@ -112,7 +131,7 @@ const SignUp = () => {
         </div>
         <p className="mt-1 text-sm text-center">
           Already have an account?
-          <Link to="/signin" className="text-blue-800 hover:underline ml-1">
+          <Link to="/login" className="text-blue-800 hover:underline ml-1">
             Login!
           </Link>
         </p>

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ENV=development nodemon ./src/server.ts",
     "push:dev": "dotenv -e .env.development prisma db push",
-    "seed:dev": "dotenv -e .env.development ts-node ./src/seed/seed.ts",
+    "seed:dev": "dotenv -e .env.development ts-node ./src/prisma/seed.ts",
     "build": "rm -rf ./dist ; tsc",
     "prod": "node ./dist/server.js"
   },

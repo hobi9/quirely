@@ -19,9 +19,14 @@ export const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const initializeUser = async () => {
-      const fetchedUser = await getCurrentUser();
-      setUser(fetchedUser);
-      setIsLoading(false);
+      try {
+        const fetchedUser = await getCurrentUser();
+        setUser(fetchedUser);
+      } catch (error) {
+        // TODO: handle it better
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initializeUser();
