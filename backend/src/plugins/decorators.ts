@@ -13,6 +13,7 @@ declare module 'fastify' {
     genSalt: (rounds?: number) => Promise<string>;
     compareHash: (s1: string, s2: string) => Promise<boolean>;
     hash: (toHash: string, salt: string) => Promise<string>;
+    isTokenExpiredError: (err: unknown) => boolean;
   }
 }
 
@@ -51,6 +52,12 @@ const miscDecorators: FastifyPluginAsync = fp(async (fastify) => {
   fastify.decorate('genSalt', (rounds?: number) => bcrypt.genSalt(rounds));
   fastify.decorate('compareHash', (s1, s2) => bcrypt.compare(s1, s2));
   fastify.decorate('hash', (toHash, salt) => bcrypt.hash(toHash, salt));
+
+  fastify.decorate('isTokenExpiredError', (error) => {
+    return (
+      typeof error === 'object' && !!error && 'code' in error && error.code === 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED'
+    );
+  });
 });
 
 export default miscDecorators;

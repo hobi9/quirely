@@ -10,6 +10,8 @@ const authControllers = (fastify: FastifyInstance) => {
     genSalt,
     compareHash,
     hash,
+    isTokenExpiredError,
+    jwt,
     config: { CLIENT_BASE_URL },
   } = fastify;
 
@@ -135,7 +137,24 @@ const authControllers = (fastify: FastifyInstance) => {
       const { id } = await request.jwtVerify<{ id: number }>();
       return prisma.user.findUnique({ where: { id } });
     } catch (err) {
-      return null;
+      if (!isTokenExpiredError(err)) {
+        return null;
+      }
+      const { id } = await request.jwtDecode<{ id: number }>();
+      const user = await prisma.user.findUnique({ where: { id }, include: { token: true } });
+
+      const refreshToken = user?.token?.refreshToken;
+
+      if (!refreshToken) {
+        return null;
+      }
+
+      try {
+        jwt.verify(refreshToken);
+        return user;
+      } catch (err) {
+        return null;
+      }
     }
   };
 

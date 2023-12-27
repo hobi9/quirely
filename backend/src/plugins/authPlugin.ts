@@ -27,7 +27,7 @@ const jwtConfig = fp(async (fastify) => {
     },
   });
 
-  const { prisma, jwt } = fastify;
+  const { prisma, jwt, isTokenExpiredError } = fastify;
 
   const findUserById = async (id: number) => {
     return prisma.user.findUnique({
@@ -73,7 +73,7 @@ const jwtConfig = fp(async (fastify) => {
 
       request.user = user;
     } catch (err) {
-      if (typeof err === 'object' && err && 'code' in err && err.code !== 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED') {
+      if (!isTokenExpiredError(err)) {
         return reply.code(401).send();
       }
 

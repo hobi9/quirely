@@ -124,9 +124,10 @@ const SignUp = () => {
           <button
             disabled={isSubmitting}
             className="text-center text-white bg-black p-1 hover:text-black 
-               hover:bg-white hover:outline-1 hover:outline-black hover:outline"
+               hover:bg-white hover:outline-1 hover:outline-black hover:outline
+               disabled:bg-slate-300 disabled:opacity-80 disabled:hover:outline-none disabled:hover:text-white"
           >
-            Sign Up
+            {isSubmitting ? 'Loading...' : 'Sign Up'}
           </button>
         </div>
         <p className="mt-1 text-sm text-center">

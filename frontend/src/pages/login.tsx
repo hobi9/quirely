@@ -5,10 +5,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { getCurrentUser, signin } from '../services/authService';
 import { UserLogin } from '../types/user';
-import { useContext } from 'react';
-import { AuthContext } from '../components/AuthProvider';
 import { isAxiosError } from 'axios';
 import { ServerError } from '../types/misc';
+import useAuthStore from '../stores/authStore';
 
 const LoginSchema: z.ZodType<UserLogin> = z.object({
   email: z.string().email(),
@@ -26,7 +25,7 @@ const Login = () => {
   });
   const navigate = useNavigate();
   const { state } = useLocation();
-  const auth = useContext(AuthContext);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const submitForm: SubmitHandler<UserLogin> = async (data) => {
     try {
@@ -45,7 +44,7 @@ const Login = () => {
       return;
     }
     const user = await getCurrentUser();
-    auth!.setUser(user!);
+    setUser(user);
     navigate(state?.from || '/');
   };
 
@@ -93,9 +92,10 @@ const Login = () => {
           <button
             disabled={isSubmitting}
             className="text-center text-white bg-black p-1 hover:text-black 
-                  hover:bg-white hover:outline-1 hover:outline-black hover:outline"
+                  hover:bg-white hover:outline-1 hover:outline-black hover:outline
+                  disabled:bg-slate-300 disabled:opacity-80 disabled:hover:outline-none disabled:hover:text-white"
           >
-            Sign In
+            {isSubmitting ? 'Loading...' : 'Sign In'}
           </button>
         </div>
         <p className="mt-1 text-sm text-center">
