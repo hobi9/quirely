@@ -9,12 +9,7 @@ export const WorkspaceSchema = Type.Object({
   description: Type.Optional(Type.String()),
 });
 
-export const WorkspaceCreationSchema = Type.Intersect([
-  Type.Omit(WorkspaceSchema, ['id']),
-  Type.Object({
-    membersMails: Type.Optional(Type.Array(Type.String({ format: 'email' }))),
-  }),
-]);
+export const WorkspaceCreationSchema = Type.Omit(WorkspaceSchema, ['id']);
 
 export const EnhancedWorkspaceSchema = Type.Intersect([
   WorkspaceSchema,

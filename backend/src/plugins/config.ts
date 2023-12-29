@@ -14,6 +14,8 @@ const configSchema = Type.Object({
   EMAIL_USER: Type.String(),
   EMAIL_PASSWORD: Type.String(),
   CLIENT_BASE_URL: Type.String(),
+  MULTIAVATAR_BASE_URL: Type.String(),
+  MULTIAVATAR_API_KEY: Type.String(),
 });
 
 declare module 'fastify' {

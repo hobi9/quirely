@@ -14,10 +14,11 @@ export const UserSchema = Type.Object({
     minLength: 8,
     maxLength: 254,
   }),
+  avatarUrl: Type.String(),
 });
 
-export const UserRegistrationSchema = Type.Omit(UserSchema, ['id']);
-export const UserLoginSchema = Type.Omit(UserSchema, ['id', 'fullName']);
+export const UserRegistrationSchema = Type.Omit(UserSchema, ['id', 'avatarUrl']);
+export const UserLoginSchema = Type.Omit(UserSchema, ['id', 'fullName', 'avatarUrl']);
 export const SanitizedUserSchema = Type.Omit(UserSchema, ['password']);
 
 // Create a type alias representing the structure of user registration data

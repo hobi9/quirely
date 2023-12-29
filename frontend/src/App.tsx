@@ -54,12 +54,14 @@ const SignedIn = () => {
   return (
     <div className="h-screen">
       <Navbar />
-      <main className="flex px-2 mx-auto pt-14 h-full flex-grow">
-        <Sidebar />
-        <div>
-          Hello <span className="text-green-500">{user.fullName}</span>
+      <div className="mx-auto h-full w-full px-1 pt-14 xl:max-w-screen-2xl">
+        <div className="flex h-full">
+          <Sidebar />
+          <main>
+            Hello <span className="text-green-500">{user.fullName}</span>
+          </main>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

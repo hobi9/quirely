@@ -6,41 +6,30 @@ const workspaceControllers = (fastify: FastifyInstance) => {
 
   const createWorkspace = async (request: FastifyRequest<{ Body: WorkspaceCreationData }>, reply: FastifyReply) => {
     const { user } = request;
-    const { membersMails = [], name, description } = request.body;
+    const { name, description } = request.body;
 
-    const uniqueMails = [...new Set(...membersMails, user.email)];
-
-    const members = await prisma.user.findMany({
-      where: {
-        email: {
-          in: uniqueMails,
+    const createdWorkspace = await prisma.$transaction(async (tr) => {
+      const workspace = await tr.workspace.create({
+        data: {
+          name: name.trim(),
+          description,
+          ownerId: user.id,
+          updatedAt: null,
         },
-      },
-    });
-
-    if (members.length !== uniqueMails.length) {
-      return reply.sendValidationError<WorkspaceCreationData>(409, {
-        message: 'Members emails mismatch.',
-        field: 'membersMails',
       });
-    }
 
-    const workspace = await prisma.workspace.create({
-      data: {
-        name: name.trim(),
-        description,
-        ownerId: user.id,
-        members: {
-          create: members.map(({ id }) => {
-            return { accepted: id === user.id || null, member: { connect: { id } } };
-          }),
+      tr.membersOnWorkspaces.create({
+        data: {
+          memberId: user.id,
+          workspaceId: workspace.id,
+          accepted: true,
         },
-        updatedAt: null,
-      },
+      });
+
+      return workspace;
     });
 
-    // TODO: this api should send email containing an invite to the workspace.
-    return reply.code(201).send(workspace);
+    return reply.code(201).send(createdWorkspace);
   };
 
   const getWorkspaces = async (request: FastifyRequest) => {
@@ -51,28 +40,12 @@ const workspaceControllers = (fastify: FastifyInstance) => {
         members: {
           some: {
             memberId: user.id,
-            accepted: true,
           },
         },
       },
-      include: {
-        members: {
-          include: {
-            member: true,
-          },
-        },
-        owner: true,
-      },
     });
 
-    const enhancedWorkspaces = workspaces.map((workspace) => {
-      const members = workspace.members
-        .filter(({ accepted }) => accepted || workspace.ownerId === user.id)
-        .map(({ member, accepted }) => ({ ...member, accepted }));
-      return { ...workspace, members };
-    });
-
-    return enhancedWorkspaces;
+    return workspaces;
   };
 
   const getWorkspaceById = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {

@@ -12,7 +12,7 @@ const authControllers = (fastify: FastifyInstance) => {
     hash,
     isTokenExpiredError,
     jwt,
-    config: { CLIENT_BASE_URL },
+    config: { CLIENT_BASE_URL, MULTIAVATAR_API_KEY, MULTIAVATAR_BASE_URL },
   } = fastify;
 
   const registerUser = async (request: FastifyRequest<{ Body: UserRegistrationData }>, reply: FastifyReply) => {
@@ -38,6 +38,7 @@ const authControllers = (fastify: FastifyInstance) => {
         password: passwordHash,
         email,
         updatedAt: null,
+        avatarUrl: `${MULTIAVATAR_BASE_URL}/${crypto.randomUUID()}.png?apikey=${MULTIAVATAR_API_KEY}`,
       },
     });
 

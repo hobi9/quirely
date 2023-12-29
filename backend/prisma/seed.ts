@@ -10,6 +10,7 @@ const prisma = new PrismaClient();
       email: 'email@email.com',
       password: await bcrypt.hash('passwordpassword', await bcrypt.genSalt()),
       isVerified: true,
+      avatarUrl: '',
       updatedAt: null,
     },
   });
@@ -20,6 +21,7 @@ const prisma = new PrismaClient();
       email: 'email1@email.com',
       password: await bcrypt.hash('passwordpassword', await bcrypt.genSalt()),
       isVerified: true,
+      avatarUrl: '',
       updatedAt: null,
     },
   });
