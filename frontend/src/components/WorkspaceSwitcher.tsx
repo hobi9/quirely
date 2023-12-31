@@ -1,24 +1,21 @@
-import { Button } from './ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
 import { Building, ChevronsUpDown, Settings, Plus } from 'lucide-react';
 
 const WorkspaceSwitcher = () => {
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant={'ghost'} className="group">
-          <div className="flex items-center gap-x-4 transition group-hover:opacity-75">
-            <div className="flex items-center gap-x-2 ">
-              <div className="size-9 flex items-center justify-center rounded-md bg-red-500 text-slate-50">
-                <Building size={28} />
-              </div>
-              <span className="w-28 overflow-hidden text-ellipsis">
-                Another Inc.
-              </span>
+      <PopoverTrigger className="group">
+        <div className="flex items-center gap-x-4 transition group-hover:opacity-75">
+          <div className="flex items-center gap-x-2 ">
+            <div className="size-9 flex items-center justify-center rounded-md bg-red-500 text-slate-50">
+              <Building size={28} />
             </div>
-            <ChevronsUpDown />
+            <span className="w-28 overflow-hidden text-ellipsis">
+              Another Inc.
+            </span>
           </div>
-        </Button>
+          <ChevronsUpDown />
+        </div>
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex items-center gap-x-2">
