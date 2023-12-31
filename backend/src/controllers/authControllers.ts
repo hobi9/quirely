@@ -167,7 +167,7 @@ const authControllers = (fastify: FastifyInstance) => {
       return reply.sendError(500, 'Error during image upload');
     }
 
-    if (!file.mimetype.match(/^image/)) {
+    if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
       return reply.sendError(500, 'Invalid file extension.');
     }
 
