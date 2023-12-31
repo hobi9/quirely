@@ -6,7 +6,7 @@ const Avatar = () => {
     <img
       src={avatarUrl}
       alt={`${fullName}'s avatar`}
-      className="h-9 w-9 rounded-full transition hover:cursor-pointer hover:opacity-75"
+      className="size-9 rounded-full transition hover:cursor-pointer hover:opacity-75"
     />
   );
 };

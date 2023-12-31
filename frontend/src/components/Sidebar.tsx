@@ -5,8 +5,8 @@ const Sidebar = () => {
       <div className="pt-4">
         <h1>Sidebar</h1>
         <ul className="mt-4 space-y-3">
-          {items.map((i) => (
-            <div>{i}</div>
+          {items.map((i, index) => (
+            <div key={index}>{i}</div>
           ))}
         </ul>
       </div>

@@ -5,11 +5,11 @@ import { Building, ChevronsUpDown, Settings, Plus } from 'lucide-react';
 const WorkspaceSwitcher = () => {
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger asChild>
         <Button variant={'ghost'} className="group">
           <div className="flex items-center gap-x-4 transition group-hover:opacity-75">
             <div className="flex items-center gap-x-2 ">
-              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-red-500 text-slate-50">
+              <div className="size-9 flex items-center justify-center rounded-md bg-red-500 text-slate-50">
                 <Building size={28} />
               </div>
               <span className="w-28 overflow-hidden text-ellipsis">
@@ -22,7 +22,7 @@ const WorkspaceSwitcher = () => {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex items-center gap-x-2">
-          <div className="flex h-11 w-11 items-center justify-center rounded-md bg-red-500 text-slate-50">
+          <div className="size-11 flex items-center justify-center rounded-md bg-red-500 text-slate-50">
             <Building size={40} />
           </div>
           <div className="flex h-full flex-col text-ellipsis leading-none">
