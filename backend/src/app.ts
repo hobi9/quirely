@@ -11,6 +11,8 @@ import Auth from './plugins/authPlugin';
 import workspaceRouter from './routes/workspaceRouter';
 import Mailer from './plugins/mailer';
 import MiscDecorators from './plugins/decorators';
+import Supabase from './plugins/supabase';
+import Multipart from '@fastify/multipart';
 
 const app = async (fastify: FastifyInstance) => {
   await fastify.register(Config);
@@ -29,8 +31,6 @@ const app = async (fastify: FastifyInstance) => {
     credentials: true,
   });
 
-  await fastify.register(Prisma);
-
   await fastify.register(Cookie, {
     secret: COOKIE_SECRET,
   });
@@ -46,8 +46,11 @@ const app = async (fastify: FastifyInstance) => {
     },
   }); //TODO: fix before deploing
 
+  await fastify.register(Prisma);
   await fastify.register(Mailer);
   await fastify.register(Auth);
+  await fastify.register(Supabase);
+  await fastify.register(Multipart);
 
   fastify.addHook('onSend', async (req, reply, payload) => {
     reply.header('x-request-id', req.id);

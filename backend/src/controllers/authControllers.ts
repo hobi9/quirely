@@ -1,22 +1,15 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { UserLoginData, UserRegistrationData } from '../schemas/authSchema';
 import crypto from 'crypto';
-import { TOKEN_COOKIE_NAME } from '../utils/constants';
+import { TOKEN_COOKIE_NAME, AVATAR_BUCKET } from '../utils/constants';
 
 const authControllers = (fastify: FastifyInstance) => {
-  const {
-    prisma,
-    sendMail,
-    genSalt,
-    compareHash,
-    hash,
-    isTokenExpiredError,
-    jwt,
-    config: { CLIENT_BASE_URL, MULTIAVATAR_API_KEY, MULTIAVATAR_BASE_URL },
-  } = fastify;
+  const { prisma } = fastify;
 
   const registerUser = async (request: FastifyRequest<{ Body: UserRegistrationData }>, reply: FastifyReply) => {
     const { email, fullName, password } = request.body;
+    const { sendMail, genSalt, hash } = fastify;
+    const { CLIENT_BASE_URL } = fastify.config;
 
     const salt = await genSalt(10);
     const passwordHash = await hash(password, salt);
@@ -38,7 +31,6 @@ const authControllers = (fastify: FastifyInstance) => {
         password: passwordHash,
         email,
         updatedAt: null,
-        avatarUrl: `${MULTIAVATAR_BASE_URL}/${crypto.randomUUID()}.png?apikey=${MULTIAVATAR_API_KEY}`,
       },
     });
 
@@ -92,6 +84,7 @@ const authControllers = (fastify: FastifyInstance) => {
 
   const login = async (request: FastifyRequest<{ Body: UserLoginData }>, reply: FastifyReply) => {
     const { email, password } = request.body;
+    const { compareHash } = fastify;
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -134,6 +127,7 @@ const authControllers = (fastify: FastifyInstance) => {
   };
 
   const me = async (request: FastifyRequest) => {
+    const { isTokenExpiredError, jwt } = fastify;
     try {
       const { id } = await request.jwtVerify<{ id: number }>();
       return prisma.user.findUnique({ where: { id } });
@@ -164,6 +158,44 @@ const authControllers = (fastify: FastifyInstance) => {
     return { csrfToken };
   };
 
+  const uploadAvatar = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { supabase } = fastify;
+    const { id, avatarUrl: oldUrl } = request.user;
+    const file = await request.file({ limits: { fileSize: 1_000_000 } });
+
+    if (!file) {
+      return reply.sendError(500, 'Error during image upload');
+    }
+
+    if (!file.mimetype.match(/^image/)) {
+      return reply.sendError(500, 'Invalid file extension.');
+    }
+
+    const fileBuffer = await file.toBuffer();
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .upload(crypto.randomUUID(), fileBuffer, { contentType: file.mimetype });
+
+    if (error) {
+      request.log.error(error, 'Error during image upload');
+      return reply.sendError(500, 'Error during image upload.');
+    }
+
+    const { publicUrl: avatarUrl } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(data.path).data;
+
+    await prisma.user.update({
+      where: { id },
+      data: { avatarUrl },
+    });
+
+    if (oldUrl) {
+      const oldFileName = oldUrl.split('/').at(-1)!;
+      await supabase.storage.from(AVATAR_BUCKET).remove([oldFileName]);
+    }
+
+    return { avatarUrl };
+  };
+
   return {
     registerUser,
     login,
@@ -171,6 +203,7 @@ const authControllers = (fastify: FastifyInstance) => {
     csrfRefresh,
     me,
     verifyEmail,
+    uploadAvatar,
   };
 };
 
