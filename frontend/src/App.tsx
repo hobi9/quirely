@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './pages/login';
-import SignUp from './pages/signup';
 import AuthGate from './components/AuthGate';
 import { useEffect, useState } from 'react';
 import { getCsrf, getCurrentUser } from './services/authService';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import useAuthStore from './stores/authStore';
-import AuthPage from './components/AuthPage';
+import AuthPage from './pages/AuthPage';
+import Login from './components/login';
+import SignUp from './components/signup';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
