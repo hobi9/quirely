@@ -7,6 +7,7 @@ import { getCsrf, getCurrentUser } from './services/authService';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import useAuthStore from './stores/authStore';
+import AuthPage from './components/AuthPage';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,8 +28,10 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<AuthGate anonymous />}>
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<SignUp />} />
+          <Route path="auth" element={<AuthPage />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<SignUp />} />
+          </Route>
         </Route>
         <Route element={<AuthGate required />}>
           <Route path="/" element={<SignedIn />} />
@@ -47,6 +50,7 @@ const SignedIn = () => {
       await getCsrf();
       setIsLoading(false);
     };
+
     getToken();
   }, []);
 

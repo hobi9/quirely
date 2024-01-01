@@ -21,5 +21,9 @@ export const getCsrf = async () => {
 
   const { csrfToken } = response.data;
 
-  client.defaults.headers.common['csrf_token'] = csrfToken;
+  client.defaults.headers.common['X-Csrf-Token'] = csrfToken;
+};
+
+export const signOut = async () => {
+  return client.post<void>('/auth/signout');
 };

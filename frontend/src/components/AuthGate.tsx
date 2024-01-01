@@ -16,7 +16,11 @@ const AuthGate = ({ required, anonymous }: Props) => {
 
   if (required && !user) {
     return (
-      <Navigate to={'/login'} state={{ from: location.pathname }} replace />
+      <Navigate
+        to={'/auth/login'}
+        state={{ from: location.pathname }}
+        replace
+      />
     );
   }
   if (anonymous && user) {

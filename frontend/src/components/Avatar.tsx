@@ -2,9 +2,21 @@ import useAuthStore from '../stores/authStore';
 import defaultAvatar from '../assets/defaultAvatar.svg';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Settings, LogOut } from 'lucide-react';
+import { Button } from './ui/button';
+import { signOut } from '@/services/authService';
+import { useNavigate } from 'react-router-dom';
 
 const Avatar = () => {
   const { fullName, avatarUrl, email } = useAuthStore((state) => state.user!);
+  const setUser = useAuthStore((state) => state.setUser);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    setUser(null);
+    navigate('/');
+  };
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -29,18 +41,22 @@ const Avatar = () => {
           </div>
         </div>
         <div className="mt-4">
-          <div className="rounded-sm py-2 hover:bg-slate-100">
-            <div className="flex items-center gap-x-1 text-slate-700">
+          <Button variant={'ghost'} className="w-full p-0">
+            <div className="flex w-full items-center gap-x-1 text-slate-700">
               <Settings size={16} />
               <span>Manage Account</span>
             </div>
-          </div>
-          <div className="rounded-sm py-2 hover:bg-slate-100">
-            <div className="flex items-center gap-x-1 text-slate-700">
+          </Button>
+          <Button
+            variant={'ghost'}
+            className="w-full p-0"
+            onClick={handleLogout}
+          >
+            <div className="flex w-full items-center gap-x-1 text-slate-700">
               <LogOut size={16} />
               <span>Sign out</span>
             </div>
-          </div>
+          </Button>
         </div>
       </PopoverContent>
     </Popover>
