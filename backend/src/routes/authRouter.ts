@@ -29,7 +29,7 @@ const authRouter = async (fastify: FastifyInstance) => {
     controllers.registerUser,
   );
 
-  fastify.get<{ Params: { id: number; token: string } }>(
+  fastify.patch<{ Params: { id: number; token: string } }>(
     '/verify/:id/:token',
     {
       schema: {
@@ -97,7 +97,7 @@ const authRouter = async (fastify: FastifyInstance) => {
         },
       },
     },
-    controllers.me,
+    controllers.getMe,
   );
 
   //TODO: understand how to display the file in swagger documentation

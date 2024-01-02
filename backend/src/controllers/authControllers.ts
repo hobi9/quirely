@@ -11,11 +11,10 @@ const authControllers = (fastify: FastifyInstance) => {
     const { sendMail, genSalt, hash } = fastify;
     const { CLIENT_BASE_URL } = fastify.config;
 
-    const salt = await genSalt(10);
-    const passwordHash = await hash(password, salt);
+    const lowercaseEmail = email.toLowerCase();
 
     const userInDb = await prisma.user.findUnique({
-      where: { email },
+      where: { email: lowercaseEmail },
     });
 
     if (userInDb) {
@@ -25,11 +24,14 @@ const authControllers = (fastify: FastifyInstance) => {
       });
     }
 
+    const salt = await genSalt(10);
+    const passwordHash = await hash(password, salt);
+
     const createdUser = await prisma.user.create({
       data: {
         fullName: fullName.trim(),
         password: passwordHash,
-        email,
+        email: lowercaseEmail,
         updatedAt: null,
       },
     });
@@ -52,9 +54,15 @@ const authControllers = (fastify: FastifyInstance) => {
     );
 
     await sendMail({
-      email,
+      email: lowercaseEmail,
       subject: 'Quirely - Verify email',
-      message: `Verify your email at ${CLIENT_BASE_URL}/${createdUser.id}/${confirmationToken}`,
+      message: `<!doctype html>
+      <html>
+        <body>
+          <p>Verify your email <a href="${CLIENT_BASE_URL}/verify-email/${createdUser.id}/${confirmationToken}">here</a></p>
+        </body>
+      </html>
+      `,
     });
 
     return reply.code(201).send();
@@ -126,7 +134,7 @@ const authControllers = (fastify: FastifyInstance) => {
     return reply.code(204).send();
   };
 
-  const me = async (request: FastifyRequest) => {
+  const getMe = async (request: FastifyRequest) => {
     const { isTokenExpiredError, jwt } = fastify;
     try {
       const { id } = await request.jwtVerify<{ id: number }>();
@@ -201,7 +209,7 @@ const authControllers = (fastify: FastifyInstance) => {
     login,
     signout,
     csrfRefresh,
-    me,
+    getMe,
     verifyEmail,
     uploadAvatar,
   };

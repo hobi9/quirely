@@ -16,7 +16,6 @@ const mailerPlugin: FastifyPluginAsync = fp(async (fastify) => {
   const transporter = nodemailer.createTransport({
     host: config.EMAIL_HOST,
     port: config.EMAIL_PORT,
-    secure: true,
     auth: {
       user: config.EMAIL_USER,
       pass: config.EMAIL_PASSWORD,
@@ -26,15 +25,14 @@ const mailerPlugin: FastifyPluginAsync = fp(async (fastify) => {
   const sendMail = async ({ email, subject, message }: EmailData) => {
     try {
       await transporter.sendMail({
-        from: process.env.USER,
+        from: 'no_reply@quirely.io', // TODO: to change
         to: email,
         subject: subject,
-        text: message,
+        html: message,
       });
       fastify.log.info(`email to ${email} sent succesfully`);
     } catch (error) {
-      fastify.log.error(`email to ${email} not sent`);
-      console.error(error);
+      fastify.log.error(error, `email to ${email} not sent`);
     }
   };
 
