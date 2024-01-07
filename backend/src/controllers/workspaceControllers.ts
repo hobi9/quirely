@@ -218,6 +218,52 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     return { logoUrl };
   };
 
+  const inviteUser = async (
+    request: FastifyRequest<{ Params: { id: number }; Body: { email: string } }>,
+    reply: FastifyReply,
+  ) => {
+    const { id } = request.params;
+    const { email } = request.body;
+    const { user } = request;
+
+    if (email === user.email) {
+      return reply.sendError(409, `You can't invite yourself`);
+    }
+
+    const member = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!member) {
+      return reply.sendError(404, 'Member not found');
+    }
+
+    const workspace = await prisma.workspace.findUnique({
+      where: {
+        id,
+        ownerId: user.id,
+        members: {
+          none: {
+            memberId: id,
+          },
+        },
+      },
+    });
+
+    if (!workspace) {
+      return reply.sendError(404, 'Workspace not found');
+    }
+
+    await prisma.membersOnWorkspaces.create({
+      data: {
+        workspaceId: workspace.id,
+        memberId: member.id,
+      },
+    });
+
+    return reply.status(200).send();
+  };
+
   return {
     createWorkspace,
     getWorkspaces,
@@ -226,6 +272,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     confirmInvitation,
     getPendingWorkspaces,
     updateWorkspaceLogo,
+    inviteUser,
   };
 };
 

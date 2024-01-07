@@ -101,7 +101,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
     controllers.confirmInvitation,
   );
 
-  fastify.put<{ Params: { id: number } }>(
+  fastify.patch<{ Params: { id: number } }>(
     '/:id/logo',
     {
       onRequest: [isAuthenticated, csrfProtection],
@@ -115,6 +115,22 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       },
     },
     controllers.updateWorkspaceLogo,
+  );
+
+  fastify.post<{ Params: { id: number }; Body: { email: string } }>(
+    '/:id/invite',
+    {
+      onRequest: [isAuthenticated, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        params: Type.Object({ id: Type.Number() }),
+        body: Type.Object({ email: Type.String() }),
+        response: {
+          200: Type.Null(),
+        },
+      },
+    },
+    controllers.inviteUser,
   );
 };
 
