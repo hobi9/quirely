@@ -4,9 +4,11 @@ import { useState } from 'react';
 import SelectWorkspaceStep from './SelectWorkspaceStep';
 import CreateWorkspaceStep from './CreateWorkspaceStep';
 import InviteToWorkspaceStep from './InviteToWorkspaceStep';
+import { Workspace } from '@/types/workspace';
 
 const SelectWorkspacePage = () => {
   const [step, setStep] = useState<'select' | 'create' | 'invite'>('select');
+  const [worskace, setWorkspace] = useState<Workspace | null>(null);
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-2">
@@ -24,11 +26,15 @@ const SelectWorkspacePage = () => {
           <CreateWorkspaceStep
             showNextStep={() => setStep('invite')}
             showInitialStep={() => setStep('select')}
+            setWorkspace={setWorkspace}
           />
         )}
 
         {step === 'invite' && (
-          <InviteToWorkspaceStep showInitialStep={() => setStep('select')} />
+          <InviteToWorkspaceStep
+            showInitialStep={() => setStep('select')}
+            workspace={worskace!}
+          />
         )}
       </Card>
     </div>

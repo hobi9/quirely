@@ -31,7 +31,7 @@ const Avatar = () => {
           <img
             src={avatarUrl || defaultAvatar}
             alt={`${fullName}'s avatar`}
-            className="size-11 rounded-full"
+            className="size-11 rounded-full object-cover"
           />
           <div className="flex h-full flex-col text-ellipsis leading-none">
             <p className="w-44 overflow-hidden text-ellipsis whitespace-nowrap font-bold">

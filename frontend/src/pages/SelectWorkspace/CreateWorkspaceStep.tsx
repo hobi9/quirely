@@ -13,7 +13,7 @@ import {
   createWorkspace,
   updateWorkspaceLogo,
 } from '@/services/workspaceService';
-import { WorkspaceCreation } from '@/types/workspace';
+import { Workspace, WorkspaceCreation } from '@/types/workspace';
 import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -24,6 +24,7 @@ import { ChangeEvent, useRef, useState } from 'react';
 type Props = {
   showNextStep: () => void;
   showInitialStep: () => void;
+  setWorkspace: (workspace: Workspace) => void;
 };
 
 const createWorkspaceSchema: z.ZodType<WorkspaceCreation> = z.object({
@@ -31,7 +32,11 @@ const createWorkspaceSchema: z.ZodType<WorkspaceCreation> = z.object({
   description: z.string().optional(),
 });
 
-const CreateWorkspaceStep = ({ showNextStep, showInitialStep }: Props) => {
+const CreateWorkspaceStep = ({
+  showNextStep,
+  showInitialStep,
+  setWorkspace,
+}: Props) => {
   const {
     register,
     handleSubmit,
@@ -54,6 +59,7 @@ const CreateWorkspaceStep = ({ showNextStep, showInitialStep }: Props) => {
         console.log('error'); // TODO: handle it better later
       }
     }
+    setWorkspace(workspace);
     showNextStep();
   };
 

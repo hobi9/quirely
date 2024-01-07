@@ -1,40 +1,99 @@
+import MultipleSelector, { Option } from '@/components/MultipleSelector';
 import { Button } from '@/components/ui/button';
 import {
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
+import { getUsers } from '@/services/userService';
+import { inviteToWorkspace } from '@/services/workspaceService';
+import { Workspace } from '@/types/workspace';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 type Props = {
   showInitialStep: () => void;
+  workspace: Workspace;
 };
 
-const InviteToWorkspaceStep = ({ showInitialStep }: Props) => {
+const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
+  const [selectedMails, setSelectedMails] = useState<Option[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const invitationPromises = selectedMails.map((option) =>
+      inviteToWorkspace(workspace.id, option.value),
+    );
+
+    await Promise.allSettled(invitationPromises);
+
+    setIsLoading(false);
+    showInitialStep();
+  };
+
   return (
     <>
       <CardHeader>
-        <CardTitle>Invite Workspace</CardTitle>
-        <CardDescription>to continue to Quirely.</CardDescription>
+        <CardTitle>Invite members</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div>Profile image</div>
-      </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-center justify-end gap-2">
-          <Button
-            variant="outline"
-            className="text-xs uppercase"
-            onClick={showInitialStep}
-          >
-            cancel
-          </Button>
-          <Button className="text-xs uppercase" onClick={showInitialStep}>
-            send invitation
-          </Button>
-        </div>
-      </CardFooter>
+      <form onSubmit={handleSubmit}>
+        <CardContent>
+          <div className="pb-4">
+            <p className="text-lg">Email addresses</p>
+            <p className="text-sm">Enter one or more email addresses.</p>
+          </div>
+          <MultipleSelector
+            onSearch={async (value) => {
+              const res = await getUsers({ email: value });
+              return res.map(({ email }) => {
+                return {
+                  label: email,
+                  value: email,
+                };
+              });
+            }}
+            value={selectedMails}
+            onChange={setSelectedMails}
+            placeholder="trying to search 'a' to get more options..."
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                loading...
+              </p>
+            }
+            emptyIndicator={
+              <p className="w-full text-center text-lg leading-10 text-muted-foreground">
+                no results found.
+              </p>
+            }
+          />
+        </CardContent>
+        <CardFooter>
+          <div className="flex w-full items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              className="text-xs uppercase"
+              type="button"
+              onClick={showInitialStep}
+            >
+              cancel
+            </Button>
+            <Button
+              className="min-w-36 text-xs uppercase"
+              disabled={!selectedMails.length || isLoading}
+            >
+              {!isLoading ? (
+                'send invitation'
+              ) : (
+                <Loader2 size={16} className="animate-spin" />
+              )}
+            </Button>
+          </div>
+        </CardFooter>
+      </form>
     </>
   );
 };
