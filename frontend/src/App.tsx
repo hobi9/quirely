@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthGate from './components/AuthGate';
 import { useEffect, useState } from 'react';
 import { getCsrf, getCurrentUser } from './services/authService';
-import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar';
+/* import Sidebar from './components/Sidebar';
+import Navbar from './components/Navbar'; */
 import useAuthStore from './stores/authStore';
 import AuthPage from './pages/AuthPage';
 import Login from './components/Login';
 import SignUp from './components/Signup';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import SelectWorkspacePage from './pages/SelectWorkspace';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +29,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AuthGate anonymous />}>
+        <Route element={<AuthGate notRequired />}>
           <Route path="auth" element={<AuthPage />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<SignUp />} />
@@ -46,7 +47,7 @@ const App = () => {
 
 const SignedIn = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const user = useAuthStore((state) => state.user!);
+  //const user = useAuthStore((state) => state.user!);
 
   useEffect(() => {
     const getToken = async () => {
@@ -58,7 +59,8 @@ const SignedIn = () => {
   }, []);
 
   if (isLoading) return null;
-  return (
+
+  /* return (
     <div className="h-screen">
       <Navbar />
       <div className="mx-auto h-full w-full px-1 pt-14 xl:max-w-screen-2xl">
@@ -70,6 +72,12 @@ const SignedIn = () => {
         </div>
       </div>
     </div>
+  ); */
+
+  return (
+    <Routes>
+      <Route path="select-workspace" element={<SelectWorkspacePage />} />
+    </Routes>
   );
 };
 

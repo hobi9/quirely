@@ -1,16 +1,11 @@
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
 
-type Props = {
-  required?: true;
-  anonymous?: true;
-};
+type Props =
+  | { required: true; notRequired?: never }
+  | { required?: never; notRequired: true };
 
-const AuthGate = ({ required, anonymous }: Props) => {
-  if (!required && !anonymous) {
-    throw new Error('Invalid state, required or anonymous must be set.');
-  }
-
+const AuthGate = ({ required, notRequired }: Props) => {
   const user = useAuthStore((state) => state.user);
   const location = useLocation();
 
@@ -23,7 +18,7 @@ const AuthGate = ({ required, anonymous }: Props) => {
       />
     );
   }
-  if (anonymous && user) {
+  if (notRequired && user) {
     return <Navigate to={'/'} replace />;
   }
   return <Outlet />;

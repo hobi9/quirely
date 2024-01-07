@@ -15,7 +15,7 @@ const AuthPage = () => {
       : DEFAULT_TAB;
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[450px] overflow-x-hidden p-2">
+    <div className="mx-auto flex min-h-screen w-full max-w-[450px] flex-col justify-center overflow-x-hidden p-2">
       <main className="flex h-full flex-col items-center justify-center">
         <div className="mb-4 flex items-center justify-center gap-x-2 transition hover:cursor-pointer hover:opacity-75">
           <img src={logo} className="size-16" />
