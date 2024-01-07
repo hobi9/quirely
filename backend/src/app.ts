@@ -9,6 +9,7 @@ import Cookie from '@fastify/cookie';
 import Csrf from '@fastify/csrf-protection';
 import Auth from './plugins/authPlugin';
 import workspaceRouter from './routes/workspaceRouter';
+import userRouter from './routes/userRouter';
 import Mailer from './plugins/mailer';
 import MiscDecorators from './plugins/decorators';
 import Supabase from './plugins/supabase';
@@ -59,6 +60,7 @@ const app = async (fastify: FastifyInstance) => {
 
   await fastify.register(authRouter, { prefix: '/api/v1/auth' });
   await fastify.register(workspaceRouter, { prefix: '/api/v1/workspaces' });
+  await fastify.register(userRouter, { prefix: '/api/v1/users' });
 };
 
 export default app;

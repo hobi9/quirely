@@ -99,22 +99,6 @@ const authRouter = async (fastify: FastifyInstance) => {
     },
     controllers.getMe,
   );
-
-  //TODO: understand how to display the file in swagger documentation
-  fastify.put(
-    '/avatar',
-    {
-      onRequest: [isAuthenticated, csrfProtection],
-      schema: {
-        tags: ['Auth'],
-        consumes: ['multipart/form-data'],
-        response: {
-          200: Type.Pick(SanitizedUserSchema, ['avatarUrl']),
-        },
-      },
-    },
-    controllers.uploadAvatar,
-  );
 };
 
 export default authRouter;

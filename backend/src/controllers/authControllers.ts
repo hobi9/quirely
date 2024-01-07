@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { UserLoginData, UserRegistrationData } from '../schemas/authSchema';
 import crypto from 'crypto';
-import { TOKEN_COOKIE_NAME, AVATAR_BUCKET } from '../utils/constants';
+import { TOKEN_COOKIE_NAME } from '../utils/constants';
 
 const authControllers = (fastify: FastifyInstance) => {
   const { prisma } = fastify;
@@ -166,44 +166,6 @@ const authControllers = (fastify: FastifyInstance) => {
     return { csrfToken };
   };
 
-  const uploadAvatar = async (request: FastifyRequest, reply: FastifyReply) => {
-    const { supabase } = fastify;
-    const { id, avatarUrl: oldAvatarUrl } = request.user;
-    const file = await request.file({ limits: { fileSize: 1_000_000 } });
-
-    if (!file) {
-      return reply.sendError(500, 'Error during image upload');
-    }
-
-    if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
-      return reply.sendError(500, 'Invalid file extension.');
-    }
-
-    const fileBuffer = await file.toBuffer();
-    const { data, error } = await supabase.storage
-      .from(AVATAR_BUCKET)
-      .upload(crypto.randomUUID(), fileBuffer, { contentType: file.mimetype });
-
-    if (error) {
-      request.log.error(error, 'Error during image upload');
-      return reply.sendError(500, 'Error during image upload.');
-    }
-
-    const { publicUrl: avatarUrl } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(data.path).data;
-
-    await prisma.user.update({
-      where: { id },
-      data: { avatarUrl },
-    });
-
-    if (oldAvatarUrl) {
-      const oldFileName = oldAvatarUrl.split('/').at(-1)!;
-      await supabase.storage.from(AVATAR_BUCKET).remove([oldFileName]);
-    }
-
-    return { avatarUrl };
-  };
-
   return {
     registerUser,
     login,
@@ -211,7 +173,6 @@ const authControllers = (fastify: FastifyInstance) => {
     csrfRefresh,
     getMe,
     verifyEmail,
-    uploadAvatar,
   };
 };
 
