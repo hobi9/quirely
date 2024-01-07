@@ -2,10 +2,10 @@ export type User = {
   id: number;
   fullName: string;
   email: string;
-  avatarUrl?: string;
+  avatarUrl: string;
 };
 
-export type UserRegistration = Omit<User, 'id'> & {
+export type UserRegistration = Omit<User, 'id' | 'avatarUrl'> & {
   password: string;
   confirmPassword: string;
 };
