@@ -14,7 +14,7 @@ export const UserSchema = Type.Object({
     minLength: 8,
     maxLength: 254,
   }),
-  avatarUrl: Type.Union([Type.String(), Type.Null()]),
+  avatarUrl: Type.String(),
 });
 
 export const UserRegistrationSchema = Type.Omit(UserSchema, ['id', 'avatarUrl']);

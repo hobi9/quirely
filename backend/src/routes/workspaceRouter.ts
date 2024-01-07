@@ -100,6 +100,22 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
     },
     controllers.confirmInvitation,
   );
+
+  fastify.put<{ Params: { id: number } }>(
+    '/:id/logo',
+    {
+      onRequest: [isAuthenticated, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        params: Type.Object({ id: Type.Number() }),
+        consumes: ['multipart/form-data'],
+        response: {
+          200: Type.Object({ logoUrl: Type.String() }),
+        },
+      },
+    },
+    controllers.updateWorkspaceLogo,
+  );
 };
 
 export default workspaceRouter;

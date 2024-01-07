@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { WorkspaceCreationData } from '../schemas/workspaceSchema';
+import { WORKSPACE_LOGO_BUCKET } from '../utils/constants';
 
 const workspaceControllers = (fastify: FastifyInstance) => {
   const { prisma } = fastify;
@@ -166,6 +167,57 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     return workspaces;
   };
 
+  const updateWorkspaceLogo = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
+    const { supabase, prisma } = fastify;
+    const {
+      user,
+      params: { id },
+    } = request;
+
+    const workspace = await prisma.workspace.findUnique({
+      where: { id, ownerId: user.id },
+    });
+
+    if (!workspace) {
+      return reply.sendError(404, 'Workspace not found');
+    }
+
+    const file = await request.file({ limits: { fileSize: 1_000_000 } });
+
+    if (!file) {
+      return reply.sendError(500, 'Error during image upload');
+    }
+
+    if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
+      return reply.sendError(500, 'Invalid file extension.');
+    }
+
+    const fileBuffer = await file.toBuffer();
+    const { data, error } = await supabase.storage
+      .from(WORKSPACE_LOGO_BUCKET)
+      .upload(crypto.randomUUID(), fileBuffer, { contentType: file.mimetype });
+
+    if (error) {
+      request.log.error(error, 'Error during image upload');
+      return reply.sendError(500, 'Error during image upload.');
+    }
+
+    const { publicUrl: logoUrl } = supabase.storage.from(WORKSPACE_LOGO_BUCKET).getPublicUrl(data.path).data;
+
+    await prisma.workspace.update({
+      where: { id },
+      data: { logoUrl },
+    });
+
+    const oldLogoUrl = workspace?.logoUrl;
+    if (oldLogoUrl) {
+      const oldFileName = oldLogoUrl.split('/').at(-1)!;
+      await supabase.storage.from(WORKSPACE_LOGO_BUCKET).remove([oldFileName]);
+    }
+
+    return { logoUrl };
+  };
+
   return {
     createWorkspace,
     getWorkspaces,
@@ -173,6 +225,7 @@ const workspaceControllers = (fastify: FastifyInstance) => {
     deleteWorkspace,
     confirmInvitation,
     getPendingWorkspaces,
+    updateWorkspaceLogo,
   };
 };
 

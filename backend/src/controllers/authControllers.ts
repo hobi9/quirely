@@ -168,7 +168,7 @@ const authControllers = (fastify: FastifyInstance) => {
 
   const uploadAvatar = async (request: FastifyRequest, reply: FastifyReply) => {
     const { supabase } = fastify;
-    const { id, avatarUrl: oldUrl } = request.user;
+    const { id, avatarUrl: oldAvatarUrl } = request.user;
     const file = await request.file({ limits: { fileSize: 1_000_000 } });
 
     if (!file) {
@@ -181,7 +181,7 @@ const authControllers = (fastify: FastifyInstance) => {
 
     const fileBuffer = await file.toBuffer();
     const { data, error } = await supabase.storage
-      .from('avatars')
+      .from(AVATAR_BUCKET)
       .upload(crypto.randomUUID(), fileBuffer, { contentType: file.mimetype });
 
     if (error) {
@@ -196,8 +196,8 @@ const authControllers = (fastify: FastifyInstance) => {
       data: { avatarUrl },
     });
 
-    if (oldUrl) {
-      const oldFileName = oldUrl.split('/').at(-1)!;
+    if (oldAvatarUrl) {
+      const oldFileName = oldAvatarUrl.split('/').at(-1)!;
       await supabase.storage.from(AVATAR_BUCKET).remove([oldFileName]);
     }
 

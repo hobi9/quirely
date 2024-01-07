@@ -7,9 +7,10 @@ export const WorkspaceSchema = Type.Object({
     maxLength: 100,
   }),
   description: Type.Optional(Type.String()),
+  logoUrl: Type.String(),
 });
 
-export const WorkspaceCreationSchema = Type.Omit(WorkspaceSchema, ['id']);
+export const WorkspaceCreationSchema = Type.Omit(WorkspaceSchema, ['id', 'logoUrl']);
 
 export const EnhancedWorkspaceSchema = Type.Intersect([
   WorkspaceSchema,
