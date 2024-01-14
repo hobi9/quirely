@@ -8,9 +8,10 @@ export const WorkspaceSchema = Type.Object({
   }),
   description: Type.Optional(Type.String()),
   logoUrl: Type.String(),
+  owner: SanitizedUserSchema,
 });
 
-export const WorkspaceCreationSchema = Type.Omit(WorkspaceSchema, ['id', 'logoUrl']);
+export const WorkspaceCreationSchema = Type.Omit(WorkspaceSchema, ['id', 'logoUrl', 'owner']);
 
 export const EnhancedWorkspaceSchema = Type.Intersect([
   WorkspaceSchema,
@@ -23,7 +24,6 @@ export const EnhancedWorkspaceSchema = Type.Intersect([
         }),
       ]),
     ),
-    owner: SanitizedUserSchema,
   }),
 ]);
 

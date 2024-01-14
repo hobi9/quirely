@@ -34,7 +34,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       schema: {
         tags: ['Workspace'],
         response: {
-          200: Type.Array(EnhancedWorkspaceSchema),
+          200: Type.Array(WorkspaceSchema),
         },
       },
     },

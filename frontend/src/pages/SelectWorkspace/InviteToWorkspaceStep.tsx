@@ -48,6 +48,7 @@ const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
           </div>
           <MultipleSelector
             onSearch={async (value) => {
+              if (value.length < 3) return [];
               const res = await getUsers({ email: value });
               return res.map(({ email }) => {
                 return {
@@ -60,12 +61,12 @@ const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
             onChange={setSelectedMails}
             placeholder="trying to search 'a' to get more options..."
             loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+              <p className="text-md py-2 text-center leading-10 text-muted-foreground">
                 loading...
               </p>
             }
             emptyIndicator={
-              <p className="w-full text-center text-lg leading-10 text-muted-foreground">
+              <p className="text-md w-full text-center leading-10 text-muted-foreground">
                 no results found.
               </p>
             }
@@ -74,12 +75,12 @@ const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
         <CardFooter>
           <div className="flex w-full items-center justify-end gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               className="text-xs uppercase"
               type="button"
               onClick={showInitialStep}
             >
-              cancel
+              skip
             </Button>
             <Button
               className="min-w-36 text-xs uppercase"

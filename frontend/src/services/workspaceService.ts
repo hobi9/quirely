@@ -25,3 +25,8 @@ export const inviteToWorkspace = async (id: number, email: string) => {
 
   return response.data;
 };
+
+export const getWorkspaces = async () => {
+  const response = await client.get<Workspace[]>('/workspaces');
+  return response.data;
+};

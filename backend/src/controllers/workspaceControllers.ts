@@ -17,9 +17,12 @@ const workspaceControllers = (fastify: FastifyInstance) => {
           ownerId: user.id,
           updatedAt: null,
         },
+        include: {
+          owner: true,
+        },
       });
 
-      tr.membersOnWorkspaces.create({
+      await tr.membersOnWorkspaces.create({
         data: {
           memberId: user.id,
           workspaceId: workspace.id,
@@ -43,6 +46,9 @@ const workspaceControllers = (fastify: FastifyInstance) => {
             memberId: user.id,
           },
         },
+      },
+      include: {
+        owner: true,
       },
     });
 

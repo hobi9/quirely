@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthGate from './components/AuthGate';
 import { useEffect, useState } from 'react';
 import { getCsrf, getCurrentUser } from './services/authService';
@@ -27,21 +27,19 @@ const App = () => {
   if (isLoading) return null;
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<AuthGate notRequired />}>
-          <Route path="auth" element={<AuthPage />}>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<SignUp />} />
-            <Route index element={<Navigate replace to="login" />} />
-          </Route>
-          <Route path="verify-email/:id/:token" element={<VerifyEmailPage />} />
+    <Routes>
+      <Route element={<AuthGate notRequired />}>
+        <Route path="auth" element={<AuthPage />}>
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<SignUp />} />
+          <Route index element={<Navigate replace to="login" />} />
         </Route>
-        <Route element={<AuthGate required />}>
-          <Route path="*" element={<SignedIn />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        <Route path="verify-email/:id/:token" element={<VerifyEmailPage />} />
+      </Route>
+      <Route element={<AuthGate required />}>
+        <Route path="*" element={<SignedIn />} />
+      </Route>
+    </Routes>
   );
 };
 
