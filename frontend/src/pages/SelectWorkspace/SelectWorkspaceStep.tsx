@@ -41,12 +41,13 @@ const SelectWorkspaceStep = ({ showNextStep }: Props) => {
                 asChild
                 className="mr-3 block"
               >
-                <Link to={`/worskace/${workspace.id}`}>
+                <Link to={`/workspace/${workspace.id}`}>
                   <div className="flex h-full items-center justify-between">
                     <div className="flex items-center  gap-x-2">
                       <img
                         src={workspace.logoUrl || defaultAvatar}
                         className="size-8 rounded-sm  object-cover"
+                        alt={`workspace ${workspace.name} logo`}
                       />
                       <span className="max-w-72 overflow-hidden text-ellipsis">
                         {workspace.name}
