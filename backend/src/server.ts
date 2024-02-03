@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import App from './app';
+import crypto from 'crypto';
 
 const envToLogger = {
   development: {
@@ -19,6 +20,7 @@ const environment = process.env.ENV;
 
 const fastify = Fastify({
   logger: envToLogger[environment],
+  genReqId: () => crypto.randomUUID(),
 });
 
 fastify.register(App);
