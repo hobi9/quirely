@@ -2,14 +2,14 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthGate from './components/AuthGate';
 import { useEffect, useState } from 'react';
 import { getCsrf, getCurrentUser } from './services/authService';
-/* import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar'; */
 import useAuthStore from './stores/authStore';
 import AuthPage from './pages/AuthPage';
 import Login from './components/Login';
 import SignUp from './components/Signup';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import SelectWorkspacePage from './pages/SelectWorkspace';
+import WorkspacePage from './pages/WorkspacePage';
+import Layout from './components/Layout';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,23 +58,12 @@ const SignedIn = () => {
 
   if (isLoading) return null;
 
-  /* return (
-    <div className="h-screen">
-      <Navbar />
-      <div className="mx-auto h-full w-full px-1 pt-14 xl:max-w-screen-2xl">
-        <div className="flex h-full">
-          <Sidebar />
-          <main>
-            Hello <span className="text-green-500">{user.fullName}</span>
-          </main>
-        </div>
-      </div>
-    </div>
-  ); */
-
   return (
     <Routes>
       <Route path="select-workspace" element={<SelectWorkspacePage />} />
+      <Route path="workspace" element={<Layout />}>
+        <Route path=":workspaceId" element={<WorkspacePage />} />
+      </Route>
     </Routes>
   );
 };

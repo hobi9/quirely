@@ -11,7 +11,7 @@ const SelectWorkspacePage = () => {
   const [worskace, setWorkspace] = useState<Workspace | null>(null);
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-2">
+    <main className="flex h-screen w-full items-center justify-center px-2">
       <Card className="w-full max-w-[450px]">
         <div className="ml-4 mt-4 inline-flex items-center gap-1 transition hover:opacity-75">
           <img src={logo} alt="logo" className="size-5" />

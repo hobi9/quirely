@@ -41,7 +41,7 @@ const Avatar = () => {
           </div>
         </div>
         <div className="mt-4">
-          <Button variant={'ghost'} className="w-full p-0">
+          <Button variant={'ghost'} type="button" className="w-full p-0">
             <div className="flex w-full items-center gap-x-1 text-slate-700">
               <Settings size={16} />
               <span>Manage Account</span>
@@ -49,6 +49,7 @@ const Avatar = () => {
           </Button>
           <Button
             variant={'ghost'}
+            type="button"
             className="w-full p-0"
             onClick={handleLogout}
           >

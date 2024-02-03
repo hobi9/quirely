@@ -49,7 +49,6 @@ const CreateWorkspaceStep = ({
   const maxSizeInBytes = 1_000_000;
 
   const submitForm: SubmitHandler<WorkspaceCreation> = async (data) => {
-    console.log('data', data);
     const workspace = await createWorkspace(data);
     if (file) {
       try {
@@ -121,7 +120,7 @@ const CreateWorkspaceStep = ({
               ) : (
                 <img
                   src={URL.createObjectURL(file)}
-                  className="size-full object-fill"
+                  className="size-full object-cover"
                 />
               )}
             </div>

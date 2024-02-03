@@ -1,5 +1,9 @@
 import { client } from '@/lib/axios';
-import { WorkspaceCreation, Workspace } from '@/types/workspace';
+import {
+  WorkspaceCreation,
+  Workspace,
+  WorkspaceDetail,
+} from '@/types/workspace';
 
 export const createWorkspace = async (req: WorkspaceCreation) => {
   const response = await client.post<Workspace>('/workspaces/', req);
@@ -28,5 +32,10 @@ export const inviteToWorkspace = async (id: number, email: string) => {
 
 export const getWorkspaces = async () => {
   const response = await client.get<Workspace[]>('/workspaces');
+  return response.data;
+};
+
+export const getWorkspace = async (id: number) => {
+  const response = await client.get<WorkspaceDetail>(`/workspaces/${id}`);
   return response.data;
 };
