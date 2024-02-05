@@ -10,6 +10,9 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import SelectWorkspacePage from './pages/SelectWorkspace';
 import WorkspacePage from './pages/WorkspacePage';
 import Layout from './components/Layout';
+import SettingsPage from './pages/SettingsPage';
+import BoardsPage from './pages/BoardsPage';
+import ActivityPage from './pages/ActivityPage';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +65,11 @@ const SignedIn = () => {
     <Routes>
       <Route path="select-workspace" element={<SelectWorkspacePage />} />
       <Route path="workspace" element={<Layout />}>
-        <Route path=":workspaceId" element={<WorkspacePage />} />
+        <Route path=":workspaceId" element={<WorkspacePage />}>
+          <Route path="" element={<BoardsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="activity" element={<ActivityPage />} />
+        </Route>
       </Route>
     </Routes>
   );

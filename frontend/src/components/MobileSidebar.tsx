@@ -3,15 +3,15 @@ import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import Sidebar from './Sidebar';
 import { useState } from 'react';
-import { useMediaQuery } from '@uidotdev/usehooks';
+import useIsMobile from '@/hooks/useIsMobile';
 
 const MobileSidebar = () => {
   const [isOpened, setIsOpened] = useState(false);
-  const isMediumDevice = useMediaQuery('(min-width : 768px)');
+  const isMobile = useIsMobile();
 
   return (
-    <Sheet open={isOpened && !isMediumDevice} onOpenChange={setIsOpened}>
-      <SheetTrigger>
+    <Sheet open={isOpened && isMobile} onOpenChange={setIsOpened}>
+      <SheetTrigger asChild>
         <Button variant={'ghost'}>
           <Menu />
         </Button>

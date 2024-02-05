@@ -6,9 +6,9 @@ const Layout = () => {
   return (
     <div className="h-screen">
       <Navbar />
-      <main className="mx-auto h-full w-full px-4 pt-14 xl:max-w-screen-2xl">
+      <main className="mx-auto h-full w-full px-4 pt-20 xl:max-w-screen-2xl">
         <div className="flex h-full">
-          <div className="hidden h-full w-64 shrink-0 pt-4 md:block">
+          <div className="hidden h-full w-64 shrink-0 md:block">
             <Sidebar />
           </div>
           <div>

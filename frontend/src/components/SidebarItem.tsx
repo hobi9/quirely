@@ -7,7 +7,7 @@ import {
 } from './ui/accordion';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import defaultLogo from '../assets/workspace-default.png';
 
 type Props = {
@@ -18,6 +18,7 @@ type Props = {
 };
 
 const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
+  const location = useLocation();
   const routes: Array<{
     type: string;
     icon: React.ReactElement;
@@ -39,7 +40,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
       link: `/workspace/${workspace.id}/settings`,
     },
   ];
-
+  //TODO: add skeleton
   return (
     <AccordionItem
       value={workspace.id.toString()}
