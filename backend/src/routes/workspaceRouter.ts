@@ -9,13 +9,13 @@ import workspaceControllers from '../controllers/workspaceControllers';
 import { Type } from '@sinclair/typebox';
 
 const workspaceRouter = async (fastify: FastifyInstance) => {
-  const { isAuthenticated, csrfProtection } = fastify;
+  const { isAuthenticated, isEmailVerified, csrfProtection } = fastify;
   const controllers = workspaceControllers(fastify);
 
   fastify.post<{ Body: WorkspaceCreationData }>(
     '/',
     {
-      onRequest: [isAuthenticated, csrfProtection],
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
         body: WorkspaceCreationSchema,
@@ -73,7 +73,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
   fastify.delete<{ Params: { id: number } }>(
     '/:id',
     {
-      onRequest: [isAuthenticated, csrfProtection],
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
         params: Type.Object({ id: Type.Number() }),
@@ -88,7 +88,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
   fastify.patch<{ Params: { id: number }; Querystring: { accept: boolean } }>(
     '/:id',
     {
-      onRequest: [isAuthenticated, csrfProtection],
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
         params: Type.Object({ id: Type.Number() }),
@@ -104,7 +104,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
   fastify.patch<{ Params: { id: number } }>(
     '/:id/logo',
     {
-      onRequest: [isAuthenticated, csrfProtection],
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
         params: Type.Object({ id: Type.Number() }),
@@ -120,7 +120,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
   fastify.post<{ Params: { id: number }; Body: { email: string } }>(
     '/:id/invite',
     {
-      onRequest: [isAuthenticated, csrfProtection],
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
         params: Type.Object({ id: Type.Number() }),

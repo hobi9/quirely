@@ -16,21 +16,24 @@ model User {
   updatedAt            DateTime?             @updatedAt @map("updated_at")
   isVerified           Boolean               @default(false) @map("is_verified")
   avatarUrl            String                @default("") @map("avatar_url")
-  token                Token?
   ownedWorkspaces      Workspace[]
   associatedWorkspaces MembersOnWorkspaces[]
+  refreshTokens        RefreshToken[]
 
   @@map("users")
 }
 
-model Token {
-  userId            Int     @id @map("user_id")
-  user              User    @relation(fields: [userId], references: [id])
-  accessToken       String? @map("access_token")
-  refreshToken      String? @map("refresh_token")
-  confirmationToken String? @map("confirmation_token")
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  revoked   Boolean   @default(false)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  ip        String
 
-  @@map("tokens")
+  @@map("refresh_tokens")
 }
 
 model Workspace {

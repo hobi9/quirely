@@ -1,6 +1,5 @@
 import { User, UserLogin, UserRegistration } from '../types/user';
 import { client } from '../lib/axios';
-import { EmailVerificationParams } from '@/types/misc';
 
 export const signin = async (req: UserLogin) => {
   return client.post<void>('/auth/login', req);
@@ -29,6 +28,6 @@ export const signOut = async () => {
   return client.post<void>('/auth/signout');
 };
 
-export const verifyEmail = async ({ id, token }: EmailVerificationParams) => {
-  return client.patch<void>(`/auth/verify/${id}/${token}`);
+export const verifyEmail = async (token: string) => {
+  return client.post<void>(`/auth/verify/${token}`);
 };

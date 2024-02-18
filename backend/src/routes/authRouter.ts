@@ -29,13 +29,12 @@ const authRouter = async (fastify: FastifyInstance) => {
     controllers.registerUser,
   );
 
-  fastify.patch<{ Params: { id: number; token: string } }>(
-    '/verify/:id/:token',
+  fastify.post<{ Params: { token: string } }>(
+    '/verify/:token',
     {
       schema: {
         tags: ['Auth'],
         params: Type.Object({
-          id: Type.Number(),
           token: Type.String(),
         }),
         response: {
@@ -98,6 +97,19 @@ const authRouter = async (fastify: FastifyInstance) => {
       },
     },
     controllers.getMe,
+  );
+
+  fastify.post(
+    '/refresh-tokens',
+    {
+      schema: {
+        tags: ['Auth'],
+        response: {
+          204: Type.Null(),
+        },
+      },
+    },
+    controllers.refresh,
   );
 };
 

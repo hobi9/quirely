@@ -21,6 +21,7 @@ const environment = process.env.ENV;
 const fastify = Fastify({
   logger: envToLogger[environment],
   genReqId: () => crypto.randomUUID(),
+  maxParamLength: 10000,
 });
 
 fastify.register(App);

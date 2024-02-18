@@ -24,6 +24,7 @@ const App = () => {
       setUser(fetchedUser);
       setIsLoading(false);
     };
+
     initializeUser();
   }, [setUser]);
 
@@ -37,7 +38,7 @@ const App = () => {
           <Route path="register" element={<SignUp />} />
           <Route index element={<Navigate replace to="login" />} />
         </Route>
-        <Route path="verify-email/:id/:token" element={<VerifyEmailPage />} />
+        <Route path="verify-email/:token" element={<VerifyEmailPage />} />
       </Route>
       <Route element={<AuthGate required />}>
         <Route path="*" element={<SignedIn />} />

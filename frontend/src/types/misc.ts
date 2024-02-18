@@ -4,8 +4,3 @@ export type ServerError<Schema> = {
   message: string;
   field?: keyof Schema;
 };
-
-export type EmailVerificationParams = {
-  id: string;
-  token: string;
-};

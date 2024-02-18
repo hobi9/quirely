@@ -2,6 +2,7 @@ import { FastifyReply } from 'fastify';
 import { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
 declare module 'fastify' {
   interface FastifyReply {
@@ -14,6 +15,8 @@ declare module 'fastify' {
     compareHash: (s1: string, s2: string) => Promise<boolean>;
     hash: (toHash: string, salt: string) => Promise<string>;
     isTokenExpiredError: (err: unknown) => boolean;
+    createToken: (opts: { payload: string | object | Buffer; secret: string; duration?: string | number }) => string;
+    verifyToken: <T extends string | object | Buffer>(opts: { token: string; secret: string }) => T;
   }
 }
 
@@ -53,10 +56,30 @@ const miscDecorators: FastifyPluginAsync = fp(async (fastify) => {
   fastify.decorate('compareHash', (s1, s2) => bcrypt.compare(s1, s2));
   fastify.decorate('hash', (toHash, salt) => bcrypt.hash(toHash, salt));
 
+  fastify.decorate(
+    'createToken',
+    ({
+      payload,
+      secret,
+      duration,
+    }: {
+      payload: string | object | Buffer;
+      secret: string;
+      duration?: string | number;
+    }) => {
+      return jwt.sign(payload, secret, { expiresIn: duration });
+    },
+  );
+
+  fastify.decorate(
+    'verifyToken',
+    <T extends string | object | Buffer>({ token, secret }: { token: string; secret: string }) => {
+      return jwt.verify(token, secret) as T;
+    },
+  );
+
   fastify.decorate('isTokenExpiredError', (error) => {
-    return (
-      typeof error === 'object' && !!error && 'code' in error && error.code === 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED'
-    );
+    return error instanceof TokenExpiredError;
   });
 });
 

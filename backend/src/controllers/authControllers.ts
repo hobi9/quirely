@@ -1,15 +1,15 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { UserLoginData, UserRegistrationData } from '../schemas/authSchema';
 import crypto from 'crypto';
-import { TOKEN_COOKIE_NAME } from '../utils/constants';
+import { REFRESH_TOKEN_COOKIE, ACCESS_TOKEN_COOKIE } from '../utils/constants';
 
 const authControllers = (fastify: FastifyInstance) => {
   const { prisma } = fastify;
 
   const registerUser = async (request: FastifyRequest<{ Body: UserRegistrationData }>, reply: FastifyReply) => {
     const { email, fullName, password } = request.body;
-    const { sendMail, genSalt, hash } = fastify;
-    const { CLIENT_BASE_URL } = fastify.config;
+    const { sendMail, genSalt, hash, createToken } = fastify;
+    const { CLIENT_BASE_URL, JWT_EMAIL_SECRET } = fastify.config;
 
     const lowercaseEmail = email.toLowerCase();
 
@@ -36,22 +36,11 @@ const authControllers = (fastify: FastifyInstance) => {
       },
     });
 
-    const confirmationToken = crypto.randomBytes(32).toString('hex');
-
-    await prisma.token.create({
-      data: { userId: createdUser.id, confirmationToken },
+    const confirmationToken = createToken({
+      payload: { id: createdUser.id },
+      secret: JWT_EMAIL_SECRET,
+      duration: 60 * 60 * 24,
     });
-
-    new Promise(
-      (resolve) =>
-        setTimeout(async () => {
-          await prisma.token.update({
-            where: { userId: createdUser.id },
-            data: { confirmationToken: null },
-          });
-          resolve(null);
-        }, 600000), // 5 minutes
-    );
 
     await sendMail({
       email: lowercaseEmail,
@@ -59,7 +48,7 @@ const authControllers = (fastify: FastifyInstance) => {
       message: `<!doctype html>
       <html>
         <body>
-          <p>Verify your email <a href="${CLIENT_BASE_URL}/verify-email/${createdUser.id}/${confirmationToken}">here</a></p>
+          <p>Verify your email <a href="${CLIENT_BASE_URL}/verify-email/${confirmationToken}">here</a></p>
         </body>
       </html>
       `,
@@ -68,26 +57,22 @@ const authControllers = (fastify: FastifyInstance) => {
     return reply.code(201).send();
   };
 
-  const verifyEmail = async (
-    request: FastifyRequest<{ Params: { id: number; token: string } }>,
-    reply: FastifyReply,
-  ) => {
-    const { id, token } = request.params;
+  const verifyEmail = async (request: FastifyRequest<{ Params: { token: string } }>, reply: FastifyReply) => {
+    try {
+      const { token } = request.params;
+      const { verifyToken, config } = fastify;
+      const { id } = verifyToken<{ id: number }>({ token, secret: config.JWT_EMAIL_SECRET });
 
-    const userTokens = await prisma.token.findUnique({
-      where: { userId: id },
-    });
+      await prisma.user.update({
+        where: { id },
+        data: { isVerified: true, updatedAt: null },
+      });
 
-    if (!userTokens || token !== userTokens.confirmationToken) {
-      return reply.sendError(400, 'Invalid link');
+      return reply.code(204).send();
+    } catch (err) {
+      fastify.log.error(err, 'Error during verifyEmail');
+      return reply.sendError(400, 'Invalid token');
     }
-
-    await prisma.user.update({
-      where: { id },
-      data: { isVerified: true, token: { update: { data: { confirmationToken: null } } } },
-    });
-
-    reply.code(200).send();
   };
 
   const login = async (request: FastifyRequest<{ Body: UserLoginData }>, reply: FastifyReply) => {
@@ -95,7 +80,7 @@ const authControllers = (fastify: FastifyInstance) => {
     const { compareHash } = fastify;
 
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
     });
 
     if (!user) {
@@ -111,59 +96,154 @@ const authControllers = (fastify: FastifyInstance) => {
       return reply.sendValidationError<UserLoginData>(400, { message: 'Invalid email or password.', field: 'email' });
     }
 
-    await fastify.refreshTokens(user.id, reply);
-
-    return reply.code(200).send();
-  };
-
-  const signout = async (request: FastifyRequest, reply: FastifyReply) => {
-    const { id } = request.user;
-
-    await prisma.token.update({
-      where: {
-        userId: id,
-      },
-      data: {
-        accessToken: null,
-        refreshToken: null,
-      },
-    });
-
-    reply.clearCookie(TOKEN_COOKIE_NAME, { path: '/' });
+    await fastify.refreshTokens(user.id, request.ip, reply);
 
     return reply.code(204).send();
   };
 
-  const getMe = async (request: FastifyRequest) => {
-    const { isTokenExpiredError, jwt } = fastify;
+  const signout = async (request: FastifyRequest, reply: FastifyReply) => {
+    const refreshTokenCookie = request.cookies[REFRESH_TOKEN_COOKIE];
+
+    if (!refreshTokenCookie) {
+      return reply.sendError(401, 'Refresh token is not present');
+    }
+
+    const verifiedRefreshTokenCookie = request.unsignCookie(refreshTokenCookie);
+
+    if (!verifiedRefreshTokenCookie.valid) {
+      return reply.sendError(401, 'Invalid cookie signature');
+    }
+
+    await prisma.refreshToken.delete({
+      where: {
+        token: verifiedRefreshTokenCookie.value!,
+      },
+    });
+
+    reply.clearCookie(ACCESS_TOKEN_COOKIE, { path: '/' });
+    reply.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
+
+    return reply.code(204).send();
+  };
+
+  const getMe = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { refreshTokens, verifyToken, isTokenExpiredError, config } = fastify;
+
+    const refreshTokenCookie = request.cookies[REFRESH_TOKEN_COOKIE];
+
+    if (!refreshTokenCookie) {
+      //return reply.sendError(401, 'Refresh token is not present');
+      return null;
+    }
+
+    const verifiedRefreshTokenCookie = request.unsignCookie(refreshTokenCookie);
+
+    if (!verifiedRefreshTokenCookie.valid) {
+      //return reply.sendError(401, 'Invalid cookie signature');
+      return null;
+    }
+
     try {
-      const { id } = await request.jwtVerify<{ id: number }>();
-      return prisma.user.findUnique({ where: { id } });
+      const { id } = verifyToken<{ id: number }>({
+        token: verifiedRefreshTokenCookie.value!,
+        secret: config.JWT_AUTH_SECRET,
+      });
+
+      const user = await prisma.user.findUnique({ where: { id } });
+
+      if (!user) {
+        // return reply.sendError(401, 'Unauthorized, user not found');
+        return null;
+      }
+
+      const revokedToken = await prisma.refreshToken.findUnique({
+        where: {
+          token: verifiedRefreshTokenCookie.value!,
+          revoked: true,
+        },
+      });
+
+      if (revokedToken) {
+        // return reply.sendError(401, 'Unauthorized, token is revoked');
+        return null;
+      }
+
+      await prisma.refreshToken.deleteMany({
+        where: {
+          token: verifiedRefreshTokenCookie.value!,
+        },
+      });
+
+      await refreshTokens(user.id, request.ip, reply);
+
+      return user;
     } catch (err) {
-      if (!isTokenExpiredError(err)) {
-        return null;
+      if (isTokenExpiredError(err)) {
+        return reply.sendError(401, 'Token is expired');
       }
-      const { id } = await request.jwtDecode<{ id: number }>();
-      const user = await prisma.user.findUnique({ where: { id }, include: { token: true } });
-
-      const refreshToken = user?.token?.refreshToken;
-
-      if (!refreshToken) {
-        return null;
-      }
-
-      try {
-        jwt.verify(refreshToken);
-        return user;
-      } catch (err) {
-        return null;
-      }
+      request.log.error(err, 'Error during getMe.refresh');
+      return reply.code(401).send();
     }
   };
 
   const csrfRefresh = async (_request: FastifyRequest, reply: FastifyReply) => {
     const csrfToken = reply.generateCsrf();
     return { csrfToken };
+  };
+
+  const refreshTokens = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { refreshTokens, verifyToken, isTokenExpiredError, config } = fastify;
+    const refreshTokenCookie = request.cookies[REFRESH_TOKEN_COOKIE];
+
+    if (!refreshTokenCookie) {
+      return reply.sendError(401, 'Refresh token is not present');
+    }
+
+    const verifiedRefreshTokenCookie = request.unsignCookie(refreshTokenCookie);
+
+    if (!verifiedRefreshTokenCookie.valid) {
+      return reply.sendError(401, 'Invalid cookie signature');
+    }
+
+    try {
+      const { id } = verifyToken<{ id: number }>({
+        token: verifiedRefreshTokenCookie.value!,
+        secret: config.JWT_AUTH_SECRET,
+      });
+
+      const user = await prisma.user.findUnique({ where: { id } });
+
+      if (!user) {
+        return reply.sendError(401, 'Unauthorized, user not found');
+      }
+
+      const revokedToken = await prisma.refreshToken.findUnique({
+        where: {
+          token: verifiedRefreshTokenCookie.value!,
+          revoked: true,
+        },
+      });
+
+      if (revokedToken) {
+        return reply.sendError(401, 'Unauthorized, token is revoked');
+      }
+
+      await prisma.refreshToken.delete({
+        where: {
+          token: verifiedRefreshTokenCookie.value!,
+        },
+      });
+
+      await refreshTokens(user.id, request.ip, reply);
+
+      return reply.code(204).send();
+    } catch (err) {
+      if (isTokenExpiredError(err)) {
+        return reply.sendError(401, 'Token is expired');
+      }
+      request.log.error(err, 'Error during auth.refresh');
+      return reply.code(401).send();
+    }
   };
 
   return {
@@ -173,6 +253,7 @@ const authControllers = (fastify: FastifyInstance) => {
     csrfRefresh,
     getMe,
     verifyEmail,
+    refresh: refreshTokens,
   };
 };
 

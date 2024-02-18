@@ -1,17 +1,15 @@
 import { verifyEmail } from '@/services/authService';
-import { EmailVerificationParams } from '@/types/misc';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const VerifyEmailPage = () => {
-  const { id, token } =
-    useParams<EmailVerificationParams>() as EmailVerificationParams;
+  const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleEmailVerification = async () => {
       try {
-        await verifyEmail({ id, token });
+        await verifyEmail(token!);
       } catch (error) {
         // TODO: add some kind of toaster
       }
@@ -19,7 +17,7 @@ const VerifyEmailPage = () => {
       navigate('/', { replace: true });
     };
     handleEmailVerification();
-  }, [id, token, navigate]);
+  }, [token, navigate]);
 
   return null;
 };

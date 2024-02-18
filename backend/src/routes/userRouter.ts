@@ -6,7 +6,7 @@ import { Type } from '@sinclair/typebox';
 import { QueryUser, QueryUserSchema } from '../schemas/userSchema';
 
 const userRouter = async (fastify: FastifyInstance) => {
-  const { isAuthenticated, csrfProtection } = fastify;
+  const { isAuthenticated, isEmailVerified, csrfProtection } = fastify;
 
   const controllers = userControllers(fastify);
 
@@ -14,7 +14,7 @@ const userRouter = async (fastify: FastifyInstance) => {
   fastify.patch(
     '/avatar',
     {
-      onRequest: [isAuthenticated, csrfProtection],
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['User'],
         consumes: ['multipart/form-data'],
