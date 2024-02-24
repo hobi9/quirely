@@ -1,62 +1,48 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id                   Int                   @id @default(autoincrement())
-  email                String                @unique @db.VarChar(254)
-  fullName             String                @map("full_name") @db.VarChar(100)
-  password             String
-  createdAt            DateTime              @default(now()) @map("created_at")
-  updatedAt            DateTime?             @updatedAt @map("updated_at")
-  isVerified           Boolean               @default(false) @map("is_verified")
-  avatarUrl            String                @default("") @map("avatar_url")
-  ownedWorkspaces      Workspace[]
-  associatedWorkspaces MembersOnWorkspaces[]
-  refreshTokens        RefreshToken[]
+    id                   Int                   @id @default(autoincrement())
+    email                String                @unique @db.VarChar(254)
+    fullName             String                @map("full_name") @db.VarChar(100)
+    password             String
+    createdAt            DateTime              @default(now()) @map("created_at")
+    updatedAt            DateTime?             @updatedAt @map("updated_at")
+    isVerified           Boolean               @default(false) @map("is_verified")
+    avatarUrl            String                @default("") @map("avatar_url")
+    ownedWorkspaces      Workspace[]
+    associatedWorkspaces MembersOnWorkspaces[]
 
-  @@map("users")
-}
-
-model RefreshToken {
-  id        Int       @id @default(autoincrement())
-  userId    Int       @map("user_id")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String    @unique
-  revoked   Boolean   @default(false)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  ip        String
-
-  @@map("refresh_tokens")
+    @@map("users")
 }
 
 model Workspace {
-  id          Int                   @id @default(autoincrement())
-  name        String                @db.VarChar(100)
-  description String?
-  ownerId     Int                   @map("owner_id")
-  createdAt   DateTime              @default(now()) @map("created_at")
-  updatedAt   DateTime?             @updatedAt @map("updated_at")
-  members     MembersOnWorkspaces[]
-  owner       User                  @relation(fields: [ownerId], references: [id])
-  logoUrl     String                @default("") @map("logo_url")
+    id          Int                   @id @default(autoincrement())
+    name        String                @db.VarChar(100)
+    description String?
+    ownerId     Int                   @map("owner_id")
+    createdAt   DateTime              @default(now()) @map("created_at")
+    updatedAt   DateTime?             @updatedAt @map("updated_at")
+    members     MembersOnWorkspaces[]
+    owner       User                  @relation(fields: [ownerId], references: [id])
+    logoUrl     String                @default("") @map("logo_url")
 
-  @@map("workspaces")
+    @@map("workspaces")
 }
 
 model MembersOnWorkspaces {
-  memberId    Int       @map("member_id")
-  member      User      @relation(fields: [memberId], references: [id])
-  workspaceId Int       @map("workspace_id")
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  accepted    Boolean?
+    memberId    Int       @map("member_id")
+    member      User      @relation(fields: [memberId], references: [id])
+    workspaceId Int       @map("workspace_id")
+    workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+    accepted    Boolean?
 
-  @@id([memberId, workspaceId])
-  @@map("members_workspaces")
+    @@id([memberId, workspaceId])
+    @@map("members_workspaces")
 }

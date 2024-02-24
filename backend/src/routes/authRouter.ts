@@ -98,19 +98,6 @@ const authRouter = async (fastify: FastifyInstance) => {
     },
     controllers.getMe,
   );
-
-  fastify.post(
-    '/refresh-tokens',
-    {
-      schema: {
-        tags: ['Auth'],
-        response: {
-          204: Type.Null(),
-        },
-      },
-    },
-    controllers.refresh,
-  );
 };
 
 export default authRouter;

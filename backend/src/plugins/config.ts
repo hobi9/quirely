@@ -5,8 +5,9 @@ import Env from '@fastify/env';
 
 const configSchema = Type.Object({
   DATABASE_URL: Type.String(),
+  REDIS_URL: Type.String(),
   COOKIE_SECRET: Type.String(),
-  JWT_AUTH_SECRET: Type.String(),
+  SESSION_SECRET: Type.String(),
   JWT_EMAIL_SECRET: Type.String(),
   ENV: Type.Union([Type.Literal('production'), Type.Literal('development'), Type.Literal('test')]),
   NODE_ENV: Type.Literal('production'),

@@ -2,12 +2,12 @@ import { FastifyReply } from 'fastify';
 import { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 import bcrypt from 'bcrypt';
-import jwt, { TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 declare module 'fastify' {
   interface FastifyReply {
-    sendValidationError: <Schema>(status: number, opts: SendErrorOpts<Schema>) => void;
-    sendError: (status: number, message: string) => void;
+    sendValidationError: <Schema>(status: number, opts: SendErrorOpts<Schema>) => FastifyReply;
+    sendError: (status: number, message: string) => FastifyReply;
   }
 
   interface FastifyInstance {
@@ -38,8 +38,7 @@ const miscDecorators: FastifyPluginAsync = fp(async (fastify) => {
       error: 'Validation',
       ...opts,
     };
-    this.status(status);
-    this.send(customError);
+    return this.status(status).send(customError);
   });
 
   fastify.decorateReply('sendError', function (this: FastifyReply, status: number, message: string) {
@@ -48,8 +47,7 @@ const miscDecorators: FastifyPluginAsync = fp(async (fastify) => {
       error: 'Error',
       message,
     };
-    this.status(status);
-    this.send(customError);
+    return this.status(status).send(customError);
   });
 
   fastify.decorate('genSalt', (rounds?: number) => bcrypt.genSalt(rounds));
@@ -77,10 +75,6 @@ const miscDecorators: FastifyPluginAsync = fp(async (fastify) => {
       return jwt.verify(token, secret) as T;
     },
   );
-
-  fastify.decorate('isTokenExpiredError', (error) => {
-    return error instanceof TokenExpiredError;
-  });
 });
 
 export default miscDecorators;
