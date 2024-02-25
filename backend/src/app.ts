@@ -17,6 +17,7 @@ import Multipart from '@fastify/multipart';
 import Session from '@fastify/session';
 import Redis from 'ioredis';
 import RedisStore from 'connect-redis';
+import crypto from 'crypto';
 
 declare module 'fastify' {
   interface Session {
@@ -51,14 +52,19 @@ const app = async (fastify: FastifyInstance) => {
     saveUninitialized: false,
     cookie: {
       secure: ENV === 'production',
-      maxAge: 60 * 60 * 24 * 365,
+      maxAge: 60 * 60 * 24 * 30,
       sameSite: 'strict',
     },
     store: new RedisStore({
       client: new Redis(REDIS_URL, { enableAutoPipelining: true, keyPrefix: 'quirely:' }),
       prefix: 'session:',
-      ttl: 60 * 60 * 24 * 365,
+      ttl: 60 * 60 * 24 * 30,
     }),
+    idGenerator: (request) => {
+      const userId = request?.session.userId || 0;
+      const randomId = crypto.randomUUID();
+      return `${userId}:${randomId}`;
+    },
   });
 
   await fastify.register(Csrf, {

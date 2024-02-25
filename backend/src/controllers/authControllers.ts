@@ -95,7 +95,11 @@ const authControllers = (fastify: FastifyInstance) => {
       return reply.sendValidationError<UserLoginData>(400, { message: 'Invalid email or password.', field: 'email' });
     }
 
-    request.session.userId = user.id;
+    if (!request.session.userId) {
+      request.session.userId = user.id;
+      await request.session.regenerate();
+      request.session.userId = user.id;
+    }
 
     return reply.code(204).send();
   };
