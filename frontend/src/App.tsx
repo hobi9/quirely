@@ -10,7 +10,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import SelectWorkspacePage from './pages/SelectWorkspace';
 import WorkspacePage from './pages/WorkspacePage';
 import Layout from './components/Layout';
-import SettingsPage from './pages/SettingsPage';
+import SettingsPage from './pages/WorkspaceSettings';
 import BoardsPage from './pages/BoardsPage';
 import ActivityPage from './pages/ActivityPage';
 
@@ -68,7 +68,7 @@ const SignedIn = () => {
       <Route path="workspace" element={<Layout />}>
         <Route path=":workspaceId" element={<WorkspacePage />}>
           <Route path="" element={<BoardsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route path="settings/*" element={<SettingsPage />} />
           <Route path="activity" element={<ActivityPage />} />
         </Route>
       </Route>

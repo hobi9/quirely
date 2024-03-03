@@ -16,7 +16,7 @@ const WorkspacePage = () => {
 
   if (isPending) return;
 
-  if (isError && isAxiosError(error) && error.status === 404) {
+  if (isError && isAxiosError(error) && error.response?.status === 404) {
     // TODO: handle it better
     return <Navigate to={'/select-workspace'} replace />;
   }

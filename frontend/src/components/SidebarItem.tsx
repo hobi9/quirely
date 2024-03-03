@@ -23,21 +23,31 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
     type: string;
     icon: React.ReactElement;
     link: string;
+    matches(): boolean;
   }> = [
     {
       type: 'Boards',
       icon: <PanelsRightBottom className="size-4" />,
       link: `/workspace/${workspace.id}`,
+      matches() {
+        return location.pathname === this.link;
+      },
     },
     {
       type: 'Activity',
       icon: <Bell className="size-4" />,
       link: `/workspace/${workspace.id}/activity`,
+      matches() {
+        return location.pathname === this.link;
+      },
     },
     {
       type: 'Settings',
       icon: <Settings className="size-4" />,
       link: `/workspace/${workspace.id}/settings`,
+      matches() {
+        return location.pathname.startsWith(this.link);
+      },
     },
   ];
   //TODO: add skeleton
@@ -71,8 +81,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
               variant={'ghost'}
               className={cn(
                 'w-full justify-start pl-10 font-normal hover:bg-none',
-                location.pathname === route.link &&
-                  'bg-blue-600/10 text-blue-700',
+                route.matches() && 'bg-blue-600/10 text-blue-700',
               )}
             >
               <Link to={route.link} className="flex gap-x-2">

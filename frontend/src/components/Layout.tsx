@@ -6,12 +6,12 @@ const Layout = () => {
   return (
     <div className="h-screen">
       <Navbar />
-      <main className="mx-auto h-full w-full px-4 pt-20 xl:max-w-screen-2xl">
-        <div className="flex h-full">
+      <main className="mx-auto h-full w-full px-4 pt-24 xl:max-w-screen-2xl">
+        <div className="flex h-full gap-x-4">
           <div className="hidden h-full w-64 shrink-0 md:block">
             <Sidebar />
           </div>
-          <div>
+          <div className="w-full">
             <Outlet />
           </div>
         </div>

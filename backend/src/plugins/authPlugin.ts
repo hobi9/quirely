@@ -4,8 +4,8 @@ import { User } from '@prisma/client';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    isAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-    isEmailVerified: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    isAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | void>;
+    isEmailVerified: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | void>;
   }
 
   interface FastifyRequest {
@@ -16,7 +16,7 @@ declare module 'fastify' {
 const authPlugin = fp(async (fastify) => {
   const { prisma } = fastify;
 
-  fastify.decorateRequest('user', Object.create(null));
+  fastify.decorateRequest('user');
 
   const isAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
     if (!request.session.userId) {
