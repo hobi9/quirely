@@ -34,13 +34,15 @@ declare global {
 }
 
 const loadDotenv = async () => {
-  if (process.env.ENV === 'production') return;
   const dotenv = await import('dotenv');
   dotenv.config({ path: `.env.${process.env.ENV}` });
 };
 
 const configPlugin: FastifyPluginAsync = fp(async (fastify) => {
-  await loadDotenv();
+  if (process.env.ENV !== 'production') {
+    await loadDotenv();
+  }
+
   await fastify.register(Env, {
     schema: configSchema,
   });

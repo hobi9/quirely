@@ -2,17 +2,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import logo from '../assets/logo.svg';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
-const ALLOWED_PATHS = ['login', 'register'];
-const DEFAULT_TAB = 'default';
-
 const AuthPage = () => {
   const location = useLocation();
-  const currentPath = location.pathname.split('/').at(-1);
-
-  const activeTab =
-    currentPath && ALLOWED_PATHS.includes(currentPath)
-      ? currentPath
-      : DEFAULT_TAB;
+  const activeTab = location.pathname.split('/').pop()!;
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[450px] flex-col justify-center overflow-x-hidden p-2">
@@ -21,7 +13,7 @@ const AuthPage = () => {
           <img src={logo} className="size-16" />
           <h1 className="font-logo text-5xl">Quirely</h1>
         </div>
-        <Tabs className="w-full" value={activeTab} defaultValue="default">
+        <Tabs className="w-full" value={activeTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login" asChild>
               <Link to={'login'}>Sign In</Link>
@@ -30,13 +22,7 @@ const AuthPage = () => {
               <Link to={'register'}>Sign Up</Link>
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="login">
-            <Outlet />
-          </TabsContent>
-          <TabsContent value="register">
-            <Outlet />
-          </TabsContent>
-          <TabsContent value="default">
+          <TabsContent value={activeTab}>
             <Outlet />
           </TabsContent>
         </Tabs>
