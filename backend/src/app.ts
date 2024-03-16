@@ -2,22 +2,22 @@ import { FastifyInstance } from 'fastify';
 import Swagger from '@fastify/swagger';
 import SwaggerUi from '@fastify/swagger-ui';
 import Cors from '@fastify/cors';
-import authRouter from './routes/authRouter';
-import Prisma from './plugins/prisma';
-import Config from './plugins/config';
+import authRouter from './modules/auth/auth.router';
+import prismaPlugin from './plugins/prismaPlugin';
 import Cookie from '@fastify/cookie';
 import Csrf from '@fastify/csrf-protection';
-import Auth from './plugins/authPlugin';
-import workspaceRouter from './routes/workspaceRouter';
-import userRouter from './routes/userRouter';
-import Mailer from './plugins/mailer';
-import MiscDecorators from './plugins/decorators';
-import Supabase from './plugins/supabase';
+import authPlugin from './plugins/authPlugin';
+import workspaceRouter from './modules/workspaces/workspace.router';
+import userRouter from './modules/users/user.router';
+import decoratorsPlugin from './plugins/decoratorsPlugin';
+import supabasePlugin from './plugins/supabasePlugin';
 import Multipart from '@fastify/multipart';
 import Session from '@fastify/session';
 import Redis from 'ioredis';
 import RedisStore from 'connect-redis';
 import crypto from 'crypto';
+import { logger } from './lib/logger';
+import { RequestContext, executionContext } from './utils/executionContext';
 
 declare module 'fastify' {
   interface Session {
@@ -26,16 +26,14 @@ declare module 'fastify' {
 }
 
 const app = async (fastify: FastifyInstance) => {
-  await fastify.register(Config);
-
-  const { CLIENT_BASE_URL, COOKIE_SECRET, ENV, SESSION_SECRET, REDIS_URL } = fastify.config;
+  const { CLIENT_BASE_URL, COOKIE_SECRET, ENV, SESSION_SECRET, REDIS_URL } = process.env;
 
   if (ENV !== 'production') {
     await fastify.register(Swagger);
     await fastify.register(SwaggerUi);
   }
 
-  await fastify.register(MiscDecorators);
+  await fastify.register(decoratorsPlugin);
 
   await fastify.register(Cors, {
     origin: CLIENT_BASE_URL,
@@ -52,7 +50,7 @@ const app = async (fastify: FastifyInstance) => {
     saveUninitialized: false,
     cookie: {
       secure: ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: 1000 * 60 * 60 * 24 * 30,
       sameSite: 'strict',
     },
     store: new RedisStore({
@@ -78,14 +76,27 @@ const app = async (fastify: FastifyInstance) => {
     },
   }); //TODO: fix before deploing
 
-  await fastify.register(Prisma);
-  await fastify.register(Mailer);
-  await fastify.register(Auth);
-  await fastify.register(Supabase);
+  fastify.addHook('preHandler', (request, _, done) => {
+    const requestContext: RequestContext = { requestId: request.id, sessionId: request.session.sessionId };
+    executionContext.run(requestContext, done);
+  });
+
+  fastify.addHook('preHandler', async (request) => {
+    const { method, url, body } = request;
+    logger.info({ method, url, body }, 'API REQUEST');
+  });
+
+  await fastify.register(prismaPlugin);
+  await fastify.register(authPlugin);
+  await fastify.register(supabasePlugin);
   await fastify.register(Multipart);
 
-  fastify.addHook('onSend', async (req, reply, payload) => {
-    reply.header('x-request-id', req.id);
+  fastify.addHook('onSend', async (request, reply, payload) => {
+    const { method, url } = request;
+    const { statusCode } = reply;
+    logger.info({ method, url, body: payload, statusCode }, 'API RESPONSE');
+
+    reply.header('requestId', request.id);
     return payload;
   });
 

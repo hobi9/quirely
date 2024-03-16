@@ -1,30 +1,30 @@
 import {
   EnhancedWorkspaceSchema,
-  WorkspaceCreationData,
+  WorkspaceCreation,
   WorkspaceCreationSchema,
   WorkspaceSchema,
-} from '../schemas/workspaceSchema';
+} from './workspace.schema';
 import { FastifyInstance } from 'fastify';
-import workspaceControllers from '../controllers/workspaceControllers';
-import { Type } from '@sinclair/typebox';
+import * as controller from './workspace.controller';
+import zodToJsonSchema from 'zod-to-json-schema';
+import z from 'zod';
 
 const workspaceRouter = async (fastify: FastifyInstance) => {
   const { isAuthenticated, isEmailVerified, csrfProtection } = fastify;
-  const controllers = workspaceControllers(fastify);
 
-  fastify.post<{ Body: WorkspaceCreationData }>(
+  fastify.post<{ Body: WorkspaceCreation }>(
     '/',
     {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
-        body: WorkspaceCreationSchema,
+        body: zodToJsonSchema(WorkspaceCreationSchema),
         response: {
-          201: WorkspaceSchema,
+          201: zodToJsonSchema(WorkspaceSchema),
         },
       },
     },
-    controllers.createWorkspace,
+    controller.createWorkspace,
   );
 
   fastify.get(
@@ -34,11 +34,26 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       schema: {
         tags: ['Workspace'],
         response: {
-          200: Type.Array(WorkspaceSchema),
+          200: zodToJsonSchema(z.array(WorkspaceSchema)),
         },
       },
     },
-    controllers.getWorkspaces,
+    controller.getWorkspaces,
+  );
+
+  fastify.get<{ Params: { id: number } }>(
+    '/:id',
+    {
+      onRequest: isAuthenticated,
+      schema: {
+        tags: ['Workspace'],
+        params: zodToJsonSchema(z.object({ id: z.number() })),
+        response: {
+          200: zodToJsonSchema(EnhancedWorkspaceSchema),
+        },
+      },
+    },
+    controller.getWorkspaceById,
   );
 
   fastify.get(
@@ -48,26 +63,11 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       schema: {
         tags: ['Workspace'],
         response: {
-          200: Type.Array(WorkspaceSchema),
+          200: zodToJsonSchema(z.array(WorkspaceSchema)),
         },
       },
     },
-    controllers.getPendingWorkspaces,
-  );
-
-  fastify.get<{ Params: { id: number } }>(
-    '/:id',
-    {
-      onRequest: isAuthenticated,
-      schema: {
-        tags: ['Workspace'],
-        params: Type.Object({ id: Type.Number() }),
-        response: {
-          200: EnhancedWorkspaceSchema,
-        },
-      },
-    },
-    controllers.getWorkspaceById,
+    controller.getPendingWorkspaces,
   );
 
   fastify.delete<{ Params: { id: number } }>(
@@ -76,13 +76,13 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
-        params: Type.Object({ id: Type.Number() }),
+        params: zodToJsonSchema(z.object({ id: z.number() })),
         response: {
-          204: Type.Null(),
+          204: zodToJsonSchema(z.null()),
         },
       },
     },
-    controllers.deleteWorkspace,
+    controller.deleteWorkspace,
   );
 
   fastify.patch<{ Params: { id: number }; Querystring: { accept: boolean } }>(
@@ -91,14 +91,14 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
-        params: Type.Object({ id: Type.Number() }),
-        querystring: Type.Object({ accept: Type.Boolean() }),
+        params: zodToJsonSchema(z.object({ id: z.number() })),
+        querystring: zodToJsonSchema(z.object({ accept: z.boolean() })),
         response: {
-          200: Type.Null(),
+          204: zodToJsonSchema(z.null()),
         },
       },
     },
-    controllers.confirmInvitation,
+    controller.confirmInvitation,
   );
 
   fastify.patch<{ Params: { id: number } }>(
@@ -107,14 +107,14 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
-        params: Type.Object({ id: Type.Number() }),
+        params: zodToJsonSchema(z.object({ id: z.number() })),
         consumes: ['multipart/form-data'],
         response: {
-          200: Type.Object({ logoUrl: Type.String() }),
+          200: zodToJsonSchema(z.object({ logoUrl: z.string() })),
         },
       },
     },
-    controllers.updateWorkspaceLogo,
+    controller.updateWorkspaceLogo,
   );
 
   fastify.post<{ Params: { id: number }; Body: { email: string } }>(
@@ -123,14 +123,14 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
         tags: ['Workspace'],
-        params: Type.Object({ id: Type.Number() }),
-        body: Type.Object({ email: Type.String() }),
+        params: zodToJsonSchema(z.object({ id: z.number() })),
+        body: zodToJsonSchema(z.object({ email: z.string() })),
         response: {
-          200: Type.Null(),
+          204: zodToJsonSchema(z.null()),
         },
       },
     },
-    controllers.inviteUser,
+    controller.inviteUser,
   );
 };
 

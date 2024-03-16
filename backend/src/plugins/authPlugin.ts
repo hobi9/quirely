@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { User } from '@prisma/client';
+import { prisma } from './prismaPlugin';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -14,8 +15,6 @@ declare module 'fastify' {
 }
 
 const authPlugin = fp(async (fastify) => {
-  const { prisma } = fastify;
-
   fastify.decorateRequest('user');
 
   const isAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {

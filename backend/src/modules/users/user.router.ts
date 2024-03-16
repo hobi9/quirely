@@ -1,14 +1,13 @@
-import { SanitizedUserSchema } from '../schemas/authSchema';
-import userControllers from '../controllers/userControllers';
+import { SanitizedUserSchema } from '../auth/auth.schema';
+import * as controller from './user.controller';
 import { FastifyInstance } from 'fastify';
 
-import { Type } from '@sinclair/typebox';
-import { QueryUser, QueryUserSchema } from '../schemas/userSchema';
+import { QueryUser, QueryUserSchema } from './user.schema';
+import zodToJsonSchema from 'zod-to-json-schema';
+import z from 'zod';
 
 const userRouter = async (fastify: FastifyInstance) => {
   const { isAuthenticated, isEmailVerified, csrfProtection } = fastify;
-
-  const controllers = userControllers(fastify);
 
   //TODO: understand how to display the file in swagger documentation
   fastify.patch(
@@ -19,11 +18,11 @@ const userRouter = async (fastify: FastifyInstance) => {
         tags: ['User'],
         consumes: ['multipart/form-data'],
         response: {
-          200: Type.Pick(SanitizedUserSchema, ['avatarUrl']),
+          200: zodToJsonSchema(SanitizedUserSchema.pick({ avatarUrl: true })),
         },
       },
     },
-    controllers.uploadAvatar,
+    controller.uploadAvatar,
   );
 
   fastify.get<{ Querystring: QueryUser }>(
@@ -32,13 +31,13 @@ const userRouter = async (fastify: FastifyInstance) => {
       onRequest: isAuthenticated,
       schema: {
         tags: ['User'],
-        querystring: QueryUserSchema,
+        querystring: zodToJsonSchema(QueryUserSchema),
         response: {
-          200: Type.Array(SanitizedUserSchema),
+          200: zodToJsonSchema(z.array(SanitizedUserSchema)),
         },
       },
     },
-    controllers.queryUsers,
+    controller.queryUsers,
   );
 };
 

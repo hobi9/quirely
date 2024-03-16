@@ -1,5 +1,6 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -15,7 +16,7 @@ model User {
     createdAt            DateTime              @default(now()) @map("created_at")
     updatedAt            DateTime?             @updatedAt @map("updated_at")
     isVerified           Boolean               @default(false) @map("is_verified")
-    avatarUrl            String                @default("") @map("avatar_url")
+    avatarUrl            String?               @map("avatar_url")
     ownedWorkspaces      Workspace[]
     associatedWorkspaces MembersOnWorkspaces[]
 

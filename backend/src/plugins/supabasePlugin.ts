@@ -8,10 +8,10 @@ declare module 'fastify' {
   }
 }
 
-const supabasePlugin: FastifyPluginAsync = fp(async (fastify: FastifyInstance) => {
-  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE } = fastify.config;
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
+const { SUPABASE_URL, SUPABASE_SERVICE_ROLE } = process.env;
+export const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
 
+const supabasePlugin: FastifyPluginAsync = fp(async (fastify: FastifyInstance) => {
   fastify.decorate('supabase', supabase);
 });
 

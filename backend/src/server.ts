@@ -1,35 +1,24 @@
 import Fastify from 'fastify';
 import App from './app';
 import crypto from 'crypto';
+import { validateEnvironment } from './config/config';
+import { logger } from './lib/logger';
 
-const envToLogger = {
-  development: {
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        translateTime: 'HH:MM:ss Z',
-        ignore: 'pid,hostname',
-      },
-    },
-  },
-  production: true,
-  test: false,
-} as const;
-
-const environment = process.env.ENV;
+validateEnvironment();
 
 const fastify = Fastify({
-  logger: envToLogger[environment],
+  logger,
   genReqId: () => crypto.randomUUID(),
   maxParamLength: 10000,
+  disableRequestLogging: true,
 });
 
 fastify.register(App);
 
-fastify.listen({ port: 8080 }, (err, address) => {
-  if (err) {
-    console.error(err);
+fastify.listen({ port: process.env.SERVER_PORT }, (error, address) => {
+  if (error) {
+    logger.error(error, 'Error during server startup');
     process.exit(1);
   }
-  console.log(`Server listening at ${address}`);
+  logger.info(`Server listening at hello ${address}`);
 });

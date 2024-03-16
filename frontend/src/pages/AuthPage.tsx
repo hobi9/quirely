@@ -4,7 +4,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 
 const AuthPage = () => {
   const location = useLocation();
-  const activeTab = location.pathname.split('/').pop()!;
+  const activeTab = location.pathname.split('/').at(-1)!;
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[450px] flex-col justify-center overflow-x-hidden p-2">
