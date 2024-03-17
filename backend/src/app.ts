@@ -3,14 +3,12 @@ import Swagger from '@fastify/swagger';
 import SwaggerUi from '@fastify/swagger-ui';
 import Cors from '@fastify/cors';
 import authRouter from './modules/auth/auth.router';
-import prismaPlugin from './plugins/prismaPlugin';
 import Cookie from '@fastify/cookie';
 import Csrf from '@fastify/csrf-protection';
 import authPlugin from './plugins/authPlugin';
 import workspaceRouter from './modules/workspaces/workspace.router';
 import userRouter from './modules/users/user.router';
 import decoratorsPlugin from './plugins/decoratorsPlugin';
-import supabasePlugin from './plugins/supabasePlugin';
 import Multipart from '@fastify/multipart';
 import Session from '@fastify/session';
 import Redis from 'ioredis';
@@ -86,9 +84,7 @@ const app = async (fastify: FastifyInstance) => {
     logger.info({ method, url, body }, 'API REQUEST');
   });
 
-  await fastify.register(prismaPlugin);
   await fastify.register(authPlugin);
-  await fastify.register(supabasePlugin);
   await fastify.register(Multipart);
 
   fastify.addHook('onSend', async (request, reply, payload) => {

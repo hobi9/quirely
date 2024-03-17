@@ -2,55 +2,31 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { WorkspaceCreation } from './workspace.schema';
 import { WORKSPACE_LOGO_BUCKET } from '../../utils/constants';
 import { logger } from '../../lib/logger';
-import { prisma } from '../../plugins/prismaPlugin';
-import { supabase } from '../../plugins/supabasePlugin';
+import {
+  deleteWorkspaceById,
+  findWorkspaceById,
+  getWorkspaceDetail,
+  getWorkspacesByMemberId,
+  insertWorkspace,
+  inviteToWorkspace,
+  updateWorkspaceLogo,
+} from './workspace.service';
+import { uploadFile } from '../../lib/supabase';
+import { findUserByEmail } from '../users/user.service';
 
 export const createWorkspace = async (request: FastifyRequest<{ Body: WorkspaceCreation }>, reply: FastifyReply) => {
-  const { user } = request;
+  const { id } = request.user;
   const { name, description } = request.body;
 
-  const createdWorkspace = await prisma.$transaction(async (tr) => {
-    const workspace = await tr.workspace.create({
-      data: {
-        name: name.trim(),
-        description,
-        ownerId: user.id,
-        updatedAt: null,
-      },
-      include: {
-        owner: true,
-      },
-    });
+  const workspace = await insertWorkspace({ name, description }, id);
 
-    await tr.membersOnWorkspaces.create({
-      data: {
-        memberId: user.id,
-        workspaceId: workspace.id,
-        accepted: true,
-      },
-    });
-
-    return workspace;
-  });
-
-  return reply.code(201).send(createdWorkspace);
+  return reply.code(201).send(workspace);
 };
 
 export const getWorkspaces = async (request: FastifyRequest) => {
-  const { user } = request;
+  const { id } = request.user;
 
-  const workspaces = await prisma.workspace.findMany({
-    where: {
-      members: {
-        some: {
-          memberId: user.id,
-        },
-      },
-    },
-    include: {
-      owner: true,
-    },
-  });
+  const workspaces = await getWorkspacesByMemberId(id, true);
 
   return workspaces;
 };
@@ -58,53 +34,19 @@ export const getWorkspaces = async (request: FastifyRequest) => {
 export const getWorkspaceById = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
   const { user, params } = request;
 
-  const workspace = await prisma.workspace.findUnique({
-    where: {
-      id: params.id,
-      members: {
-        some: {
-          memberId: user.id,
-          accepted: true,
-        },
-      },
-    },
-    include: {
-      members: {
-        include: {
-          member: true,
-        },
-      },
-      owner: true,
-    },
-  });
+  const workspace = await getWorkspaceDetail({ workspaceId: params.id, userId: user.id });
 
   if (!workspace) {
     return reply.sendValidationError(404, { message: 'Workspace not found.' });
   }
 
-  const members = workspace.members
-    .filter(({ accepted }) => accepted || workspace.ownerId === user.id)
-    .map(({ member, accepted }) => ({ ...member, accepted }));
-
-  return { ...workspace, members };
+  return workspace;
 };
 
 export const getPendingWorkspaces = async (request: FastifyRequest) => {
-  const { user } = request;
+  const { id } = request.user;
 
-  const workspaces = await prisma.workspace.findMany({
-    where: {
-      members: {
-        some: {
-          memberId: user.id,
-          accepted: null,
-        },
-      },
-    },
-    include: {
-      owner: true,
-    },
-  });
+  const workspaces = await getWorkspacesByMemberId(id);
 
   return workspaces;
 };
@@ -112,11 +54,7 @@ export const getPendingWorkspaces = async (request: FastifyRequest) => {
 export const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
   const { user, params } = request;
 
-  const workspace = await prisma.workspace.findUnique({
-    where: {
-      id: params.id,
-    },
-  });
+  const workspace = await findWorkspaceById(params.id);
 
   if (!workspace) {
     return reply.sendError(404, 'Workspace not found.');
@@ -126,11 +64,7 @@ export const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: nu
     return reply.sendError(409, 'You are not the owner of the workspace.');
   }
 
-  await prisma.workspace.delete({
-    where: {
-      id: params.id,
-    },
-  });
+  await deleteWorkspaceById(params.id);
 
   return reply.code(204).send();
 };
@@ -173,54 +107,48 @@ export const confirmInvitation = async (
   return reply.code(204).send();
 };
 
-export const updateWorkspaceLogo = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
+export const updateLogo = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
   const {
     user,
     params: { id },
   } = request;
 
-  const workspace = await prisma.workspace.findUnique({
-    where: { id, ownerId: user.id },
-  });
+  const workspace = await findWorkspaceById(id);
 
   if (!workspace) {
-    return reply.sendError(404, 'Workspace not found');
+    return reply.sendError(404, 'Workspace not found.');
+  }
+
+  if (workspace.ownerId !== user.id) {
+    return reply.sendError(409, 'You are not the owner of the workspace.');
   }
 
   const file = await request.file({ limits: { fileSize: 1_000_000 } });
 
   if (!file) {
-    return reply.sendError(500, 'Error during image upload');
+    return reply.sendError(400, 'Invalid file.');
   }
 
   if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
-    return reply.sendError(500, 'Invalid file extension.');
+    return reply.sendError(400, 'Invalid file extension.');
   }
 
-  const fileBuffer = await file.toBuffer();
-  const { data, error } = await supabase.storage
-    .from(WORKSPACE_LOGO_BUCKET)
-    .upload(crypto.randomUUID(), fileBuffer, { contentType: file.mimetype });
+  try {
+    const fileBuffer = await file.toBuffer();
 
-  if (error) {
-    logger.error(error, 'Error during image upload');
-    return reply.sendError(500, 'Error during image upload.');
+    const logoUrl = await uploadFile({
+      bucket: WORKSPACE_LOGO_BUCKET,
+      mimeType: file.mimetype,
+      oldFileUrl: workspace.logoUrl,
+      fileBuffer,
+      updateCallback: (url) => updateWorkspaceLogo(url, workspace.id),
+    });
+
+    return { logoUrl };
+  } catch (error) {
+    logger.error({ error }, 'Error during logo upload');
+    return reply.sendError(500, 'Error during logo upload.');
   }
-
-  const { publicUrl: logoUrl } = supabase.storage.from(WORKSPACE_LOGO_BUCKET).getPublicUrl(data.path).data;
-
-  await prisma.workspace.update({
-    where: { id },
-    data: { logoUrl },
-  });
-
-  const oldLogoUrl = workspace?.logoUrl;
-  if (oldLogoUrl) {
-    const oldFileName = oldLogoUrl.split('/').at(-1)!;
-    await supabase.storage.from(WORKSPACE_LOGO_BUCKET).remove([oldFileName]);
-  }
-
-  return { logoUrl };
 };
 
 export const inviteUser = async (
@@ -235,12 +163,10 @@ export const inviteUser = async (
     return reply.sendError(409, `You can't invite yourself`);
   }
 
-  const member = await prisma.user.findUnique({
-    where: { email },
-  });
+  const member = await findUserByEmail(email);
 
   if (!member) {
-    return reply.sendError(404, 'Member not found');
+    return reply.sendError(404, 'User not found');
   }
 
   const workspace = await prisma.workspace.findUnique({
@@ -259,11 +185,9 @@ export const inviteUser = async (
     return reply.sendError(404, 'Workspace not found');
   }
 
-  await prisma.membersOnWorkspaces.create({
-    data: {
-      workspaceId: workspace.id,
-      memberId: member.id,
-    },
+  await inviteToWorkspace({
+    workspaceId: id,
+    userId: user.id,
   });
 
   return reply.status(204).send();

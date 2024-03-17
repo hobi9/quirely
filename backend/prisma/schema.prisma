@@ -32,7 +32,7 @@ model Workspace {
     updatedAt   DateTime?             @updatedAt @map("updated_at")
     members     MembersOnWorkspaces[]
     owner       User                  @relation(fields: [ownerId], references: [id])
-    logoUrl     String                @default("") @map("logo_url")
+    logoUrl     String?               @map("logo_url")
 
     @@map("workspaces")
 }

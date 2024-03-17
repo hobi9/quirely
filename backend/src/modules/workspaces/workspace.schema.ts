@@ -4,20 +4,15 @@ import { SanitizedUserSchema } from '../auth/auth.schema';
 export const WorkspaceSchema = z.object({
   id: z.number(),
   name: z.string().max(100),
-  description: z.string().optional(),
-  logoUrl: z.string(),
-  owner: SanitizedUserSchema,
+  description: z.string().optional().nullable(),
+  logoUrl: z.string().nullable(),
 });
 
 export const WorkspaceCreationSchema = WorkspaceSchema.omit({ id: true, logoUrl: true, owner: true });
 
-export const EnhancedWorkspaceSchema = WorkspaceSchema.extend({
-  members: z.array(
-    z.object({
-      ...SanitizedUserSchema.shape,
-      accepted: z.boolean().nullable(),
-    }),
-  ),
+export const WorkspaceDetailSchema = WorkspaceSchema.extend({
+  owner: SanitizedUserSchema,
 });
 
 export type WorkspaceCreation = z.infer<typeof WorkspaceCreationSchema>;
+export type WorkspaceDetail = z.infer<typeof WorkspaceDetailSchema>;

@@ -15,7 +15,7 @@ export const prisma = new PrismaClient({
 
 export const prismaPlugin: FastifyPluginAsync = fp(async (fastify) => {
   prisma.$on('query', (e) => {
-    logger.info(`Query: ${e.query} \n Params: ${e.params} \n Duration: ${e.duration} ms`);
+    logger.info(`PRISMAQuery: ${e.query} \n Params: ${e.params} \n Duration: ${e.duration} ms`);
   });
 
   await prisma.$connect();

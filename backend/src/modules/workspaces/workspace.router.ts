@@ -1,9 +1,4 @@
-import {
-  EnhancedWorkspaceSchema,
-  WorkspaceCreation,
-  WorkspaceCreationSchema,
-  WorkspaceSchema,
-} from './workspace.schema';
+import { WorkspaceCreation, WorkspaceCreationSchema, WorkspaceDetailSchema, WorkspaceSchema } from './workspace.schema';
 import { FastifyInstance } from 'fastify';
 import * as controller from './workspace.controller';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -49,7 +44,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
         tags: ['Workspace'],
         params: zodToJsonSchema(z.object({ id: z.number() })),
         response: {
-          200: zodToJsonSchema(EnhancedWorkspaceSchema),
+          200: zodToJsonSchema(WorkspaceDetailSchema),
         },
       },
     },
@@ -114,7 +109,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
         },
       },
     },
-    controller.updateWorkspaceLogo,
+    controller.updateLogo,
   );
 
   fastify.post<{ Params: { id: number }; Body: { email: string } }>(

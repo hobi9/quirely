@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { User } from '@prisma/client';
-import { prisma } from './prismaPlugin';
+import { findUserById } from '../modules/users/user.service';
+import { SelectUser } from '../db/schema';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -10,7 +10,7 @@ declare module 'fastify' {
   }
 
   interface FastifyRequest {
-    user: User;
+    user: SelectUser;
   }
 }
 
@@ -24,9 +24,7 @@ const authPlugin = fp(async (fastify) => {
 
     const { userId } = request.session;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const user = await findUserById(userId);
 
     if (!user) {
       return reply.sendError(401, 'User not found');

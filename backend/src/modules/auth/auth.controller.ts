@@ -2,9 +2,9 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { UserLogin, UserRegistration } from './auth.schema';
 import crypto from 'crypto';
 import { logger } from '../../lib/logger';
-import { prisma } from '../../plugins/prismaPlugin';
 import { compareHash, createToken, genSalt, hash, verifyToken } from './auth.service';
 import { sendMail } from '../../lib/mailer';
+import { createUser, findUserByEmail, findUserById, verifyUserEmail } from '../users/user.service';
 
 export const registerUser = async (request: FastifyRequest<{ Body: UserRegistration }>, reply: FastifyReply) => {
   const { CLIENT_BASE_URL, JWT_EMAIL_SECRET } = process.env;
@@ -12,9 +12,7 @@ export const registerUser = async (request: FastifyRequest<{ Body: UserRegistrat
 
   const lowerCasedEmail = email.toLowerCase();
 
-  const userInDb = await prisma.user.findUnique({
-    where: { email: lowerCasedEmail },
-  });
+  const userInDb = await findUserByEmail(lowerCasedEmail);
 
   if (userInDb) {
     return reply.sendValidationError<UserRegistration>(409, {
@@ -26,13 +24,10 @@ export const registerUser = async (request: FastifyRequest<{ Body: UserRegistrat
   const salt = await genSalt(10);
   const passwordHash = await hash(password, salt);
 
-  const createdUser = await prisma.user.create({
-    data: {
-      fullName: fullName.trim(),
-      password: passwordHash,
-      email: lowerCasedEmail,
-      updatedAt: null,
-    },
+  const createdUser = await createUser({
+    fullName: fullName.trim(),
+    password: passwordHash,
+    email: lowerCasedEmail,
   });
 
   const confirmationToken = createToken({
@@ -61,10 +56,7 @@ export const verifyEmail = async (request: FastifyRequest<{ Params: { token: str
     const { token } = request.params;
     const { id } = verifyToken<{ id: number }>({ token, secret: process.env.JWT_EMAIL_SECRET });
 
-    await prisma.user.update({
-      where: { id },
-      data: { isVerified: true, updatedAt: null },
-    });
+    await verifyUserEmail(id);
 
     return reply.code(204).send();
   } catch (err) {
@@ -76,9 +68,7 @@ export const verifyEmail = async (request: FastifyRequest<{ Params: { token: str
 export const login = async (request: FastifyRequest<{ Body: UserLogin }>, reply: FastifyReply) => {
   const { email, password } = request.body;
 
-  const user = await prisma.user.findUnique({
-    where: { email: email.toLowerCase() },
-  });
+  const user = await findUserByEmail(email.toLowerCase());
 
   if (!user) {
     // instead of returning early we compare with a random string in order to prevent timing attacks
@@ -120,9 +110,11 @@ export const getMe = async (request: FastifyRequest, reply: FastifyReply) => {
     return reply.code(204).send(null);
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
+  const user = await findUserById(userId);
+
+  if (!user) {
+    return reply.code(204).send(null);
+  }
 
   return user;
 };

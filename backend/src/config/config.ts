@@ -32,7 +32,11 @@ export const validateEnvironment = () => {
   const parsedConfig = configSchema.safeParse(process.env);
 
   if (!parsedConfig.success) {
-    console.error('Error during env validation:', parsedConfig.error);
+    const { fieldErrors } = parsedConfig.error.flatten();
+    const errorMessage = Object.entries(fieldErrors)
+      .map(([field, errors]) => (errors ? `${field}: ${errors.join(', ')}` : field))
+      .join('\n  ');
+    console.error('Error during env validation:', errorMessage);
     process.exit(-1);
   }
 };
