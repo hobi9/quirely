@@ -5,10 +5,14 @@ import { logger } from '../../lib/logger';
 import {
   deleteWorkspaceById,
   findWorkspaceById,
+  getExternalWorkspaceById,
+  getMembership,
   getWorkspaceDetail,
+  getWorkspaceMembers,
   getWorkspacesByMemberId,
   insertWorkspace,
   inviteToWorkspace,
+  updateInvitationStatus,
   updateWorkspaceLogo,
 } from './workspace.service';
 import { uploadFile } from '../../lib/supabase';
@@ -75,13 +79,9 @@ export const confirmInvitation = async (
 ) => {
   const { user, params, query } = request;
 
-  const memberWorkspace = await prisma.membersOnWorkspaces.findUnique({
-    where: {
-      memberId_workspaceId: {
-        memberId: user.id,
-        workspaceId: params.id,
-      },
-    },
+  const memberWorkspace = await getMembership({
+    workspaceId: params.id,
+    userId: user.id,
   });
 
   if (!memberWorkspace) {
@@ -92,16 +92,10 @@ export const confirmInvitation = async (
     return reply.sendError(409, 'You have already confirmed this workspace.');
   }
 
-  await prisma.membersOnWorkspaces.update({
-    where: {
-      memberId_workspaceId: {
-        memberId: user.id,
-        workspaceId: params.id,
-      },
-    },
-    data: {
-      accepted: query.accept,
-    },
+  await updateInvitationStatus({
+    memberId: user.id,
+    workspaceId: memberWorkspace.workspaceId,
+    accepted: query.accept,
   });
 
   return reply.code(204).send();
@@ -169,16 +163,9 @@ export const inviteUser = async (
     return reply.sendError(404, 'User not found');
   }
 
-  const workspace = await prisma.workspace.findUnique({
-    where: {
-      id,
-      ownerId: user.id,
-      members: {
-        none: {
-          memberId: member.id,
-        },
-      },
-    },
+  const workspace = await getExternalWorkspaceById({
+    workspaceId: id,
+    userId: member.id,
   });
 
   if (!workspace) {
@@ -191,4 +178,14 @@ export const inviteUser = async (
   });
 
   return reply.status(204).send();
+};
+
+export const getMembers = async (request: FastifyRequest<{ Params: { id: number } }>) => {
+  const { id } = request.params;
+  const { user } = request;
+
+  return getWorkspaceMembers({
+    workspaceId: id,
+    userId: user.id,
+  });
 };

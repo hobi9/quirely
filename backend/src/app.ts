@@ -74,6 +74,9 @@ const app = async (fastify: FastifyInstance) => {
     },
   }); //TODO: fix before deploing
 
+  await fastify.register(authPlugin);
+  await fastify.register(Multipart);
+
   fastify.addHook('preHandler', (request, _, done) => {
     const requestContext: RequestContext = { requestId: request.id, sessionId: request.session.sessionId };
     executionContext.run(requestContext, done);
@@ -83,9 +86,6 @@ const app = async (fastify: FastifyInstance) => {
     const { method, url, body } = request;
     logger.info({ method, url, body }, 'API REQUEST');
   });
-
-  await fastify.register(authPlugin);
-  await fastify.register(Multipart);
 
   fastify.addHook('onSend', async (request, reply, payload) => {
     const { method, url } = request;

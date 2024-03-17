@@ -3,6 +3,7 @@ import { FastifyInstance } from 'fastify';
 import * as controller from './workspace.controller';
 import zodToJsonSchema from 'zod-to-json-schema';
 import z from 'zod';
+import { SanitizedUserSchema } from '../auth/auth.schema';
 
 const workspaceRouter = async (fastify: FastifyInstance) => {
   const { isAuthenticated, isEmailVerified, csrfProtection } = fastify;
@@ -126,6 +127,21 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       },
     },
     controller.inviteUser,
+  );
+
+  fastify.get<{ Params: { id: number } }>(
+    '/:id/members',
+    {
+      onRequest: [isAuthenticated, isEmailVerified],
+      schema: {
+        tags: ['Workspace'],
+        params: zodToJsonSchema(z.object({ id: z.number() })),
+        response: {
+          200: zodToJsonSchema(z.array(SanitizedUserSchema)),
+        },
+      },
+    },
+    controller.getMembers,
   );
 };
 

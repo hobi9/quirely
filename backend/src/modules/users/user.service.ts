@@ -25,7 +25,7 @@ export const createUser = async (user: UserRegistration) => {
   return newUser[0]!;
 };
 
-export const verifyUserEmail = async (id: number) => {
+export const updateVerification = async (id: number) => {
   await db.update(users).set({ isVerified: true }).where(eq(users.id, id));
 };
 
@@ -48,5 +48,5 @@ export const findOtherUsersByFilter = async (filter: QueryUser & { userId: numbe
 };
 
 export const updateUserAvatar = async (avatarUrl: string, userId: number) => {
-  await db.update(users).set({ avatarUrl }).where(eq(users.id, userId));
+  await db.update(users).set({ avatarUrl, updatedAt: new Date() }).where(eq(users.id, userId));
 };

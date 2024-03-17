@@ -6,7 +6,7 @@ import { logger } from '../lib/logger';
 
 class DrizzleLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
-    logger.info(`DRIZZLEQuery: ${query} \n Params: ${params}`);
+    logger.info(`Query: ${query} \n Params: ${params}`);
   }
 }
 

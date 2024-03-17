@@ -34,9 +34,9 @@ export const validateEnvironment = () => {
   if (!parsedConfig.success) {
     const { fieldErrors } = parsedConfig.error.flatten();
     const errorMessage = Object.entries(fieldErrors)
-      .map(([field, errors]) => (errors ? `${field}: ${errors.join(', ')}` : field))
-      .join('\n  ');
-    console.error('Error during env validation:', errorMessage);
+      .map(([field, errors]) => (errors ? `${field}: ${errors.join(',')}` : field))
+      .join('\n');
+    console.error('Error during env validation: \n', errorMessage);
     process.exit(-1);
   }
 };

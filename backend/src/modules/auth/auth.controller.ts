@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { logger } from '../../lib/logger';
 import { compareHash, createToken, genSalt, hash, verifyToken } from './auth.service';
 import { sendMail } from '../../lib/mailer';
-import { createUser, findUserByEmail, findUserById, verifyUserEmail } from '../users/user.service';
+import { createUser, findUserByEmail, findUserById, updateVerification } from '../users/user.service';
 
 export const registerUser = async (request: FastifyRequest<{ Body: UserRegistration }>, reply: FastifyReply) => {
   const { CLIENT_BASE_URL, JWT_EMAIL_SECRET } = process.env;
@@ -56,7 +56,7 @@ export const verifyEmail = async (request: FastifyRequest<{ Params: { token: str
     const { token } = request.params;
     const { id } = verifyToken<{ id: number }>({ token, secret: process.env.JWT_EMAIL_SECRET });
 
-    await verifyUserEmail(id);
+    await updateVerification(id);
 
     return reply.code(204).send();
   } catch (err) {

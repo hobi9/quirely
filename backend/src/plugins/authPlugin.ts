@@ -15,8 +15,6 @@ declare module 'fastify' {
 }
 
 const authPlugin = fp(async (fastify) => {
-  fastify.decorateRequest('user');
-
   const isAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
     if (!request.session.userId) {
       return reply.sendError(401, 'SessionId not present');
@@ -33,8 +31,6 @@ const authPlugin = fp(async (fastify) => {
     request.user = user;
   };
 
-  fastify.decorate('isAuthenticated', isAuthenticated);
-
   const isEmailVerified = async (request: FastifyRequest, reply: FastifyReply) => {
     const user = request.user;
 
@@ -43,6 +39,8 @@ const authPlugin = fp(async (fastify) => {
     }
   };
 
+  fastify.decorateRequest('user');
+  fastify.decorate('isAuthenticated', isAuthenticated);
   fastify.decorate('isEmailVerified', isEmailVerified);
 });
 
