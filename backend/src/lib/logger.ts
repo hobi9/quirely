@@ -1,5 +1,5 @@
-import pino, { LoggerOptions } from 'pino';
-import { ENV } from '../config/config';
+import pino, { type LoggerOptions } from 'pino';
+import type { ENV } from '../config/config';
 import { executionContext } from '../utils/executionContext';
 
 type LoggerConfig = Record<ENV, LoggerOptions>;

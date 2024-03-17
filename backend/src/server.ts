@@ -1,6 +1,6 @@
+import crypto from 'node:crypto';
 import Fastify from 'fastify';
 import App from './app';
-import crypto from 'crypto';
 import { validateEnvironment } from './config/config';
 import { logger } from './lib/logger';
 

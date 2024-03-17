@@ -1,9 +1,14 @@
-import { WorkspaceCreation, WorkspaceCreationSchema, WorkspaceDetailSchema, WorkspaceSchema } from './workspace.schema';
-import { FastifyInstance } from 'fastify';
-import * as controller from './workspace.controller';
-import zodToJsonSchema from 'zod-to-json-schema';
+import type { FastifyInstance } from 'fastify';
 import z from 'zod';
+import zodToJsonSchema from 'zod-to-json-schema';
 import { SanitizedUserSchema } from '../auth/auth.schema';
+import * as controller from './workspace.controller';
+import {
+  type WorkspaceCreation,
+  WorkspaceCreationSchema,
+  WorkspaceDetailSchema,
+  WorkspaceSchema,
+} from './workspace.schema';
 
 const workspaceRouter = async (fastify: FastifyInstance) => {
   const { isAuthenticated, isEmailVerified, csrfProtection } = fastify;

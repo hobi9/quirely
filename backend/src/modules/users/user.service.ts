@@ -1,8 +1,8 @@
 import { and, eq, like, ne, notInArray } from 'drizzle-orm';
 import { db } from '../../db';
 import { membersWorkspaces, users } from '../../db/schema';
-import { UserRegistration } from '../auth/auth.schema';
-import { QueryUser } from './user.schema';
+import type { UserRegistration } from '../auth/auth.schema';
+import type { QueryUser } from './user.schema';
 
 export const findUserById = async (id: number) => {
   const result = await db.select().from(users).where(eq(users.id, id));

@@ -1,12 +1,12 @@
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import type { SelectUser } from '../db/schema';
 import { findUserById } from '../modules/users/user.service';
-import { SelectUser } from '../db/schema';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    isAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | void>;
-    isEmailVerified: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | void>;
+    isAuthenticated: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | undefined>;
+    isEmailVerified: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | undefined>;
   }
 
   interface FastifyRequest {

@@ -1,9 +1,9 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { AVATAR_BUCKET } from '../../utils/constants';
-import { QueryUser } from './user.schema';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logger } from '../../lib/logger';
-import { findOtherUsersByFilter, updateUserAvatar } from './user.service';
 import { uploadFile } from '../../lib/supabase';
+import { AVATAR_BUCKET } from '../../utils/constants';
+import type { QueryUser } from './user.schema';
+import { findOtherUsersByFilter, updateUserAvatar } from './user.service';
 
 export const uploadAvatar = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id, avatarUrl: oldAvatarUrl } = request.user;

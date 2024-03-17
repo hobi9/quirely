@@ -1,5 +1,5 @@
-import { FastifyReply } from 'fastify';
-import { FastifyPluginAsync } from 'fastify';
+import type { FastifyReply } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 
 declare module 'fastify' {

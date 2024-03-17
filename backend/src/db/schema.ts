@@ -1,14 +1,14 @@
-import { InferSelectModel } from 'drizzle-orm';
+import type { InferSelectModel } from 'drizzle-orm';
 import {
-  pgTable,
-  uniqueIndex,
-  serial,
-  varchar,
-  text,
-  timestamp,
   boolean,
   integer,
+  pgTable,
   primaryKey,
+  serial,
+  text,
+  timestamp,
+  uniqueIndex,
+  varchar,
 } from 'drizzle-orm/pg-core';
 
 export const users = pgTable(

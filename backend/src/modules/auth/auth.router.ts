@@ -1,14 +1,14 @@
-import * as controller from './auth.controller';
-import { FastifyInstance } from 'fastify';
-import {
-  UserRegistration,
-  UserRegistrationSchema,
-  UserLogin,
-  UserLoginSchema,
-  SanitizedUserSchema,
-} from './auth.schema';
-import zodToJsonSchema from 'zod-to-json-schema';
+import type { FastifyInstance } from 'fastify';
 import z from 'zod';
+import zodToJsonSchema from 'zod-to-json-schema';
+import * as controller from './auth.controller';
+import {
+  SanitizedUserSchema,
+  type UserLogin,
+  UserLoginSchema,
+  type UserRegistration,
+  UserRegistrationSchema,
+} from './auth.schema';
 
 const authRouter = async (fastify: FastifyInstance) => {
   const { isAuthenticated, csrfProtection } = fastify;

@@ -1,7 +1,7 @@
-import { SQL, and, eq, inArray, isNull, notInArray } from 'drizzle-orm';
+import { type SQL, and, eq, inArray, isNull, notInArray } from 'drizzle-orm';
 import { db } from '../../db';
 import { membersWorkspaces, users, workspaces } from '../../db/schema';
-import { WorkspaceCreation, WorkspaceDetail } from './workspace.schema';
+import type { WorkspaceCreation, WorkspaceDetail } from './workspace.schema';
 
 export const insertWorkspace = async (workspace: WorkspaceCreation, ownerId: number) => {
   const { name, description } = workspace;

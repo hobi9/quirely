@@ -1,7 +1,9 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { WorkspaceCreation } from './workspace.schema';
-import { WORKSPACE_LOGO_BUCKET } from '../../utils/constants';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logger } from '../../lib/logger';
+import { uploadFile } from '../../lib/supabase';
+import { WORKSPACE_LOGO_BUCKET } from '../../utils/constants';
+import { findUserByEmail } from '../users/user.service';
+import type { WorkspaceCreation } from './workspace.schema';
 import {
   deleteWorkspaceById,
   findWorkspaceById,
@@ -15,8 +17,6 @@ import {
   updateInvitationStatus,
   updateWorkspaceLogo,
 } from './workspace.service';
-import { uploadFile } from '../../lib/supabase';
-import { findUserByEmail } from '../users/user.service';
 
 export const createWorkspace = async (request: FastifyRequest<{ Body: WorkspaceCreation }>, reply: FastifyReply) => {
   const { id } = request.user;

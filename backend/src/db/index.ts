@@ -1,8 +1,8 @@
+import type { Logger } from 'drizzle-orm/logger';
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { Logger } from 'drizzle-orm/logger';
 import postgres from 'postgres';
-import * as schema from './schema';
 import { logger } from '../lib/logger';
+import * as schema from './schema';
 
 class DrizzleLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {

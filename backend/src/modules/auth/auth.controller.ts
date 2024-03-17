@@ -1,10 +1,10 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { UserLogin, UserRegistration } from './auth.schema';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logger } from '../../lib/logger';
-import { compareHash, createToken, genSalt, hash, verifyToken } from './auth.service';
 import { sendMail } from '../../lib/mailer';
 import { createUser, findUserByEmail, findUserById, updateVerification } from '../users/user.service';
+import type { UserLogin, UserRegistration } from './auth.schema';
+import { compareHash, createToken, genSalt, hash, verifyToken } from './auth.service';
 
 export const registerUser = async (request: FastifyRequest<{ Body: UserRegistration }>, reply: FastifyReply) => {
   const { CLIENT_BASE_URL, JWT_EMAIL_SECRET } = process.env;
@@ -54,7 +54,10 @@ export const registerUser = async (request: FastifyRequest<{ Body: UserRegistrat
 export const verifyEmail = async (request: FastifyRequest<{ Params: { token: string } }>, reply: FastifyReply) => {
   try {
     const { token } = request.params;
-    const { id } = verifyToken<{ id: number }>({ token, secret: process.env.JWT_EMAIL_SECRET });
+    const { id } = verifyToken<{ id: number }>({
+      token,
+      secret: process.env.JWT_EMAIL_SECRET,
+    });
 
     await updateVerification(id);
 
@@ -74,13 +77,19 @@ export const login = async (request: FastifyRequest<{ Body: UserLogin }>, reply:
     // instead of returning early we compare with a random string in order to prevent timing attacks
     const randomString = crypto.randomBytes(24).toString('hex');
     await compareHash(password, randomString);
-    return reply.sendValidationError<UserLogin>(400, { message: 'Invalid email or password.', field: 'email' });
+    return reply.sendValidationError<UserLogin>(400, {
+      message: 'Invalid email or password.',
+      field: 'email',
+    });
   }
 
   const isValidPassword = await compareHash(password, user.password);
 
   if (!isValidPassword) {
-    return reply.sendValidationError<UserLogin>(400, { message: 'Invalid email or password.', field: 'email' });
+    return reply.sendValidationError<UserLogin>(400, {
+      message: 'Invalid email or password.',
+      field: 'email',
+    });
   }
 
   if (!request.session.userId) {

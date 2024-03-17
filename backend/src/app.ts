@@ -1,21 +1,21 @@
-import { FastifyInstance } from 'fastify';
-import Swagger from '@fastify/swagger';
-import SwaggerUi from '@fastify/swagger-ui';
-import Cors from '@fastify/cors';
-import authRouter from './modules/auth/auth.router';
+import crypto from 'node:crypto';
 import Cookie from '@fastify/cookie';
+import Cors from '@fastify/cors';
 import Csrf from '@fastify/csrf-protection';
-import authPlugin from './plugins/authPlugin';
-import workspaceRouter from './modules/workspaces/workspace.router';
-import userRouter from './modules/users/user.router';
-import decoratorsPlugin from './plugins/decoratorsPlugin';
 import Multipart from '@fastify/multipart';
 import Session from '@fastify/session';
-import Redis from 'ioredis';
+import Swagger from '@fastify/swagger';
+import SwaggerUi from '@fastify/swagger-ui';
 import RedisStore from 'connect-redis';
-import crypto from 'crypto';
+import type { FastifyInstance } from 'fastify';
+import Redis from 'ioredis';
 import { logger } from './lib/logger';
-import { RequestContext, executionContext } from './utils/executionContext';
+import authRouter from './modules/auth/auth.router';
+import userRouter from './modules/users/user.router';
+import workspaceRouter from './modules/workspaces/workspace.router';
+import authPlugin from './plugins/authPlugin';
+import decoratorsPlugin from './plugins/decoratorsPlugin';
+import { type RequestContext, executionContext } from './utils/executionContext';
 
 declare module 'fastify' {
   interface Session {

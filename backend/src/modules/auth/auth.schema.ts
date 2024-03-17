@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import { UserSchema } from '../users/user.schema';
 
 export const UserRegistrationSchema = UserSchema.omit({ id: true, avatarUrl: true });
