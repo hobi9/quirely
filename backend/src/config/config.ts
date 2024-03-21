@@ -19,7 +19,6 @@ const configSchema = z.object({
 });
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     export interface ProcessEnv extends EnvSchema {}
   }
