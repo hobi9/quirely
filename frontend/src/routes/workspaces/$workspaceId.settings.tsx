@@ -1,15 +1,24 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import useWorkspace from '@/hooks/useWorkspace';
-import { Settings, Users } from 'lucide-react';
-import { Link, Route, Routes, useLocation } from 'react-router-dom';
-import defaultWorkspaceLogo from '../../assets/workspace-default.png';
-import { cn } from '@/lib/utils';
 import { Sheet } from '@/components/ui/sheet';
+import useWorkspace from '@/hooks/useWorkspace';
+import { cn } from '@/lib/utils';
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useRouterState,
+} from '@tanstack/react-router';
+import { Users, Settings } from 'lucide-react';
+import defaultWorkspaceLogo from '../../assets/workspace-default.png';
 
-const SettingsPage = () => {
-  const { data: workspace, isPending } = useWorkspace();
-  const location = useLocation();
+export const Route = createFileRoute('/workspaces/$workspaceId/settings')({
+  component: SettingsPage,
+});
+
+function SettingsPage() {
+  const workspace = useWorkspace();
+  const { location } = useRouterState();
 
   const sidebarButtons: Array<{
     label: string;
@@ -19,24 +28,21 @@ const SettingsPage = () => {
     {
       label: 'Members',
       icon: <Users size={16} />,
-      path: `/workspace/${workspace?.id}/settings`,
+      path: `/workspaces/${workspace?.id}/settings`,
     },
     {
       label: 'Settings',
       icon: <Settings size={16} />,
-      path: `/workspace/${workspace?.id}/settings/workspace-settings`,
+      path: `/workspaces/${workspace?.id}/settings/workspace-settings`,
     },
   ];
-
-  //TODO: add skeleton
-  if (isPending) return null;
 
   return (
     <Card className="flex h-[604px] w-full border">
       <div className="hidden w-60 basis-60 flex-col border-r px-5 py-9 lg:flex">
         <div className="flex items-center gap-x-4">
           <img
-            src={workspace?.logoUrl || defaultWorkspaceLogo}
+            src={workspace.logoUrl || defaultWorkspaceLogo}
             className="size-8 rounded-md object-cover"
           />
           <span className="overflow-hidden text-ellipsis text-nowrap text-sm">
@@ -65,13 +71,8 @@ const SettingsPage = () => {
       </div>
       <div className="flex-1 px-5 py-9">
         <Sheet></Sheet>
-        <Routes>
-          <Route path="" element={<div>Parent</div>} />
-          <Route path="workspace-settings" element={<div>Setting</div>} />
-          <Route path="*" element={<div>404</div>} />
-        </Routes>
+        <Outlet />
       </div>
     </Card>
   );
-};
-export default SettingsPage;
+}

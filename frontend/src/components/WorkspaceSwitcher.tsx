@@ -1,25 +1,17 @@
 import useWorkspaces from '@/hooks/useWorskpaces';
 import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
 import { ChevronsUpDown, Settings, Plus, ArrowRightLeft } from 'lucide-react';
-import useAuthStore from '@/stores/authStore';
 import { Button } from './ui/button';
-import useWorkspaceStore from '@/stores/workspaceStore';
-import { Link } from 'react-router-dom';
 import defaultLogo from '../assets/workspace-default.png';
 import { ScrollArea } from './ui/scroll-area';
+import { useCurrentUser } from '@/hooks/auth';
+import useWorkspace from '@/hooks/useWorkspace';
+import { Link } from '@tanstack/react-router';
 
 const WorkspaceSwitcher = () => {
-  const { data: workspaces, isPending } = useWorkspaces();
-  const activeWorkspaceId = useWorkspaceStore((state) => state.activeId);
-  const user = useAuthStore((state) => state.user!);
-
-  if (!activeWorkspaceId) return;
-
-  if (isPending || !activeWorkspaceId) return null;
-
-  const activeWorkspace = workspaces!.find(
-    ({ id }) => Number(activeWorkspaceId) === id,
-  );
+  const workspaces = useWorkspaces();
+  const activeWorkspace = useWorkspace();
+  const user = useCurrentUser()!;
 
   return (
     <Popover>
@@ -28,12 +20,12 @@ const WorkspaceSwitcher = () => {
           <div className="flex items-center gap-x-2 ">
             <div className="flex size-9 items-center justify-center rounded-md text-slate-50">
               <img
-                src={activeWorkspace!.logoUrl || defaultLogo}
+                src={activeWorkspace.logoUrl || defaultLogo}
                 className="rounded-md object-cover"
               />
             </div>
             <span className="max-w-28 overflow-hidden text-ellipsis text-nowrap">
-              {activeWorkspace!.name}
+              {activeWorkspace.name}
             </span>
           </div>
           <ChevronsUpDown />
@@ -43,16 +35,16 @@ const WorkspaceSwitcher = () => {
         <div className="flex items-center gap-x-2">
           <div className="flex size-11 items-center justify-center rounded-md text-slate-50">
             <img
-              src={activeWorkspace!.logoUrl || defaultLogo}
+              src={activeWorkspace.logoUrl || defaultLogo}
               className="rounded-md object-cover"
             />
           </div>
           <div className="flex h-full flex-col text-ellipsis leading-none">
             <p className="w-52 overflow-hidden text-ellipsis whitespace-nowrap font-bold">
-              {activeWorkspace!.name}
+              {activeWorkspace.name}
             </p>
             <p className="text-xs">
-              {activeWorkspace!.owner.id === user.id ? 'Owner' : 'Member'}
+              {activeWorkspace.owner.id === user.id ? 'Owner' : 'Member'}
             </p>
           </div>
         </div>
@@ -65,7 +57,7 @@ const WorkspaceSwitcher = () => {
           </Button>
           <ScrollArea>
             <ul role="list" className="flex max-h-40 flex-col space-y-2">
-              {workspaces!
+              {workspaces
                 .filter((workspace) => workspace.id !== activeWorkspace!.id)
                 .map((workspace) => (
                   <Button

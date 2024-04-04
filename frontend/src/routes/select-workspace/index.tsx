@@ -1,12 +1,21 @@
 import { Card } from '@/components/ui/card';
-import logo from '../../assets/logo.svg';
-import { useState } from 'react';
-import SelectWorkspaceStep from './SelectWorkspaceStep';
-import CreateWorkspaceStep from './CreateWorkspaceStep';
-import InviteToWorkspaceStep from './InviteToWorkspaceStep';
 import { Workspace } from '@/types/workspace';
+import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
+import logo from '../../assets/logo.svg';
+import SelectWorkspaceStep from './-(components)/SelectWorkspaceStep';
+import CreateWorkspaceStep from './-(components)/CreateWorkspaceStep';
+import InviteToWorkspaceStep from './-(components)/InviteToWorkspaceStep';
+import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 
-const SelectWorkspacePage = () => {
+export const Route = createFileRoute('/select-workspace/')({
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(workspacesQueryOption);
+  },
+  component: SelectWorkspacePage,
+});
+
+function SelectWorkspacePage() {
   const [step, setStep] = useState<'select' | 'create' | 'invite'>('select');
   const [worskace, setWorkspace] = useState<Workspace | null>(null);
 
@@ -39,6 +48,4 @@ const SelectWorkspacePage = () => {
       </Card>
     </main>
   );
-};
-
-export default SelectWorkspacePage;
+}

@@ -1,11 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import clsx from 'clsx';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { z } from 'zod';
-import { UserRegistration } from '../types/user';
-import { signUp } from '../services/authService';
-import { isAxiosError } from 'axios';
-import { ServerError } from '../types/misc';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,7 +9,19 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
+import { signUp } from '@/services/authService';
+import { ServerError } from '@/types/misc';
+import { UserRegistration } from '@/types/user';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { isAxiosError } from 'axios';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
+
+export const Route = createFileRoute('/auth/_layout/register')({
+  component: SignUp,
+});
 
 const SignUpSchema: z.ZodType<UserRegistration> = z
   .object({
@@ -31,7 +35,7 @@ const SignUpSchema: z.ZodType<UserRegistration> = z
     path: ['confirmPassword'],
   });
 
-const SignUp = () => {
+function SignUp() {
   const {
     register,
     handleSubmit,
@@ -77,7 +81,7 @@ const SignUp = () => {
               aria-invalid={!!errors.fullName}
               autoComplete="name"
               {...register('fullName')}
-              className={clsx(
+              className={cn(
                 errors.fullName &&
                   'ring ring-red-200 focus-visible:ring-red-200',
               )}
@@ -91,7 +95,7 @@ const SignUp = () => {
               autoComplete="email"
               aria-invalid={!!errors.email}
               {...register('email')}
-              className={clsx(
+              className={cn(
                 errors.email && 'ring ring-red-200 focus-visible:ring-red-200',
               )}
             />
@@ -104,7 +108,7 @@ const SignUp = () => {
               type="password"
               aria-invalid={!!errors.password}
               {...register('password')}
-              className={clsx(
+              className={cn(
                 errors.password &&
                   'ring ring-red-200 focus-visible:ring-red-200',
               )}
@@ -118,7 +122,7 @@ const SignUp = () => {
               type="password"
               aria-invalid={!!errors.confirmPassword}
               {...register('confirmPassword')}
-              className={clsx(
+              className={cn(
                 errors.confirmPassword &&
                   'ring ring-red-200 focus-visible:ring-red-200',
               )}
@@ -136,6 +140,4 @@ const SignUp = () => {
       </form>
     </Card>
   );
-};
-
-export default SignUp;
+}

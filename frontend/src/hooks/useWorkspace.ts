@@ -1,13 +1,16 @@
 import { getWorkspace } from '@/services/workspaceService';
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+import { useParams } from '@tanstack/react-router';
 
-const useWorkspace = () => {
-  const { workspaceId } = useParams<{ workspaceId: string }>();
-  return useQuery({
+export const workspaceQueryOptions = (workspaceId: number) =>
+  queryOptions({
     queryKey: ['workspaces', workspaceId],
     queryFn: () => getWorkspace(Number(workspaceId)),
   });
+
+const useWorkspace = () => {
+  const { workspaceId } = useParams({ from: '/workspaces/$workspaceId' });
+  return useSuspenseQuery(workspaceQueryOptions(Number(workspaceId))).data;
 };
 
 export default useWorkspace;

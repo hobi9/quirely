@@ -1,16 +1,16 @@
 import useWorkspaces from '@/hooks/useWorskpaces';
 import { Plus } from 'lucide-react';
 import { Button } from './ui/button';
-import { Link } from 'react-router-dom';
 import { Accordion } from './ui/accordion';
 import { ScrollArea } from './ui/scroll-area';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import useWorkspaceStore from '@/stores/workspaceStore';
 import SidebarItem from './SidebarItem';
+import useWorkspace from '@/hooks/useWorkspace';
+import { Link } from '@tanstack/react-router';
 
 const Sidebar = () => {
-  const { isPending, data: workspaces } = useWorkspaces();
-  const { activeId } = useWorkspaceStore();
+  const workspaces = useWorkspaces();
+  const { id: activeId } = useWorkspace();
   const [opened, setIsOpened] = useLocalStorage<Record<string, true>>(
     'opened_sidebar',
     {},
@@ -27,8 +27,6 @@ const Sidebar = () => {
       return openedCopy;
     });
   };
-
-  if (isPending) return null;
 
   return (
     <aside className="flex h-full flex-col">

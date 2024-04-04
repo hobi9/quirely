@@ -1,32 +1,36 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import clsx from 'clsx';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { z } from 'zod';
-import { signin } from '../services/authService';
-import { UserLogin } from '../types/user';
-import { isAxiosError } from 'axios';
-import { ServerError } from '../types/misc';
+import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
 } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useQueryClient } from '@tanstack/react-query';
+import { Label } from '@/components/ui/label';
 import { authQueryOptions } from '@/hooks/auth';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
+import { signin } from '@/services/authService';
+import { ServerError } from '@/types/misc';
+import { UserLogin } from '@/types/user';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { isAxiosError } from 'axios';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
+
+export const Route = createFileRoute('/auth/_layout/login')({
+  component: LoginPage,
+});
 
 const LoginSchema: z.ZodType<UserLogin> = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(254),
 });
 
-const Login = () => {
+function LoginPage() {
   const {
     register,
     handleSubmit,
@@ -36,7 +40,7 @@ const Login = () => {
     resolver: zodResolver(LoginSchema),
   });
   const navigate = useNavigate();
-  const search = useSearch({ from: '/auth/_layout/login' });
+  //const { state } = useLocation();
   const queryClient = useQueryClient();
 
   const submitForm: SubmitHandler<UserLogin> = async (data) => {
@@ -56,9 +60,9 @@ const Login = () => {
       return;
     }
     queryClient.invalidateQueries(authQueryOptions);
+    //navigate(state?.from || '/');
     navigate({
-      to: search.redirect || '/',
-      replace: true,
+      to: '',
     });
   };
 
@@ -77,7 +81,7 @@ const Login = () => {
               aria-invalid={!!errors.email}
               autoComplete="email"
               {...register('email')}
-              className={clsx(
+              className={cn(
                 errors.email && 'ring ring-red-200 focus-visible:ring-red-200',
               )}
             />
@@ -90,7 +94,7 @@ const Login = () => {
               type="password"
               aria-invalid={!!errors.password}
               {...register('password')}
-              className={clsx(
+              className={cn(
                 errors.password &&
                   'ring ring-red-200 focus-visible:ring-red-200',
               )}
@@ -106,6 +110,4 @@ const Login = () => {
       </form>
     </Card>
   );
-};
-
-export default Login;
+}

@@ -1,20 +1,21 @@
-import useAuthStore from '../stores/authStore';
 import defaultAvatar from '../assets/defaultAvatar.svg';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Settings, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { signOut } from '@/services/authService';
-import { useNavigate } from 'react-router-dom';
+import { authQueryOptions, useCurrentUser } from '@/hooks/auth';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 
 const Avatar = () => {
-  const { fullName, avatarUrl, email } = useAuthStore((state) => state.user!);
-  const setUser = useAuthStore((state) => state.setUser);
+  const { fullName, avatarUrl, email } = useCurrentUser()!;
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await signOut();
-    setUser(null);
-    navigate('/');
+    await queryClient.invalidateQueries(authQueryOptions);
+    navigate({ to: '/', replace: true });
   };
 
   return (

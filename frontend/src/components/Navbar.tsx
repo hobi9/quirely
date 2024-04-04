@@ -1,14 +1,15 @@
-import clsx from 'clsx';
-import useAuthStore from '../stores/authStore';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { Button } from './ui/button';
 import WorkspaceSwitcher from './WorkspaceSwitcher';
 import { Plus } from 'lucide-react';
 import MobileSidebar from './MobileSidebar';
+import { useCurrentUser } from '@/hooks/auth';
+import { cn } from '@/lib/utils';
 
 const Navbar = () => {
-  const user = useAuthStore((state) => state.user);
+  const user = useCurrentUser();
+
   return (
     <header className="fixed top-0 z-50 h-14 w-full bg-slate-50 shadow-md">
       <div className="flex h-full items-center justify-between px-5">
@@ -26,7 +27,7 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-x-4">
           <WorkspaceSwitcher />
-          <div className={clsx(!user && 'hidden')}>
+          <div className={cn(!user && 'hidden')}>
             <Avatar />
           </div>
         </div>

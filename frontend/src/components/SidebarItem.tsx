@@ -7,8 +7,8 @@ import {
 } from './ui/accordion';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import { Link, useLocation } from 'react-router-dom';
 import defaultLogo from '../assets/workspace-default.png';
+import { Link, useRouterState } from '@tanstack/react-router';
 
 type Props = {
   workspace: Workspace;
@@ -18,7 +18,7 @@ type Props = {
 };
 
 const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
-  const location = useLocation();
+  const { location } = useRouterState();
   const routes: Array<{
     type: string;
     icon: React.ReactElement;
@@ -28,7 +28,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
     {
       type: 'Boards',
       icon: <PanelsRightBottom className="size-4" />,
-      link: `/workspace/${workspace.id}`,
+      link: `/workspaces/${workspace.id}`,
       matches() {
         return location.pathname === this.link;
       },
@@ -36,7 +36,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
     {
       type: 'Activity',
       icon: <Bell className="size-4" />,
-      link: `/workspace/${workspace.id}/activity`,
+      link: `/workspaces/${workspace.id}/activity`,
       matches() {
         return location.pathname === this.link;
       },
@@ -44,7 +44,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
     {
       type: 'Settings',
       icon: <Settings className="size-4" />,
-      link: `/workspace/${workspace.id}/settings`,
+      link: `/workspaces/${workspace.id}/settings`,
       matches() {
         return location.pathname.startsWith(this.link);
       },

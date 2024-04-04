@@ -1,12 +1,12 @@
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import useAuthStore from '../stores/authStore';
+import { useCurrentUser } from '@/hooks/auth';
 
 type Props =
   | { required: true; notRequired?: never }
   | { required?: never; notRequired: true };
 
 const AuthGate = ({ required, notRequired }: Props) => {
-  const user = useAuthStore((state) => state.user);
+  const user = useCurrentUser();
   const location = useLocation();
 
   if (required && !user) {
@@ -18,9 +18,11 @@ const AuthGate = ({ required, notRequired }: Props) => {
       />
     );
   }
+
   if (notRequired && user) {
-    return <Navigate to={'/'} replace />;
+    return <Navigate to={'select-workspace'} replace />;
   }
+
   return <Outlet />;
 };
 

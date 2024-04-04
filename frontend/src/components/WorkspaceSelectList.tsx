@@ -1,26 +1,12 @@
 import { ScrollArea } from './ui/scroll-area';
 import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Skeleton } from './ui/skeleton';
 import defaultLogo from '../assets/workspace-default.png';
 import useWorkspaces from '@/hooks/useWorskpaces';
+import { Link } from '@tanstack/react-router';
 
 const WorkspaceSelectList = () => {
-  const { data: workspaces, isPending } = useWorkspaces();
-
-  if (isPending) {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <div key={index} className="flex gap-x-2">
-            <Skeleton className="size-7 rounded-md" />
-            <Skeleton className="w-full rounded-md" />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  const workspaces = useWorkspaces();
 
   return (
     <ScrollArea>
@@ -32,7 +18,10 @@ const WorkspaceSelectList = () => {
             asChild
             className="mr-3 block"
           >
-            <Link to={`/workspace/${workspace.id}`} replace>
+            <Link
+              to={'/workspaces/$workspaceId'}
+              params={{ workspaceId: workspace.id }}
+            >
               <div className="flex h-full items-center justify-between">
                 <div className="flex items-center  gap-x-2">
                   {

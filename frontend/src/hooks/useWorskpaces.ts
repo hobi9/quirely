@@ -1,11 +1,13 @@
 import { getWorkspaces } from '@/services/workspaceService';
-import { useQuery } from '@tanstack/react-query';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+
+export const workspacesQueryOption = queryOptions({
+  queryKey: ['workspaces'],
+  queryFn: getWorkspaces,
+});
 
 const useWorkspaces = () => {
-  return useQuery({
-    queryKey: ['workspaces'],
-    queryFn: getWorkspaces,
-  });
+  return useSuspenseQuery(workspacesQueryOption).data;
 };
 
 export default useWorkspaces;

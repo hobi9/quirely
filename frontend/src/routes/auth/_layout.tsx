@@ -1,9 +1,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import logo from '../assets/logo.svg';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import {
+  Link,
+  Outlet,
+  createFileRoute,
+  useRouterState,
+} from '@tanstack/react-router';
+import logo from '../../assets/logo.svg';
 
-const AuthPage = () => {
-  const location = useLocation();
+export const Route = createFileRoute('/auth/_layout')({
+  component: AuthLayout,
+});
+
+function AuthLayout() {
+  const { location } = useRouterState();
   const activeTab = location.pathname.split('/').at(-1)!;
 
   return (
@@ -16,10 +25,10 @@ const AuthPage = () => {
         <Tabs className="w-full" value={activeTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login" asChild>
-              <Link to={'login'}>Sign In</Link>
+              <Link to={'/auth/login'}>Sign In</Link>
             </TabsTrigger>
             <TabsTrigger value="register" asChild>
-              <Link to={'register'}>Sign Up</Link>
+              <Link to={'/auth/register'}>Sign Up</Link>
             </TabsTrigger>
           </TabsList>
           <TabsContent value={activeTab}>
@@ -29,6 +38,4 @@ const AuthPage = () => {
       </main>
     </div>
   );
-};
-
-export default AuthPage;
+}
