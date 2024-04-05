@@ -13,16 +13,17 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PublicImport } from './routes/_public'
 import { Route as ProtectedImport } from './routes/_protected'
-import { Route as IndexImport } from './routes/index'
-import { Route as AuthIndexImport } from './routes/auth/index'
+import { Route as PublicIndexImport } from './routes/_public/index'
 import { Route as VerifyEmailTokenImport } from './routes/verify-email.$token'
-import { Route as AuthLayoutImport } from './routes/auth/_layout'
+import { Route as PublicAuthIndexImport } from './routes/_public/auth/index'
 import { Route as ProtectedSelectWorkspaceIndexImport } from './routes/_protected/select-workspace/index'
-import { Route as AuthLayoutRegisterImport } from './routes/auth/_layout.register'
-import { Route as AuthLayoutLoginImport } from './routes/auth/_layout.login'
+import { Route as PublicAuthLayoutImport } from './routes/_public/auth/_layout'
 import { Route as ProtectedWorkspacesWorkspaceIdImport } from './routes/_protected/workspaces/$workspaceId'
 import { Route as ProtectedWorkspacesWorkspaceIdIndexImport } from './routes/_protected/workspaces/$workspaceId.index'
+import { Route as PublicAuthLayoutRegisterImport } from './routes/_public/auth/_layout.register'
+import { Route as PublicAuthLayoutLoginImport } from './routes/_public/auth/_layout.login'
 import { Route as ProtectedWorkspacesWorkspaceIdSettingsImport } from './routes/_protected/workspaces/$workspaceId.settings'
 import { Route as ProtectedWorkspacesWorkspaceIdActivityImport } from './routes/_protected/workspaces/$workspaceId.activity'
 import { Route as ProtectedWorkspacesWorkspaceIdSettingsIndexImport } from './routes/_protected/workspaces/$workspaceId.settings.index'
@@ -30,12 +31,12 @@ import { Route as ProtectedWorkspacesWorkspaceIdSettingsWorkspaceSettingsImport 
 
 // Create Virtual Routes
 
-const AuthImport = createFileRoute('/auth')()
+const PublicAuthImport = createFileRoute('/_public/auth')()
 
 // Create/Update Routes
 
-const AuthRoute = AuthImport.update({
-  path: '/auth',
+const PublicRoute = PublicImport.update({
+  id: '/_public',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -44,14 +45,14 @@ const ProtectedRoute = ProtectedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  path: '/',
-  getParentRoute: () => rootRoute,
+const PublicAuthRoute = PublicAuthImport.update({
+  path: '/auth',
+  getParentRoute: () => PublicRoute,
 } as any)
 
-const AuthIndexRoute = AuthIndexImport.update({
+const PublicIndexRoute = PublicIndexImport.update({
   path: '/',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => PublicRoute,
 } as any)
 
 const VerifyEmailTokenRoute = VerifyEmailTokenImport.update({
@@ -59,9 +60,9 @@ const VerifyEmailTokenRoute = VerifyEmailTokenImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthLayoutRoute = AuthLayoutImport.update({
-  id: '/_layout',
-  getParentRoute: () => AuthRoute,
+const PublicAuthIndexRoute = PublicAuthIndexImport.update({
+  path: '/',
+  getParentRoute: () => PublicAuthRoute,
 } as any)
 
 const ProtectedSelectWorkspaceIndexRoute =
@@ -70,14 +71,9 @@ const ProtectedSelectWorkspaceIndexRoute =
     getParentRoute: () => ProtectedRoute,
   } as any)
 
-const AuthLayoutRegisterRoute = AuthLayoutRegisterImport.update({
-  path: '/register',
-  getParentRoute: () => AuthLayoutRoute,
-} as any)
-
-const AuthLayoutLoginRoute = AuthLayoutLoginImport.update({
-  path: '/login',
-  getParentRoute: () => AuthLayoutRoute,
+const PublicAuthLayoutRoute = PublicAuthLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => PublicAuthRoute,
 } as any)
 
 const ProtectedWorkspacesWorkspaceIdRoute =
@@ -91,6 +87,16 @@ const ProtectedWorkspacesWorkspaceIdIndexRoute =
     path: '/',
     getParentRoute: () => ProtectedWorkspacesWorkspaceIdRoute,
   } as any)
+
+const PublicAuthLayoutRegisterRoute = PublicAuthLayoutRegisterImport.update({
+  path: '/register',
+  getParentRoute: () => PublicAuthLayoutRoute,
+} as any)
+
+const PublicAuthLayoutLoginRoute = PublicAuthLayoutLoginImport.update({
+  path: '/login',
+  getParentRoute: () => PublicAuthLayoutRoute,
+} as any)
 
 const ProtectedWorkspacesWorkspaceIdSettingsRoute =
   ProtectedWorkspacesWorkspaceIdSettingsImport.update({
@@ -120,45 +126,41 @@ const ProtectedWorkspacesWorkspaceIdSettingsWorkspaceSettingsRoute =
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
     '/_protected': {
       preLoaderRoute: typeof ProtectedImport
       parentRoute: typeof rootRoute
     }
-    '/auth': {
-      preLoaderRoute: typeof AuthImport
+    '/_public': {
+      preLoaderRoute: typeof PublicImport
       parentRoute: typeof rootRoute
-    }
-    '/auth/_layout': {
-      preLoaderRoute: typeof AuthLayoutImport
-      parentRoute: typeof AuthRoute
     }
     '/verify-email/$token': {
       preLoaderRoute: typeof VerifyEmailTokenImport
       parentRoute: typeof rootRoute
     }
-    '/auth/': {
-      preLoaderRoute: typeof AuthIndexImport
-      parentRoute: typeof AuthImport
+    '/_public/': {
+      preLoaderRoute: typeof PublicIndexImport
+      parentRoute: typeof PublicImport
     }
     '/_protected/workspaces/$workspaceId': {
       preLoaderRoute: typeof ProtectedWorkspacesWorkspaceIdImport
       parentRoute: typeof ProtectedImport
     }
-    '/auth/_layout/login': {
-      preLoaderRoute: typeof AuthLayoutLoginImport
-      parentRoute: typeof AuthLayoutImport
+    '/_public/auth': {
+      preLoaderRoute: typeof PublicAuthImport
+      parentRoute: typeof PublicImport
     }
-    '/auth/_layout/register': {
-      preLoaderRoute: typeof AuthLayoutRegisterImport
-      parentRoute: typeof AuthLayoutImport
+    '/_public/auth/_layout': {
+      preLoaderRoute: typeof PublicAuthLayoutImport
+      parentRoute: typeof PublicAuthRoute
     }
     '/_protected/select-workspace/': {
       preLoaderRoute: typeof ProtectedSelectWorkspaceIndexImport
       parentRoute: typeof ProtectedImport
+    }
+    '/_public/auth/': {
+      preLoaderRoute: typeof PublicAuthIndexImport
+      parentRoute: typeof PublicAuthImport
     }
     '/_protected/workspaces/$workspaceId/activity': {
       preLoaderRoute: typeof ProtectedWorkspacesWorkspaceIdActivityImport
@@ -167,6 +169,14 @@ declare module '@tanstack/react-router' {
     '/_protected/workspaces/$workspaceId/settings': {
       preLoaderRoute: typeof ProtectedWorkspacesWorkspaceIdSettingsImport
       parentRoute: typeof ProtectedWorkspacesWorkspaceIdImport
+    }
+    '/_public/auth/_layout/login': {
+      preLoaderRoute: typeof PublicAuthLayoutLoginImport
+      parentRoute: typeof PublicAuthLayoutImport
+    }
+    '/_public/auth/_layout/register': {
+      preLoaderRoute: typeof PublicAuthLayoutRegisterImport
+      parentRoute: typeof PublicAuthLayoutImport
     }
     '/_protected/workspaces/$workspaceId/': {
       preLoaderRoute: typeof ProtectedWorkspacesWorkspaceIdIndexImport
@@ -186,7 +196,6 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
-  IndexRoute,
   ProtectedRoute.addChildren([
     ProtectedWorkspacesWorkspaceIdRoute.addChildren([
       ProtectedWorkspacesWorkspaceIdActivityRoute,
@@ -198,12 +207,15 @@ export const routeTree = rootRoute.addChildren([
     ]),
     ProtectedSelectWorkspaceIndexRoute,
   ]),
-  AuthRoute.addChildren([
-    AuthLayoutRoute.addChildren([
-      AuthLayoutLoginRoute,
-      AuthLayoutRegisterRoute,
+  PublicRoute.addChildren([
+    PublicIndexRoute,
+    PublicAuthRoute.addChildren([
+      PublicAuthLayoutRoute.addChildren([
+        PublicAuthLayoutLoginRoute,
+        PublicAuthLayoutRegisterRoute,
+      ]),
+      PublicAuthIndexRoute,
     ]),
-    AuthIndexRoute,
   ]),
   VerifyEmailTokenRoute,
 ])

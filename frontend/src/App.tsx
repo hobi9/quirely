@@ -1,11 +1,11 @@
 import { useAuth } from './hooks/auth';
 import { routeTree } from './routeTree.gen';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
-import { queryClient } from './lib/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 const router = createRouter({
   routeTree,
-  context: { queryClient, user: null },
+  context: { queryClient: undefined! },
 });
 
 declare module '@tanstack/react-router' {
@@ -15,11 +15,12 @@ declare module '@tanstack/react-router' {
 }
 
 const App = () => {
-  const { isPending, data: user } = useAuth();
+  const queryClient = useQueryClient();
+  const { isPending } = useAuth();
 
-  if (isPending) null;
+  if (isPending) return null;
 
-  return <RouterProvider router={router} context={{ queryClient, user }} />;
+  return <RouterProvider router={router} context={{ queryClient }} />;
 };
 
 export default App;

@@ -5,9 +5,9 @@ import {
   createFileRoute,
   useRouterState,
 } from '@tanstack/react-router';
-import logo from '../../assets/logo.svg';
+import logo from '../../../assets/logo.svg';
 
-export const Route = createFileRoute('/auth/_layout')({
+export const Route = createFileRoute('/_public/auth/_layout')({
   component: AuthLayout,
 });
 
