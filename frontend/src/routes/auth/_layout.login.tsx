@@ -46,8 +46,6 @@ function LoginPage() {
   const { redirect } = Route.useSearch();
   const queryClient = useQueryClient();
 
-  console.log('redirect', redirect);
-
   const submitForm: SubmitHandler<UserLogin> = async (data) => {
     try {
       await signin(data);
