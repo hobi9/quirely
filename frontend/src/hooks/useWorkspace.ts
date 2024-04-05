@@ -9,7 +9,9 @@ export const workspaceQueryOptions = (workspaceId: number) =>
   });
 
 const useWorkspace = () => {
-  const { workspaceId } = useParams({ from: '/workspaces/$workspaceId' });
+  const { workspaceId } = useParams({
+    from: '/_protected/workspaces/$workspaceId',
+  });
   return useSuspenseQuery(workspaceQueryOptions(Number(workspaceId))).data;
 };
 

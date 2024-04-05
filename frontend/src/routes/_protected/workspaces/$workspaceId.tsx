@@ -5,7 +5,7 @@ import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 import { Outlet, createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-export const Route = createFileRoute('/workspaces/$workspaceId')({
+export const Route = createFileRoute('/_protected/workspaces/$workspaceId')({
   parseParams: (params) => ({
     workspaceId: z.number().int().parse(Number(params.workspaceId)),
   }),

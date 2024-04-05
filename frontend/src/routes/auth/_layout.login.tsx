@@ -22,6 +22,9 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
 export const Route = createFileRoute('/auth/_layout/login')({
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+  }),
   component: LoginPage,
 });
 
@@ -40,8 +43,10 @@ function LoginPage() {
     resolver: zodResolver(LoginSchema),
   });
   const navigate = useNavigate();
-  //const { state } = useLocation();
+  const { redirect } = Route.useSearch();
   const queryClient = useQueryClient();
+
+  console.log('redirect', redirect);
 
   const submitForm: SubmitHandler<UserLogin> = async (data) => {
     try {
@@ -59,11 +64,9 @@ function LoginPage() {
       //TODO: add toaster or some kind of notification
       return;
     }
-    queryClient.invalidateQueries(authQueryOptions);
-    //navigate(state?.from || '/');
-    navigate({
-      to: '',
-    });
+
+    await queryClient.invalidateQueries(authQueryOptions);
+    navigate({ to: redirect ?? '/select-workspace', replace: true });
   };
 
   return (

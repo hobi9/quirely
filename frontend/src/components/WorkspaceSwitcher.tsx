@@ -66,7 +66,10 @@ const WorkspaceSwitcher = () => {
                     variant={'ghost'}
                     className="mr-2 pl-0"
                   >
-                    <Link to={`/workspace/${workspace.id}`}>
+                    <Link
+                      to={'/workspaces/$workspaceId'}
+                      params={{ workspaceId: workspace.id }}
+                    >
                       <div className="flex w-full items-center justify-between pl-1">
                         <div className="flex items-center gap-x-1">
                           <img

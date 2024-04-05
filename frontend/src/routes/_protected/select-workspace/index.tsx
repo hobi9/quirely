@@ -2,13 +2,13 @@ import { Card } from '@/components/ui/card';
 import { Workspace } from '@/types/workspace';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import logo from '../../assets/logo.svg';
+import logo from '../../../assets/logo.svg';
 import SelectWorkspaceStep from './-(components)/SelectWorkspaceStep';
 import CreateWorkspaceStep from './-(components)/CreateWorkspaceStep';
 import InviteToWorkspaceStep from './-(components)/InviteToWorkspaceStep';
 import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 
-export const Route = createFileRoute('/select-workspace/')({
+export const Route = createFileRoute('/_protected/select-workspace/')({
   loader: async ({ context: { queryClient } }) => {
     await queryClient.ensureQueryData(workspacesQueryOption);
   },

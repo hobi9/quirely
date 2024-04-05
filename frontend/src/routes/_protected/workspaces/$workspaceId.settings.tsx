@@ -10,9 +10,11 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import { Users, Settings } from 'lucide-react';
-import defaultWorkspaceLogo from '../../assets/workspace-default.png';
+import defaultWorkspaceLogo from '../../../assets/workspace-default.png';
 
-export const Route = createFileRoute('/workspaces/$workspaceId/settings')({
+export const Route = createFileRoute(
+  '/_protected/workspaces/$workspaceId/settings',
+)({
   component: SettingsPage,
 });
 
