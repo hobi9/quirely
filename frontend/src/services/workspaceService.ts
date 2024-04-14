@@ -10,6 +10,11 @@ export const createWorkspace = async (req: WorkspaceCreation) => {
   return response.data;
 };
 
+export const updateWorkspace = async (req: WorkspaceCreation, id: number) => {
+  const response = await client.patch<Workspace>(`/workspaces/${id}`, req);
+  return response.data;
+};
+
 export const updateWorkspaceLogo = async (id: number, file: File) => {
   const formData = new FormData();
   formData.append('file', file);
@@ -38,4 +43,12 @@ export const getWorkspaces = async () => {
 export const getWorkspace = async (id: number) => {
   const response = await client.get<WorkspaceDetail>(`/workspaces/${id}`);
   return response.data;
+};
+
+export const deleteWorkspace = async (id: number) => {
+  return client.delete<void>(`/workspaces/${id}`);
+};
+
+export const leaveWorkspace = async (id: number) => {
+  return client.delete<void>(`/workspaces/${id}/leave`);
 };
