@@ -1,13 +1,13 @@
 import type { FastifyInstance } from 'fastify';
 import z from 'zod';
 import zodToJsonSchema from 'zod-to-json-schema';
-import { SanitizedUserSchema } from '../auth/auth.schema';
 import * as controller from './workspace.controller';
 import {
   type WorkspaceCreation,
   WorkspaceCreationSchema,
   WorkspaceDetailSchema,
   WorkspaceSchema,
+  MembersSchema,
 } from './workspace.schema';
 
 const workspaceRouter = async (fastify: FastifyInstance) => {
@@ -26,6 +26,22 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       },
     },
     controller.createWorkspace,
+  );
+
+  fastify.patch<{ Body: WorkspaceCreation; Params: { id: number } }>(
+    '/:id',
+    {
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        body: zodToJsonSchema(WorkspaceCreationSchema),
+        params: zodToJsonSchema(z.object({ id: z.number() })),
+        response: {
+          200: zodToJsonSchema(WorkspaceSchema),
+        },
+      },
+    },
+    controller.updateWorkspace,
   );
 
   fastify.get(
@@ -86,8 +102,23 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
     controller.deleteWorkspace,
   );
 
+  fastify.delete<{ Params: { id: number } }>(
+    '/:id/leave',
+    {
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        params: zodToJsonSchema(z.object({ id: z.number() })),
+        response: {
+          204: zodToJsonSchema(z.null()),
+        },
+      },
+    },
+    controller.leaveWorkspace,
+  );
+
   fastify.patch<{ Params: { id: number }; Querystring: { accept: boolean } }>(
-    '/:id',
+    '/:id/confirm-invitation',
     {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
       schema: {
@@ -142,7 +173,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
         tags: ['Workspace'],
         params: zodToJsonSchema(z.object({ id: z.number() })),
         response: {
-          200: zodToJsonSchema(z.array(SanitizedUserSchema)),
+          200: zodToJsonSchema(z.array(MembersSchema)),
         },
       },
     },

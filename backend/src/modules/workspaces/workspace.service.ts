@@ -1,6 +1,6 @@
 import { type SQL, and, eq, inArray, isNull, notInArray } from 'drizzle-orm';
 import { db } from '../../db';
-import { membersWorkspaces, users, workspaces } from '../../db/schema';
+import { SelectUser, membersWorkspaces, users, workspaces } from '../../db/schema';
 import type { WorkspaceCreation, WorkspaceDetail } from './workspace.schema';
 
 export const insertWorkspace = async (workspace: WorkspaceCreation, ownerId: number) => {
@@ -19,6 +19,16 @@ export const insertWorkspace = async (workspace: WorkspaceCreation, ownerId: num
     });
     return createdWorkspace!;
   });
+};
+
+export const updateWorkspaceData = async (workspace: WorkspaceCreation, id: number) => {
+  const result = await db
+    .update(workspaces)
+    .set({ ...workspace, updatedAt: new Date() })
+    .where(eq(workspaces.id, id))
+    .returning();
+
+  return result[0]!;
 };
 
 export const getWorkspacesByMemberId = async (memberId: number, accepted?: true) => {
@@ -137,10 +147,28 @@ export const getWorkspaceMembers = async ({ workspaceId, userId }: { workspaceId
     .where(and(eq(membersWorkspaces.workspaceId, workspaceId), eq(membersWorkspaces.memberId, userId)));
 
   const result = await db
-    .select({ user: users })
+    .select({ user: users, accepted: membersWorkspaces.accepted })
     .from(users)
     .leftJoin(membersWorkspaces, eq(membersWorkspaces.memberId, users.id))
     .where(and(eq(membersWorkspaces.workspaceId, workspaceId), inArray(membersWorkspaces.workspaceId, inQuery)));
 
-  return result.map((row) => row.user);
+  return result.map(({ user, accepted }) => ({ ...user, accepted }));
+};
+
+export const quitWorkspace = async ({
+  workspaceId,
+  userId,
+  members,
+}: {
+  workspaceId: number;
+  userId: number;
+  members: SelectUser[];
+}) => {
+  const nextOwner = members.find((member) => member.id !== userId)!;
+  await db.transaction(async (tx) => {
+    await tx.update(workspaces).set({ ownerId: nextOwner.id }).where(eq(workspaces.id, workspaceId));
+    await tx
+      .delete(membersWorkspaces)
+      .where(and(eq(membersWorkspaces.memberId, userId), eq(membersWorkspaces.workspaceId, workspaceId)));
+  });
 };

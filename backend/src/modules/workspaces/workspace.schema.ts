@@ -14,5 +14,9 @@ export const WorkspaceDetailSchema = WorkspaceSchema.extend({
   owner: SanitizedUserSchema,
 });
 
+export const MembersSchema = SanitizedUserSchema.extend({
+  accepted: z.boolean().optional().nullable(),
+});
+
 export type WorkspaceCreation = z.infer<typeof WorkspaceCreationSchema>;
 export type WorkspaceDetail = z.infer<typeof WorkspaceDetailSchema>;

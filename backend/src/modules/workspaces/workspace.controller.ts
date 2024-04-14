@@ -14,7 +14,9 @@ import {
   getWorkspacesByMemberId,
   insertWorkspace,
   inviteToWorkspace,
+  quitWorkspace,
   updateInvitationStatus,
+  updateWorkspaceData,
   updateWorkspaceLogo,
 } from './workspace.service';
 
@@ -25,6 +27,28 @@ export const createWorkspace = async (request: FastifyRequest<{ Body: WorkspaceC
   const workspace = await insertWorkspace({ name, description }, id);
 
   return reply.code(201).send(workspace);
+};
+
+export const updateWorkspace = async (
+  request: FastifyRequest<{ Body: WorkspaceCreation; Params: { id: number } }>,
+  reply: FastifyReply,
+) => {
+  const { id } = request.user;
+  const { name, description } = request.body;
+
+  const workspace = await findWorkspaceById(request.params.id);
+
+  if (!workspace) {
+    return reply.sendError(404, 'Workspace not found');
+  }
+
+  if (workspace.ownerId !== id) {
+    return reply.sendError(403, 'You are not the owner of the workspace');
+  }
+
+  const updatedWorkspace = await updateWorkspaceData({ name, description }, request.params.id);
+
+  return updatedWorkspace;
 };
 
 export const getWorkspaces = async (request: FastifyRequest) => {
@@ -69,7 +93,34 @@ export const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: nu
   }
 
   await deleteWorkspaceById(params.id);
+  //TODO: remove any logo
 
+  return reply.code(204).send();
+};
+
+export const leaveWorkspace = async (request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) => {
+  const { user, params } = request;
+
+  const workspace = await findWorkspaceById(params.id);
+
+  if (!workspace) {
+    return reply.sendError(404, 'Workspace not found.');
+  }
+
+  const members = (await getWorkspaceMembers({ workspaceId: params.id, userId: user.id })).filter(
+    (member) => member.accepted,
+  );
+
+  if (members.length === 1) {
+    if (members[0]!.id === user.id) {
+      await deleteWorkspaceById(params.id);
+      return reply.code(204).send();
+    } else {
+      return reply.sendError(409, "You didn't accept the workspace invitation yet.");
+    }
+  }
+
+  await quitWorkspace({ workspaceId: params.id, userId: user.id, members });
   return reply.code(204).send();
 };
 
