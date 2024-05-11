@@ -10,13 +10,13 @@ import useWorkspace from '@/hooks/useWorkspace';
 import { cn } from '@/lib/utils';
 import defaultAvatar from '../../../assets/defaultAvatar.svg';
 import { useCurrentUser } from '@/hooks/auth';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Ellipsis } from 'lucide-react';
 import { PopoverContent } from '@radix-ui/react-popover';
 import { kickFromWorkspace } from '@/services/workspaceService';
 import { useQueryClient } from '@tanstack/react-query';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const Route = createFileRoute(
   '/_protected/workspaces/$workspaceId/settings/',
@@ -118,7 +118,7 @@ function Page() {
           <p>View and manage workspace members</p>
         </div>
 
-        <div className="mb-2 border-b">
+        <div className="mb-5 border-b">
           <div className="mb-[-1px] flex gap-x-2">
             <button
               className={cn(
@@ -141,7 +141,12 @@ function Page() {
           </div>
         </div>
 
-        <ScrollArea className="h-96">
+        <ScrollArea
+          className={cn(
+            'h-[420px] rounded-md border-t',
+            filteredMembers.length >= 5 && 'border-b',
+          )}
+        >
           <DataTable data={filteredMembers} columns={columns} />
         </ScrollArea>
       </div>
