@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logger } from '../../lib/logger';
 import { uploadFile } from '../../lib/supabase';
 import { WORKSPACE_LOGO_BUCKET } from '../../utils/constants';
-import { findUserByEmail } from '../users/user.service';
+import { findUserByEmail, findUserById } from '../users/user.service';
 import type { WorkspaceCreation } from './workspace.schema';
 import {
   deleteWorkspaceById,
@@ -15,6 +15,7 @@ import {
   insertWorkspace,
   inviteToWorkspace,
   quitWorkspace,
+  removeMember,
   updateInvitationStatus,
   updateWorkspaceData,
   updateWorkspaceLogo,
@@ -239,4 +240,34 @@ export const getMembers = async (request: FastifyRequest<{ Params: { id: number 
     workspaceId: id,
     userId: user.id,
   });
+};
+
+export const kickMember = async (
+  request: FastifyRequest<{ Params: { workspaceId: number; memberId: number } }>,
+  reply: FastifyReply,
+) => {
+  const { workspaceId, memberId } = request.params;
+  const { user } = request;
+
+  if (user.id === memberId) {
+    return reply.sendError(409, "You can't kick yourself.");
+  }
+
+  const member = await findUserById(memberId);
+  if (!member) {
+    return reply.sendError(404, 'Member not found.');
+  }
+
+  const workspace = await findWorkspaceById(workspaceId);
+  if (!workspace) {
+    return reply.sendError(404, 'Workspace not found.');
+  }
+
+  if (workspace.ownerId !== user.id) {
+    return reply.sendError(409, 'You are not the owner of the workspace.');
+  }
+
+  await removeMember({ workspaceId, memberId });
+
+  return reply.code(204).send();
 };

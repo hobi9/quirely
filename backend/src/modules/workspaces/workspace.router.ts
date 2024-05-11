@@ -102,7 +102,7 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
     controller.deleteWorkspace,
   );
 
-  fastify.delete<{ Params: { id: number } }>(
+  fastify.post<{ Params: { id: number } }>(
     '/:id/leave',
     {
       onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
@@ -178,6 +178,21 @@ const workspaceRouter = async (fastify: FastifyInstance) => {
       },
     },
     controller.getMembers,
+  );
+
+  fastify.delete<{ Params: { workspaceId: number; memberId: number } }>(
+    '/:workspaceId/members/:memberId',
+    {
+      onRequest: [isAuthenticated, isEmailVerified, csrfProtection],
+      schema: {
+        tags: ['Workspace'],
+        params: zodToJsonSchema(z.object({ workspaceId: z.number(), memberId: z.number() })),
+        response: {
+          204: zodToJsonSchema(z.null()),
+        },
+      },
+    },
+    controller.kickMember,
   );
 };
 

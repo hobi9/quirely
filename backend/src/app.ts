@@ -77,7 +77,8 @@ const app = async (fastify: FastifyInstance) => {
   await fastify.register(authPlugin);
   await fastify.register(Multipart);
 
-  fastify.addHook('preHandler', (request, _, done) => {
+  fastify.addHook('onRequest', (request, reply, done) => {
+    reply.header('requestId', request.id);
     const requestContext: RequestContext = { requestId: request.id, sessionId: request.session.sessionId };
     executionContext.run(requestContext, done);
   });
@@ -92,7 +93,6 @@ const app = async (fastify: FastifyInstance) => {
     const { statusCode } = reply;
     logger.info({ method, url, body: payload, statusCode }, 'API RESPONSE');
 
-    reply.header('requestId', request.id);
     return payload;
   });
 

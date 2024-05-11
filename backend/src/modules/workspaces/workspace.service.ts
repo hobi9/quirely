@@ -152,7 +152,13 @@ export const getWorkspaceMembers = async ({ workspaceId, userId }: { workspaceId
     .leftJoin(membersWorkspaces, eq(membersWorkspaces.memberId, users.id))
     .where(and(eq(membersWorkspaces.workspaceId, workspaceId), inArray(membersWorkspaces.workspaceId, inQuery)));
 
-  return result.map(({ user, accepted }) => ({ ...user, accepted }));
+  return result
+    .map(({ user, accepted }) => ({ ...user, accepted }))
+    .sort((member1, member2) => {
+      if (member1.id === userId) return -1;
+      else if (member2.id === userId) return 1;
+      return 0;
+    });
 };
 
 export const quitWorkspace = async ({
@@ -171,4 +177,10 @@ export const quitWorkspace = async ({
       .delete(membersWorkspaces)
       .where(and(eq(membersWorkspaces.memberId, userId), eq(membersWorkspaces.workspaceId, workspaceId)));
   });
+};
+
+export const removeMember = async ({ workspaceId, memberId }: { workspaceId: number; memberId: number }) => {
+  await db
+    .delete(membersWorkspaces)
+    .where(and(eq(membersWorkspaces.memberId, memberId), eq(membersWorkspaces.workspaceId, workspaceId)));
 };
