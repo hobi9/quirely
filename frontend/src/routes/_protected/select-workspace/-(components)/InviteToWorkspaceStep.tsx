@@ -6,9 +6,11 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
+import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 import { getUsers } from '@/services/userService';
 import { inviteToWorkspace } from '@/services/workspaceService';
 import { Workspace } from '@/types/workspace';
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,6 +22,7 @@ type Props = {
 const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
   const [selectedMails, setSelectedMails] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,6 +33,7 @@ const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
     );
 
     await Promise.allSettled(invitationPromises);
+    await queryClient.invalidateQueries(workspacesQueryOption);
 
     setIsLoading(false);
     showInitialStep();

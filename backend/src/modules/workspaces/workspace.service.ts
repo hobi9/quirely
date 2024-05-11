@@ -87,8 +87,8 @@ export const deleteWorkspaceById = async (workspaceId: number) => {
   await db.delete(workspaces).where(eq(workspaces.id, workspaceId));
 };
 
-export const inviteToWorkspace = async ({ workspaceId, userId }: { workspaceId: number; userId: number }) => {
-  await db.insert(membersWorkspaces).values({ workspaceId, memberId: userId });
+export const inviteToWorkspace = async ({ workspaceId, memberId }: { workspaceId: number; memberId: number }) => {
+  await db.insert(membersWorkspaces).values({ workspaceId, memberId });
 };
 
 export const updateInvitationStatus = async ({
@@ -115,11 +115,19 @@ export const getMembership = async ({ workspaceId, userId }: { workspaceId: numb
   return result[0];
 };
 
-export const getExternalWorkspaceById = async ({ workspaceId, userId }: { workspaceId: number; userId: number }) => {
+export const getExternalWorkspaceById = async ({
+  workspaceId,
+  userId,
+  memberId,
+}: {
+  workspaceId: number;
+  userId: number;
+  memberId: number;
+}) => {
   const inQuery = db
     .select({ id: membersWorkspaces.memberId })
     .from(membersWorkspaces)
-    .where(eq(membersWorkspaces.memberId, userId));
+    .where(eq(membersWorkspaces.memberId, memberId));
 
   const [result] = await db
     .select({ workspace: workspaces })

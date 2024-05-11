@@ -217,7 +217,8 @@ export const inviteUser = async (
 
   const workspace = await getExternalWorkspaceById({
     workspaceId: id,
-    userId: member.id,
+    userId: user.id,
+    memberId: member.id,
   });
 
   if (!workspace) {
@@ -226,7 +227,7 @@ export const inviteUser = async (
 
   await inviteToWorkspace({
     workspaceId: id,
-    userId: user.id,
+    memberId: member.id,
   });
 
   return reply.status(204).send();
