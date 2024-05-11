@@ -10,3 +10,5 @@ export type Workspace = {
 export type WorkspaceCreation = Omit<Workspace, 'id' | 'logoUrl' | 'owner'>;
 
 export type WorkspaceDetail = Workspace & { members: User[]; owner: User };
+
+export type Member = User & { accepted?: boolean };

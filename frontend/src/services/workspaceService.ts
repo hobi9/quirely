@@ -3,6 +3,7 @@ import {
   WorkspaceCreation,
   Workspace,
   WorkspaceDetail,
+  Member,
 } from '@/types/workspace';
 
 export const createWorkspace = async (req: WorkspaceCreation) => {
@@ -50,5 +51,20 @@ export const deleteWorkspace = async (id: number) => {
 };
 
 export const leaveWorkspace = async (id: number) => {
-  return client.delete<void>(`/workspaces/${id}/leave`);
+  return client.post<void>(`/workspaces/${id}/leave`);
+};
+
+export const getWorkspaceMembers = async (id: number) => {
+  const response = await client.get<Member[]>(`/workspaces/${id}/members`);
+  return response.data;
+};
+
+export const kickFromWorkspace = async ({
+  workspaceId,
+  memberId,
+}: {
+  workspaceId: number;
+  memberId: number;
+}) => {
+  return client.delete<void>(`/workspaces/${workspaceId}/members/${memberId}`);
 };

@@ -7,12 +7,13 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import SidebarItem from './SidebarItem';
 import useWorkspace from '@/hooks/useWorkspace';
 import { Link } from '@tanstack/react-router';
+import { SIDEBAR_KEY } from '@/utils/constants';
 
 const Sidebar = () => {
   const workspaces = useWorkspaces();
   const { id: activeId } = useWorkspace();
   const [opened, setIsOpened] = useLocalStorage<Record<string, true>>(
-    'opened_sidebar',
+    SIDEBAR_KEY,
     {},
   );
 

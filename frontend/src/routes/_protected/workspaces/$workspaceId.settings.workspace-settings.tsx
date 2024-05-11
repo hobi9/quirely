@@ -100,8 +100,7 @@ function Page() {
       </div>
 
       <div>
-        <h4 className="border-b-2 border-gray-100 font-bold">Danger</h4>
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-2 border-t-2 border-gray-100">
           {isWorkspaceOwner && (
             <Dialog
               title="Are you absolutely sure?"

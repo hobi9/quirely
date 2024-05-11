@@ -6,6 +6,7 @@ import { signOut } from '@/services/authService';
 import { authQueryOptions, useCurrentUser } from '@/hooks/auth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { SIDEBAR_KEY } from '@/utils/constants';
 
 const Avatar = () => {
   const { fullName, avatarUrl, email } = useCurrentUser()!;
@@ -15,6 +16,7 @@ const Avatar = () => {
   const handleLogout = async () => {
     await signOut();
     await queryClient.invalidateQueries(authQueryOptions);
+    localStorage.removeItem(SIDEBAR_KEY);
     navigate({ to: '/', replace: true });
   };
 
