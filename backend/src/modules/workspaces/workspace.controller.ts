@@ -225,10 +225,17 @@ export const inviteUser = async (
     return reply.sendError(404, 'Workspace not found');
   }
 
-  await inviteToWorkspace({
-    workspaceId: id,
-    memberId: member.id,
-  });
+  const membership = await getMembership({ workspaceId: id, userId: member.id });
+  if (membership && membership.accepted) {
+    return reply.sendError(404, 'The user already accepted the invite.');
+  }
+
+  if (!membership) {
+    await inviteToWorkspace({
+      workspaceId: id,
+      memberId: member.id,
+    });
+  }
 
   return reply.status(204).send();
 };
