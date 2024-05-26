@@ -9,17 +9,21 @@ import {
 import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 import { getUsers } from '@/services/userService';
 import { inviteToWorkspace } from '@/services/workspaceService';
-import { Workspace } from '@/types/workspace';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 type Props = {
   showInitialStep: () => void;
-  workspace: Workspace;
+  workspaceId: number;
+  isNotFromCreationPage?: true;
 };
 
-const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
+const InviteToWorkspaceStep = ({
+  showInitialStep,
+  workspaceId,
+  isNotFromCreationPage,
+}: Props) => {
   const [selectedMails, setSelectedMails] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -29,7 +33,7 @@ const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
     setIsLoading(true);
 
     const invitationPromises = selectedMails.map((option) =>
-      inviteToWorkspace(workspace.id, option.value),
+      inviteToWorkspace(workspaceId, option.value),
     );
 
     await Promise.allSettled(invitationPromises);
@@ -84,7 +88,7 @@ const InviteToWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
               type="button"
               onClick={showInitialStep}
             >
-              skip
+              {isNotFromCreationPage ? 'cancel' : 'skip'}
             </Button>
             <Button
               className="min-w-36 text-xs uppercase"

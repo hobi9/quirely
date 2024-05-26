@@ -42,7 +42,7 @@ function SelectWorkspacePage() {
         {step === 'invite' && (
           <InviteToWorkspaceStep
             showInitialStep={() => setStep('select')}
-            workspace={worskace!}
+            workspaceId={worskace!.id}
           />
         )}
       </Card>
