@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@uidotdev/usehooks';
 
-const useIsMobile = () => {
-  return useMediaQuery('(max-width : 768px)');
+const useIsMobile = (width = 768) => {
+  return useMediaQuery(`(max-width : ${width}px)`);
 };
 
 export default useIsMobile;
