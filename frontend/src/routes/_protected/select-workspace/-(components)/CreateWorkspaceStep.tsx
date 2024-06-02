@@ -20,6 +20,8 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { Upload, Loader2 } from 'lucide-react';
 import { ChangeEvent, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 
 type Props = {
   showNextStep: () => void;
@@ -47,9 +49,11 @@ const CreateWorkspaceStep = ({
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const maxSizeInBytes = 1_000_000;
+  const queryClient = useQueryClient();
 
   const submitForm: SubmitHandler<WorkspaceCreation> = async (data) => {
     const workspace = await createWorkspace(data);
+    await queryClient.invalidateQueries(workspacesQueryOption);
     if (file) {
       try {
         const { logoUrl } = await updateWorkspaceLogo(workspace.id, file);

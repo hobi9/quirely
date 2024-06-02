@@ -17,8 +17,8 @@ const WorkspaceSwitcher = () => {
     <Popover>
       <PopoverTrigger className="group w-48 p-1">
         <div className="flex items-center justify-between gap-x-4 rounded-md transition group-hover:bg-blue-50 group-hover:opacity-75">
-          <div className="flex items-center gap-x-2 ">
-            <div className="flex size-9 items-center justify-center rounded-md text-slate-50">
+          <div className="flex items-center gap-x-2">
+            <div className="flex size-9 items-center justify-center overflow-hidden rounded-md text-slate-50">
               <img
                 src={activeWorkspace.logoUrl || defaultLogo}
                 className="rounded-md object-cover"
@@ -33,7 +33,7 @@ const WorkspaceSwitcher = () => {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex items-center gap-x-2">
-          <div className="flex size-11 items-center justify-center rounded-md text-slate-50">
+          <div className="flex size-11 items-center justify-center overflow-hidden rounded-md text-slate-50">
             <img
               src={activeWorkspace.logoUrl || defaultLogo}
               className="rounded-md object-cover"

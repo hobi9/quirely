@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logger } from '../../lib/logger';
-import { uploadFile } from '../../lib/supabase';
+import { deleteFiles, uploadFile } from '../../lib/supabase';
 import { WORKSPACE_LOGO_BUCKET } from '../../utils/constants';
 import { findUserByEmail, findUserById } from '../users/user.service';
 import type { WorkspaceCreation } from './workspace.schema';
@@ -94,7 +94,15 @@ export const deleteWorkspace = async (request: FastifyRequest<{ Params: { id: nu
   }
 
   await deleteWorkspaceById(params.id);
-  //TODO: remove any logo
+
+  const logoUrl = workspace.logoUrl;
+  if (logoUrl) {
+    try {
+      await deleteFiles({ bucket: WORKSPACE_LOGO_BUCKET, publicUrls: [logoUrl] });
+    } catch (error) {
+      logger.info(error, 'Error during file deletion.');
+    }
+  }
 
   return reply.code(204).send();
 };
@@ -115,6 +123,14 @@ export const leaveWorkspace = async (request: FastifyRequest<{ Params: { id: num
   if (members.length === 1) {
     if (members[0]!.id === user.id) {
       await deleteWorkspaceById(params.id);
+      const logoUrl = workspace.logoUrl;
+      if (logoUrl) {
+        try {
+          await deleteFiles({ bucket: WORKSPACE_LOGO_BUCKET, publicUrls: [logoUrl] });
+        } catch (error) {
+          logger.warn(error, 'Error during file deletion.');
+        }
+      }
       return reply.code(204).send();
     } else {
       return reply.sendError(409, "You didn't accept the workspace invitation yet.");

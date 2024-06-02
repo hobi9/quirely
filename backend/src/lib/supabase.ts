@@ -36,3 +36,12 @@ export const uploadFile = async ({ bucket, mimeType, oldFileUrl, fileBuffer, upd
 
   return publicUrl;
 };
+
+export const deleteFiles = async ({ bucket, publicUrls }: { bucket: string; publicUrls: string[] }) => {
+  const paths = publicUrls.map((publicUrl) => publicUrl.split('/').at(-1)!);
+
+  const { error } = await supabase.storage.from(bucket).remove(paths);
+  if (error) {
+    throw error;
+  }
+};
