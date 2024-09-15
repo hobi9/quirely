@@ -13,6 +13,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import static com.quirely.backend.utils.JwtUtils.createJwt;
+import static com.quirely.backend.utils.JwtUtils.parseJwt;
 
 @Slf4j
 @Service
@@ -35,6 +36,14 @@ public class EmailService {
 
         String htmlContent = templateEngine.process("verify-email", context);
         sendMail(recipient, "Quirely - Verify email", htmlContent);
+    }
+
+    public Long getUserIdFromVerificationToken(String verificationToken) {
+        EmailVerificationJwtPayload emailVerificationJwtPayload = parseJwt(verificationToken, jwtEmailSecret, EmailVerificationJwtPayload.class);
+        if (emailVerificationJwtPayload == null) {
+            return null;
+        }
+        return emailVerificationJwtPayload.getId();
     }
 
     private void sendMail(String to, String subject, String text) {

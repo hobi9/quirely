@@ -1,7 +1,7 @@
 package com.quirely.backend.config.security.filter;
 
-import com.quirely.backend.config.manager.AuthManager;
-import com.quirely.backend.config.SessionAuthentication;
+import com.quirely.backend.config.security.manager.AuthManager;
+import com.quirely.backend.config.security.authentication.SessionAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

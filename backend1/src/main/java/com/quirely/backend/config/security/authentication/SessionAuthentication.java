@@ -1,4 +1,4 @@
-package com.quirely.backend.config;
+package com.quirely.backend.config.security.authentication;
 
 import com.quirely.backend.service.User;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SessionAuthentication implements Authentication {
     private User user;
-    private final Long userId;
+    private final long userId;
     private boolean authenticated;
 
     @Override
@@ -34,7 +34,7 @@ public class SessionAuthentication implements Authentication {
     }
 
     @Override
-    public Object getPrincipal() {
+    public User getPrincipal() {
         return user;
     }
 
@@ -50,9 +50,6 @@ public class SessionAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        if (user != null) {
-            return user.getFullName();
-        }
         return null;
     }
 }

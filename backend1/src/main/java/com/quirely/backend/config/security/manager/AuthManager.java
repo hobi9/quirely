@@ -1,4 +1,4 @@
-package com.quirely.backend.config.manager;
+package com.quirely.backend.config.security.manager;
 
 import com.quirely.backend.config.security.provider.SessionAuthProvider;
 import lombok.RequiredArgsConstructor;

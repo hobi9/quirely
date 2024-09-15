@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
     <body>
-        <p>Verify your email <a href="${clientBaseUrl}/verify-email/${confirmationToken}">here</a></p>
+        <p>Verify your email <a th:href="|${clientBaseUrl}/verify-email/${confirmationToken}|">here</a></p>
     </body>
 </html>

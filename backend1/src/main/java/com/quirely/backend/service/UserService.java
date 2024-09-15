@@ -1,5 +1,6 @@
 package com.quirely.backend.service;
 
+import com.quirely.backend.controller.exception.UserNotFoundException;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.entity.UserEntity;
 import com.quirely.backend.repository.UserRepository;
@@ -37,5 +38,17 @@ public class UserService {
 
     public boolean comparePassword(User user, String password) {
         return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    public void verifyUser(long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (user.isVerified()) {
+            throw new RuntimeException("User with id " + id + " is already verified"); //TODO: conflict exception
+        }
+
+        user.setVerified(true);
+        userRepository.save(user);
     }
 }

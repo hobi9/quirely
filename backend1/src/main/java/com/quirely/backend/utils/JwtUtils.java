@@ -7,8 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 @Slf4j
@@ -16,7 +16,7 @@ import java.util.Date;
 public class JwtUtils {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static Key createKey(String secret) {
+    private static SecretKey createKey(String secret) {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -32,5 +32,20 @@ public class JwtUtils {
             log.error("Error while creating JWT", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> T parseJwt(String jwt, String secret, Class<T> payloadClass) {
+        try {
+            String subject = Jwts.parser()
+                    .verifyWith(createKey(secret))
+                    .build()
+                    .parseSignedClaims(jwt).getPayload().getSubject();
+
+            return objectMapper.readValue(subject,payloadClass);
+        } catch (Exception e) {
+            log.error("Error while parsing JWT", e);
+            return null;
+        }
+
     }
 }
