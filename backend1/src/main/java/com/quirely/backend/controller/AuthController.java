@@ -13,8 +13,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -47,7 +51,7 @@ public class AuthController {
             log.error("Error while sending registration email", e);
         }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
@@ -100,6 +104,13 @@ public class AuthController {
 
         userService.verifyUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/csrf-refresh")
+    @Operation(summary = "Refresh CSRF Token", description = "Generates and returns a new CSRF token.")
+    public ResponseEntity<CsrfDto> getCsrf(CsrfToken csrfToken) {
+        var csrfDto = new CsrfDto(csrfToken.getToken());
+        return ResponseEntity.ok(csrfDto);
     }
 
 

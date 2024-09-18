@@ -23,7 +23,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         Long userId = (Long) request.getSession().getAttribute("userId");
 
         if (userId !=  null) {
-            SessionAuthentication sessionAuthentication = new SessionAuthentication(userId);
+            var sessionAuthentication = new SessionAuthentication(userId);
 
             var authentication = authManager.authenticate(sessionAuthentication);
 
