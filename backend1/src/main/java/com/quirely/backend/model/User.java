@@ -1,4 +1,4 @@
-package com.quirely.backend.service;
+package com.quirely.backend.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

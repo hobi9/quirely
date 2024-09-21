@@ -1,9 +1,9 @@
 package com.quirely.backend.mapper;
 
-import com.quirely.backend.controller.RegistrationInputDto;
-import com.quirely.backend.controller.UserDto;
+import com.quirely.backend.dto.RegistrationInputDto;
+import com.quirely.backend.dto.UserDto;
 import com.quirely.backend.entity.UserEntity;
-import com.quirely.backend.service.User;
+import com.quirely.backend.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

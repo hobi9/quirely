@@ -14,34 +14,29 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="users")
-public class UserEntity {
+@Table(name = "workspaces")
+public class WorkspaceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "full_name")
-    private String fullName;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "logo_url")
+    private String logoUrl;
 
-    @Column(name = "is_verified")
-    private boolean verified;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private UserEntity owner;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
-
-    @OneToMany(mappedBy = "owner")
-    private List<WorkspaceEntity> ownedWorkspaces;
-
-    @OneToMany(mappedBy = "member")
-    private List<MemberWorkspaceEntity> associatedWorkspaces;
+    @OneToMany(mappedBy = "workspace")
+    private List<MemberWorkspaceEntity> members;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -58,5 +53,4 @@ public class UserEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 }

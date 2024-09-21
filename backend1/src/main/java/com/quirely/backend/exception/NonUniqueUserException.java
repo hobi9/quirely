@@ -1,4 +1,4 @@
-package com.quirely.backend.controller.exception;
+package com.quirely.backend.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

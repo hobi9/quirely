@@ -1,4 +1,4 @@
-package com.quirely.backend.controller;
+package com.quirely.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

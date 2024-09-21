@@ -1,7 +1,7 @@
 package com.quirely.backend.controller;
 
-import com.quirely.backend.controller.exception.NonUniqueUserException;
-import com.quirely.backend.controller.exception.UserNotFoundException;
+import com.quirely.backend.exception.NonUniqueUserException;
+import com.quirely.backend.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

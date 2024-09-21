@@ -1,4 +1,4 @@
-package com.quirely.backend.controller.exception;
+package com.quirely.backend.exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {

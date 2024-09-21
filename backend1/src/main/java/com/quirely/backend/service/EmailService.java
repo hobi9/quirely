@@ -1,6 +1,6 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.controller.EmailVerificationJwtPayload;
+import com.quirely.backend.model.EmailVerificationJwtPayload;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
 
-    @Value("${client_base_url}")
+    @Value("${client.base-url}")
     private String clientBaseUrl;
     @Value("${jwt.email.secret}")
     private String jwtEmailSecret;

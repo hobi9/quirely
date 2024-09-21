@@ -1,6 +1,6 @@
 package com.quirely.backend.config.security.authentication;
 
-import com.quirely.backend.service.User;
+import com.quirely.backend.model.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

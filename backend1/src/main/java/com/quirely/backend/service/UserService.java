@@ -1,8 +1,9 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.controller.exception.UserNotFoundException;
+import com.quirely.backend.exception.UserNotFoundException;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.entity.UserEntity;
+import com.quirely.backend.model.User;
 import com.quirely.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

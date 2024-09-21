@@ -1,10 +1,14 @@
 package com.quirely.backend.controller;
 
-import com.quirely.backend.controller.exception.NonUniqueUserException;
-import com.quirely.backend.controller.exception.UserNotFoundException;
+import com.quirely.backend.dto.CsrfDto;
+import com.quirely.backend.dto.LoginInputDto;
+import com.quirely.backend.dto.RegistrationInputDto;
+import com.quirely.backend.dto.UserDto;
+import com.quirely.backend.exception.NonUniqueUserException;
+import com.quirely.backend.exception.UserNotFoundException;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.service.EmailService;
-import com.quirely.backend.service.User;
+import com.quirely.backend.model.User;
 import com.quirely.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
