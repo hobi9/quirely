@@ -2,6 +2,7 @@ package com.quirely.backend.config.security.filter;
 
 import com.quirely.backend.config.security.manager.AuthManager;
 import com.quirely.backend.config.security.authentication.SessionAuthentication;
+import com.quirely.backend.constants.SessionConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        Long userId = (Long) request.getSession().getAttribute("userId");
+        Long userId = (Long) request.getSession().getAttribute(SessionConstants.SESSION_USER_ID_ATTRIBUTE);
 
         if (userId !=  null) {
             var sessionAuthentication = new SessionAuthentication(userId);

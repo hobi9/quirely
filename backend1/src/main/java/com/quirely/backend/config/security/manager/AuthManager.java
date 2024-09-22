@@ -3,7 +3,7 @@ package com.quirely.backend.config.security.manager;
 import com.quirely.backend.config.security.provider.SessionAuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -19,6 +19,6 @@ public class AuthManager implements AuthenticationManager {
             return sessionAuthProvider.authenticate(authentication);
         }
 
-        throw new BadCredentialsException("Oh no"); //TODO: fix
+        throw new ProviderNotFoundException("Unsupported Authentication");
     }
 }

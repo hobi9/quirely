@@ -1,7 +1,5 @@
-package com.quirely.backend.controller;
+package com.quirely.backend.exception;
 
-import com.quirely.backend.exception.NonUniqueUserException;
-import com.quirely.backend.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class ControllerAdvice {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
@@ -52,4 +50,16 @@ public class ControllerAdvice {
 
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<Map<String, String>> handleException(IncorrectPasswordException ex) {
+        Map<String, String> errors = new HashMap<>();
+
+        errors.put("message", "Incorrect password");
+        errors.put("key", "Incorrect password");
+
+
+        return new ResponseEntity<>(errors, HttpStatus.UNAUTHORIZED);
+    }
+
 }

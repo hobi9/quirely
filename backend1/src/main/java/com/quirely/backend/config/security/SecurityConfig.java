@@ -1,25 +1,42 @@
 package com.quirely.backend.config.security;
 
 import com.quirely.backend.config.security.filter.AuthenticationFilter;
+import com.quirely.backend.config.security.filter.SessionCookieRefreshFilter;
+import com.quirely.backend.constants.SessionConstants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Value("${client.base-url}")
+    private String clientBaseUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilter authenticationFilter) throws Exception {
+        http.addFilterBefore(new SessionCookieRefreshFilter(), DisableEncodeUrlFilter.class);
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        http.cors(Customizer.withDefaults());
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/verify/*")
@@ -45,8 +62,31 @@ public class SecurityConfig {
 
     @Bean
     public FilterRegistrationBean<AuthenticationFilter> tenantFilterRegistration(AuthenticationFilter authenticationFilter) {
-        FilterRegistrationBean<AuthenticationFilter> registration = new FilterRegistrationBean<>(authenticationFilter);
+        var registration = new FilterRegistrationBean<>(authenticationFilter);
         registration.setEnabled(false);
         return registration;
+    }
+
+    @Bean
+    public CookieSerializer cookieSerializer() {
+        var cookieSerializer = new DefaultCookieSerializer();
+        //cookieSerializer.setUseSecureCookie(true); //TODO: add support for it later
+        cookieSerializer.setCookieName(SessionConstants.SESSION_COOKIE_NAME);
+        cookieSerializer.setCookieMaxAge(SessionConstants.SESSION_MAX_AGE);
+        cookieSerializer.setCookiePath(SessionConstants.SESSION_COOKIE_PATH);
+        cookieSerializer.setUseHttpOnlyCookie(true);
+        return cookieSerializer;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(List.of((clientBaseUrl)));
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedMethods(List.of("*"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 }

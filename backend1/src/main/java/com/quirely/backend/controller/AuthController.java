@@ -1,9 +1,11 @@
 package com.quirely.backend.controller;
 
+import com.quirely.backend.constants.SessionConstants;
 import com.quirely.backend.dto.CsrfDto;
 import com.quirely.backend.dto.LoginInputDto;
 import com.quirely.backend.dto.RegistrationInputDto;
 import com.quirely.backend.dto.UserDto;
+import com.quirely.backend.exception.IncorrectPasswordException;
 import com.quirely.backend.exception.NonUniqueUserException;
 import com.quirely.backend.exception.UserNotFoundException;
 import com.quirely.backend.mapper.UserMapper;
@@ -60,7 +62,10 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "User Login", description = "Authenticates a user using email and password, creating a session upon success.")
-    public ResponseEntity<Void> login(@RequestBody @Valid LoginInputDto request, HttpSession httpSession) {
+    public ResponseEntity<Void> login(@RequestBody @Valid LoginInputDto request, HttpSession httpSession, @AuthenticationPrincipal User user) {
+        if (user != null) {
+            return ResponseEntity.noContent().build();
+        }
         Optional<User> userByEmail = userService.findUserByEmail(request.email());
 
         if (userByEmail.isEmpty()) {
@@ -69,10 +74,10 @@ public class AuthController {
 
         boolean passwordIsCorrect = userService.comparePassword(userByEmail.get(), request.password());
         if (!passwordIsCorrect) {
-            throw new RuntimeException("Incorrect password"); //TODO: change
+            throw new IncorrectPasswordException();
         }
 
-        httpSession.setAttribute("userId", userByEmail.get().getId());
+        httpSession.setAttribute(SessionConstants.SESSION_USER_ID_ATTRIBUTE, userByEmail.get().getId());
 
         return ResponseEntity.noContent().build();
     }
