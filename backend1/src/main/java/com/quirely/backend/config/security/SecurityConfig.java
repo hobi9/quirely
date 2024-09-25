@@ -39,13 +39,23 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults());
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/verify/*")
+                .ignoringRequestMatchers(
+                        "/api/v1/auth/register",
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/verify/*"
+                )
         );
 
         http.authorizeHttpRequests(authorize -> {
                     authorize
-                            .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/me",
-                                    "/api/v1/auth/verify/*", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+                            .requestMatchers(
+                                    "/api/v1/auth/register",
+                                    "/api/v1/auth/login",
+                                    "/api/v1/auth/me",
+                                    "/api/v1/auth/verify/*",
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html"
                             )
                             .permitAll()
                             .anyRequest().authenticated();
