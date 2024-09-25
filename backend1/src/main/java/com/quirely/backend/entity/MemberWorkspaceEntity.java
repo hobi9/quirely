@@ -20,12 +20,12 @@ public class MemberWorkspaceEntity {
     @ManyToOne
     @MapsId("memberId")
     @JoinColumn(name = "member_id")
-    private UserEntity member;
+    private User member;
 
     @ManyToOne
     @MapsId("workspaceId")
     @JoinColumn(name = "workspace_id")
-    private WorkspaceEntity workspace;
+    private Workspace workspace;
 
     @Column(name= "accepted")
     private Boolean accepted;

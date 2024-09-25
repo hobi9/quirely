@@ -1,5 +1,6 @@
 package com.quirely.backend.entity;
 
+import com.quirely.backend.utils.DateUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="users")
-public class UserEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +39,7 @@ public class UserEntity {
     private String avatarUrl;
 
     @OneToMany(mappedBy = "owner")
-    private List<WorkspaceEntity> ownedWorkspaces;
+    private List<Workspace> ownedWorkspaces;
 
     @OneToMany(mappedBy = "member")
     private List<MemberWorkspaceEntity> associatedWorkspaces;
@@ -51,12 +52,12 @@ public class UserEntity {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = DateUtils.getCurrentDateTime();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = DateUtils.getCurrentDateTime();
     }
 
 }

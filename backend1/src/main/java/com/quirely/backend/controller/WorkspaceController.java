@@ -2,9 +2,9 @@ package com.quirely.backend.controller;
 
 import com.quirely.backend.dto.WorkspaceCreationDto;
 import com.quirely.backend.dto.WorkspaceDto;
+import com.quirely.backend.entity.User;
+import com.quirely.backend.entity.Workspace;
 import com.quirely.backend.mapper.WorkspaceMapper;
-import com.quirely.backend.model.User;
-import com.quirely.backend.model.Workspace;
 import com.quirely.backend.service.WorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +30,7 @@ public class WorkspaceController {
     @PostMapping
     @Operation(summary = "Create a new workspace", description = "Creates a new workspace for the authenticated user.")
     public ResponseEntity<WorkspaceDto> createWorkspace(@RequestBody @Valid WorkspaceCreationDto workspaceDto, @AuthenticationPrincipal User user) {
-        Workspace createdWorkspace = workspaceService.createWorkspace(workspaceMapper.toModel(workspaceDto), user.getId());
+        Workspace createdWorkspace = workspaceService.createWorkspace(workspaceDto, user);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(workspaceMapper.toDto(createdWorkspace));

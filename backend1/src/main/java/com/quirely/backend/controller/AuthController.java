@@ -5,12 +5,8 @@ import com.quirely.backend.dto.CsrfDto;
 import com.quirely.backend.dto.LoginInputDto;
 import com.quirely.backend.dto.RegistrationInputDto;
 import com.quirely.backend.dto.UserDto;
-import com.quirely.backend.exception.IncorrectPasswordException;
-import com.quirely.backend.exception.NonUniqueUserException;
-import com.quirely.backend.exception.UserNotFoundException;
+import com.quirely.backend.entity.User;
 import com.quirely.backend.mapper.UserMapper;
-import com.quirely.backend.service.EmailService;
-import com.quirely.backend.model.User;
 import com.quirely.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,8 +23,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -37,26 +31,11 @@ import java.util.Optional;
 public class AuthController {
     private final UserService userService;
     private final UserMapper userMapper;
-    private final EmailService emailService;
 
     @PostMapping("/register")
     @Operation(summary = "Create a New Account", description = "Registers a new user account by providing valid user details and email.")
     public ResponseEntity<Void> register(@RequestBody @Valid RegistrationInputDto request) {
-        User user = userMapper.toModel(request);
-        Optional<User> userByEmail = userService.findUserByEmail(user.getEmail());
-
-        if (userByEmail.isPresent()) {
-            throw new NonUniqueUserException(user.getEmail());
-        }
-
-        User createdUser = userService.createUser(user);
-
-        try {
-            emailService.sendRegistrationEmail(createdUser.getEmail(), createdUser.getId());
-        } catch (Exception e) {
-            log.error("Error while sending registration email", e);
-        }
-
+        userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -66,18 +45,9 @@ public class AuthController {
         if (user != null) {
             return ResponseEntity.noContent().build();
         }
-        Optional<User> userByEmail = userService.findUserByEmail(request.email());
 
-        if (userByEmail.isEmpty()) {
-            throw new UserNotFoundException("User not found");
-        }
-
-        boolean passwordIsCorrect = userService.comparePassword(userByEmail.get(), request.password());
-        if (!passwordIsCorrect) {
-            throw new IncorrectPasswordException();
-        }
-
-        httpSession.setAttribute(SessionConstants.SESSION_USER_ID_ATTRIBUTE, userByEmail.get().getId());
+        Long userId = userService.loginUser(request);
+        httpSession.setAttribute(SessionConstants.SESSION_USER_ID_ATTRIBUTE, userId);
 
         return ResponseEntity.noContent().build();
     }
@@ -96,22 +66,13 @@ public class AuthController {
         if (user == null) {
             return ResponseEntity.noContent().build();
         }
-
-        UserDto userDto = userMapper.toDto(user);
-
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(userMapper.toDto(user));
     }
 
     @PutMapping("/verify/{verificationToken}")
     @Operation(summary = "Verify User Email", description = "Confirms a user's email address using a verification token.")
     public ResponseEntity<Void> verify(@PathVariable("verificationToken") @NotBlank String verificationToken) {
-        Long userId = emailService.getUserIdFromVerificationToken(verificationToken);
-
-        if (userId == null) {
-            throw new RuntimeException("Incorrect verification token"); //TODO: 400 status exception
-        }
-
-        userService.verifyUser(userId);
+        userService.verifyUser(verificationToken);
         return ResponseEntity.noContent().build();
     }
 

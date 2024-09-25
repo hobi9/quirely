@@ -30,7 +30,7 @@ public class EmailService {
     public void sendRegistrationEmail(String recipient, long userId) {
         String confirmationToken = createJwt(new EmailVerificationJwtPayload(userId), jwtEmailSecret, 86_400_000);
 
-        Context context = new Context();
+        var context = new Context();
         context.setVariable("confirmationToken", confirmationToken);
         context.setVariable("clientBaseUrl", clientBaseUrl);
 
@@ -49,7 +49,7 @@ public class EmailService {
     private void sendMail(String to, String subject, String text) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            var helper = new MimeMessageHelper(message, true);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text, true);

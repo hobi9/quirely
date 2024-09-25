@@ -1,20 +1,24 @@
 package com.quirely.backend.mapper;
 
 import com.quirely.backend.entity.MemberWorkspaceEntity;
-import com.quirely.backend.entity.UserEntity;
-import com.quirely.backend.entity.WorkspaceEntity;
+import com.quirely.backend.entity.User;
+import com.quirely.backend.entity.Workspace;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MemberWorkspaceMapper {
 
-    public MemberWorkspaceEntity createEntity(UserEntity ownerEntity, WorkspaceEntity savedEntity) {
-        MemberWorkspaceEntity.MemberWorkspacePK memberWorkspacePK = new MemberWorkspaceEntity.MemberWorkspacePK(ownerEntity.getId(), savedEntity.getId());
+    public MemberWorkspaceEntity createEntity(User member, Workspace workspace, Boolean accepted) {
+        MemberWorkspaceEntity.MemberWorkspacePK memberWorkspacePK = MemberWorkspaceEntity.MemberWorkspacePK.builder()
+                .workspaceId(workspace.getId())
+                .memberId(member.getId())
+                .build();
+
         return MemberWorkspaceEntity.builder()
                 .id(memberWorkspacePK)
-                .member(ownerEntity)
-                .accepted(true)
-                .workspace(savedEntity)
+                .member(member)
+                .accepted(accepted)
+                .workspace(workspace)
                 .build();
     }
 }

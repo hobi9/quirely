@@ -2,8 +2,7 @@ package com.quirely.backend.mapper;
 
 import com.quirely.backend.dto.RegistrationInputDto;
 import com.quirely.backend.dto.UserDto;
-import com.quirely.backend.entity.UserEntity;
-import com.quirely.backend.model.User;
+import com.quirely.backend.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,33 +10,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
 
-    public User toModel(RegistrationInputDto registrationInputDto) {
+    public User toEntity(RegistrationInputDto registrationInputDto) {
         return User.builder()
                 .fullName(registrationInputDto.fullName().trim())
                 .email(registrationInputDto.email().toLowerCase())
                 .password(registrationInputDto.password())
-                .build();
-    }
-
-    public UserEntity toEntity(User user) {
-        return UserEntity.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .password(user.getPassword())
-                .verified(user.isVerified())
-                .avatarUrl(user.getAvatarUrl())
-                .build();
-    }
-
-    public User toModel(UserEntity userEntity) {
-        return User.builder()
-                .id(userEntity.getId())
-                .email(userEntity.getEmail())
-                .fullName(userEntity.getFullName())
-                .password(userEntity.getPassword())
-                .verified(userEntity.isVerified())
-                .avatarUrl(userEntity.getAvatarUrl())
                 .build();
     }
 
