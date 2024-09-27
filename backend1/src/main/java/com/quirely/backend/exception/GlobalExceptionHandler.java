@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    //TODO: handle all exceptions correctly with a standard error object.
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public ResponseEntity<Map<String, String>> handleException(MethodArgumentNotValidException ex) {

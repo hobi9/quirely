@@ -1,7 +1,7 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.dto.LoginInputDto;
-import com.quirely.backend.dto.RegistrationInputDto;
+import com.quirely.backend.dto.LoginRequest;
+import com.quirely.backend.dto.RegistrationRequest;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.exception.IncorrectPasswordException;
 import com.quirely.backend.exception.NonUniqueUserException;
@@ -28,14 +28,18 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public void createUser(RegistrationInputDto inputDto) {
-        Optional<User> userByEmail = userRepository.findByEmail(inputDto.email());
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public void createUser(RegistrationRequest request) {
+        Optional<User> userByEmail = this.findUserByEmail(request.email());
 
         if (userByEmail.isPresent()) {
-            throw new NonUniqueUserException(inputDto.email());
+            throw new NonUniqueUserException(request.email());
         }
 
-        User user = userRepository.save(userMapper.toEntity(inputDto));
+        User user = userRepository.save(userMapper.toEntity(request));
 
         try {
             emailService.sendRegistrationEmail(user.getEmail(), user.getId());
@@ -44,13 +48,13 @@ public class UserService {
         }
     }
 
-    public Long loginUser(LoginInputDto inputDto) {
-        Optional<User> userByEmail = userRepository.findByEmail(inputDto.email());
+    public Long loginUser(LoginRequest request) {
+        Optional<User> userByEmail = userRepository.findByEmail(request.email());
         if (userByEmail.isEmpty()) {
-            throw new UserNotFoundException("User not found");
+            throw new UserNotFoundException();
         }
 
-        boolean matches = passwordEncoder.matches(inputDto.password(), userByEmail.get().getPassword());
+        boolean matches = passwordEncoder.matches(request.password(), userByEmail.get().getPassword());
         if (!matches) {
             throw new IncorrectPasswordException();
         }
@@ -65,7 +69,7 @@ public class UserService {
         }
 
         User user = this.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         if (user.isVerified()) {
             throw new RuntimeException(String.format("User with id %d already verified", user.getId())); //TODO: conflict exception

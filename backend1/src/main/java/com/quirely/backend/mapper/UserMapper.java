@@ -1,6 +1,6 @@
 package com.quirely.backend.mapper;
 
-import com.quirely.backend.dto.RegistrationInputDto;
+import com.quirely.backend.dto.RegistrationRequest;
 import com.quirely.backend.dto.UserDto;
 import com.quirely.backend.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
 
-    public User toEntity(RegistrationInputDto registrationInputDto) {
+    public User toEntity(RegistrationRequest registrationInputDto) {
         return User.builder()
                 .fullName(registrationInputDto.fullName().trim())
                 .email(registrationInputDto.email().toLowerCase())

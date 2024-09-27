@@ -2,8 +2,8 @@ package com.quirely.backend.controller;
 
 import com.quirely.backend.constants.SessionConstants;
 import com.quirely.backend.dto.CsrfDto;
-import com.quirely.backend.dto.LoginInputDto;
-import com.quirely.backend.dto.RegistrationInputDto;
+import com.quirely.backend.dto.LoginRequest;
+import com.quirely.backend.dto.RegistrationRequest;
 import com.quirely.backend.dto.UserDto;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.mapper.UserMapper;
@@ -34,14 +34,14 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Create a New Account", description = "Registers a new user account by providing valid user details and email.")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegistrationInputDto request) {
+    public ResponseEntity<Void> register(@RequestBody @Valid RegistrationRequest request) {
         userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
     @Operation(summary = "User Login", description = "Authenticates a user using email and password, creating a session upon success.")
-    public ResponseEntity<Void> login(@RequestBody @Valid LoginInputDto request, HttpSession httpSession, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request, HttpSession httpSession, @AuthenticationPrincipal User user) {
         if (user != null) {
             return ResponseEntity.noContent().build();
         }

@@ -2,7 +2,7 @@ package com.quirely.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record WorkspaceCreationDto(
+public record WorkspaceCreationRequest(
         @NotBlank String name,
         String description
 ) {
