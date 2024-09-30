@@ -2,13 +2,16 @@ package com.quirely.backend.config.security;
 
 import com.quirely.backend.config.security.filter.AuthenticationFilter;
 import com.quirely.backend.config.security.filter.SessionCookieRefreshFilter;
+import com.quirely.backend.config.security.provider.SessionAuthProvider;
 import com.quirely.backend.constants.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,23 +49,29 @@ public class SecurityConfig {
                 )
         );
 
-        http.authorizeHttpRequests(authorize -> {
-                    authorize
-                            .requestMatchers(
-                                    "/api/v1/auth/register",
-                                    "/api/v1/auth/login",
-                                    "/api/v1/auth/me",
-                                    "/api/v1/auth/verify/*",
-                                    "/v3/api-docs/**",
-                                    "/swagger-ui/**",
-                                    "/swagger-ui.html"
-                            )
-                            .permitAll()
-                            .anyRequest().authenticated();
-                }
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(
+                        "/api/v1/auth/register",
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/me",
+                        "/api/v1/auth/verify/*",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                )
+                .permitAll()
+                .anyRequest().authenticated()
         );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http, SessionAuthProvider sessionAuthProvider) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(sessionAuthProvider);
+        return authenticationManagerBuilder.build();
     }
 
     @Bean

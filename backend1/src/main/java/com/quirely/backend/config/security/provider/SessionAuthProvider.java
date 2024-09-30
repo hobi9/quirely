@@ -4,6 +4,7 @@ import com.quirely.backend.config.security.authentication.SessionAuthentication;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class SessionAuthProvider implements org.springframework.security.authentication.AuthenticationProvider {
+public class SessionAuthProvider implements AuthenticationProvider {
     private final UserService userService;
 
     @Override
