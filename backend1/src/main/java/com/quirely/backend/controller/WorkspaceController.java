@@ -13,16 +13,17 @@ import com.quirely.backend.service.WorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/workspaces")
@@ -114,8 +115,8 @@ public class WorkspaceController {
 
     @PostMapping("/{workspaceId}/invite")
     @Operation(summary = "Invite a member", description = "Invites a new member to the specified workspace.")
-    public ResponseEntity<Void> inviteMember(@Valid MemberInvitationRequest request,
-                                             @AuthenticationPrincipal User user, @PathVariable Long workspaceId) {
+    public ResponseEntity<Void> inviteMember(@RequestBody @Valid MemberInvitationRequest request, @PathVariable Long workspaceId,
+                                             @AuthenticationPrincipal User user) {
 
         workspaceService.inviteMember(request, workspaceId, user);
         return ResponseEntity.noContent().build();
@@ -130,7 +131,22 @@ public class WorkspaceController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping(value = "/{workspaceId}/logo", consumes = "multipart/form-data")
+    @Operation(summary = "Upload workspace logo", description = "Uploads a new logo for the specified workspace. Only image files are accepted.")
+    public ResponseEntity<UploadFileResponse> uploadLogo(@PathVariable Long workspaceId, @RequestParam("file") @NotNull MultipartFile multipartFile,
+                                                         @AuthenticationPrincipal User user) throws IOException {
 
-    //TODO: add upload logo endpoint
+        if (multipartFile.isEmpty()) {
+            throw new IllegalArgumentException("File must not be empty");
+        }
+        String contentType = multipartFile.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Invalid content type: " + contentType); //TODO: handle it better
+        }
+
+        String url = workspaceService.uploadLogo(workspaceId, user.getId(), multipartFile);
+
+        return ResponseEntity.ok().body(new UploadFileResponse(url));
+    }
 
 }

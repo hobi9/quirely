@@ -4,3 +4,7 @@ export type ServerError<Schema> = {
   message: string;
   field?: keyof Schema;
 };
+
+export type UploadFileResponse = {
+  url: string;
+};

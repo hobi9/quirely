@@ -1,5 +1,6 @@
 package com.quirely.backend.service;
 
+import com.quirely.backend.enums.S3Prefix;
 import com.quirely.backend.dto.workspace.MemberInvitationRequest;
 import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
 import com.quirely.backend.entity.MemberWorkspaceEntity;
@@ -13,18 +14,24 @@ import com.quirely.backend.model.UserWithAcceptance;
 import com.quirely.backend.repository.MemberWorkspaceRepository;
 import com.quirely.backend.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final MemberWorkspaceRepository memberWorkspaceRepository;
     private final UserService userService;
+    private final FileService fileService;
     private final WorkspaceMapper workspaceMapper;
     private final MemberWorkspaceMapper memberWorkspaceMapper;
 
@@ -40,14 +47,12 @@ public class WorkspaceService {
     }
 
     public Workspace updateWorkspace(Long workspaceId, WorkspaceCreationRequest request, User owner) {
-        Optional<Workspace> workspace = workspaceRepository.findWorkspaceByIdAndOwner(workspaceId, owner.getId());
-        if (workspace.isEmpty()) {
-            throw new WorkspaceNotFoundException();
-        }
-        Workspace workspaceToUpdate = workspace.get();
-        workspaceToUpdate.setName(request.name());
-        workspaceToUpdate.setDescription(request.description());
-        return workspaceRepository.save(workspaceToUpdate);
+        Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, owner.getId())
+                .orElseThrow(WorkspaceNotFoundException::new);
+
+        workspace.setName(request.name());
+        workspace.setDescription(request.description());
+        return workspaceRepository.save(workspace);
     }
 
     public List<Workspace> getMemberWorkspaces(Long userId, Boolean accepted) {
@@ -128,6 +133,7 @@ public class WorkspaceService {
 
         MemberWorkspaceEntity memberWorkspace = MemberWorkspaceEntity
                 .builder()
+                .id(new MemberWorkspaceEntity.MemberWorkspacePK(member.getId(), workspace.getId()))
                 .member(member)
                 .workspace(workspace)
                 .build();
@@ -146,5 +152,25 @@ public class WorkspaceService {
         userService.findUserById(memberId)
                 .orElseThrow(UserNotFoundException::new);
         memberWorkspaceRepository.deleteMembership(memberId, workspaceId);
+    }
+
+    public String uploadLogo(Long workspaceId, Long userId, MultipartFile file) throws IOException {
+        Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
+                .orElseThrow(WorkspaceNotFoundException::new);
+
+        if (!workspace.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("You are not the owner of this workspace"); //TODO: change with custom exception
+        }
+        String oldLogoUrl = workspace.getLogoUrl();
+
+        String logoUrl = fileService.uploadFile(file, S3Prefix.WORKSPACE_LOGO);
+        workspace.setLogoUrl(logoUrl);
+        workspaceRepository.save(workspace);
+
+        if (StringUtils.isNotBlank(oldLogoUrl)) {
+            fileService.deleteFile(oldLogoUrl, S3Prefix.WORKSPACE_LOGO);
+        }
+
+        return logoUrl;
     }
 }

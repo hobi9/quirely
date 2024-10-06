@@ -1,6 +1,9 @@
 spring:
   application:
     name: backend
+  servlet:
+    multipart:
+      max-file-size: 1MB
   jackson:
     default-property-inclusion: NON_NULL
   datasource:
@@ -9,7 +12,6 @@ spring:
     password: ${DB_PASSWORD}
   liquibase:
     change-log: classpath:/db/changelog/app-changelog.xml
-    default-schema: public
   mail:
     host: ${SMTP_HOST}
     port: ${SMTP_PORT}
@@ -31,6 +33,17 @@ spring:
       flush-mode: on_save
       namespace: ${REDIS_SESSION_NAMESPACE}
     timeout: ${REDIS_SESSION_TIMEOUT}
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        region: ${AWS_S3_REGION}
+
+s3:
+  bucket:
+    name: ${BUCKET_NAME}
 
 jwt:
   email:

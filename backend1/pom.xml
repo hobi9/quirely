@@ -22,6 +22,7 @@
         <maven.compiler.target>23</maven.compiler.target>
         <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
         <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
+        <spring.cloud.aws.version>3.2.0</spring.cloud.aws.version>
     </properties>
     <dependencies>
         <dependency>
@@ -55,6 +56,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-s3</artifactId>
+            <version>${spring.cloud.aws.version}</version>
         </dependency>
 
         <dependency>

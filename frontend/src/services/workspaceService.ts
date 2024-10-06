@@ -1,4 +1,5 @@
 import { client } from '@/lib/axios';
+import { UploadFileResponse } from '@/types/misc';
 import {
   WorkspaceCreation,
   Workspace,
@@ -7,7 +8,7 @@ import {
 } from '@/types/workspace';
 
 export const createWorkspace = async (req: WorkspaceCreation) => {
-  const response = await client.post<Workspace>('/workspaces/', req);
+  const response = await client.post<Workspace>('/workspaces', req);
   return response.data;
 };
 
@@ -20,7 +21,7 @@ export const updateWorkspaceLogo = async (id: number, file: File) => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await client.patch<Workspace>(
+  const response = await client.patch<UploadFileResponse>(
     `/workspaces/${id}/logo`,
     formData,
   );
