@@ -1,8 +1,10 @@
 package com.quirely.backend.mapper;
 
-import com.quirely.backend.dto.RegistrationRequest;
+import com.quirely.backend.dto.UserAcceptanceDto;
+import com.quirely.backend.dto.authentication.RegistrationRequest;
 import com.quirely.backend.dto.UserDto;
 import com.quirely.backend.entity.User;
+import com.quirely.backend.model.UserWithAcceptance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,17 @@ public class UserMapper {
                 .fullName(user.getFullName())
                 .verified(user.isVerified())
                 .avatarUrl(user.getAvatarUrl())
+                .build();
+    }
+
+    public UserAcceptanceDto toDto(UserWithAcceptance userAcceptance) {
+        return UserAcceptanceDto.builder()
+                .id(userAcceptance.getUser().getId())
+                .email(userAcceptance.getUser().getEmail())
+                .fullName(userAcceptance.getUser().getFullName())
+                .verified(userAcceptance.getUser().isVerified())
+                .avatarUrl(userAcceptance.getUser().getAvatarUrl())
+                .accepted(userAcceptance.getAccepted())
                 .build();
     }
 }

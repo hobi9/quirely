@@ -1,7 +1,7 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.dto.LoginRequest;
-import com.quirely.backend.dto.RegistrationRequest;
+import com.quirely.backend.dto.authentication.LoginRequest;
+import com.quirely.backend.dto.authentication.RegistrationRequest;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.exception.IncorrectPasswordException;
 import com.quirely.backend.exception.NonUniqueUserException;

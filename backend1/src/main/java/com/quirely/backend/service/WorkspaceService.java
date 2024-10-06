@@ -1,7 +1,7 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.dto.MemberInvitationRequest;
-import com.quirely.backend.dto.WorkspaceCreationRequest;
+import com.quirely.backend.dto.workspace.MemberInvitationRequest;
+import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
 import com.quirely.backend.entity.MemberWorkspaceEntity;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
@@ -9,13 +9,13 @@ import com.quirely.backend.exception.UserNotFoundException;
 import com.quirely.backend.exception.WorkspaceNotFoundException;
 import com.quirely.backend.mapper.MemberWorkspaceMapper;
 import com.quirely.backend.mapper.WorkspaceMapper;
+import com.quirely.backend.model.UserWithAcceptance;
 import com.quirely.backend.repository.MemberWorkspaceRepository;
 import com.quirely.backend.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,10 +98,20 @@ public class WorkspaceService {
         memberWorkspaceRepository.save(membership);
     }
 
-    public List<User> getWorkspaceMembers(Long workspaceId, Long userId) {
+    public List<UserWithAcceptance> getWorkspaceMembers(Long workspaceId, Long userId) {
         workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
                 .orElseThrow(WorkspaceNotFoundException::new);
-        return memberWorkspaceRepository.getWorkspaceMembers(workspaceId);
+        return memberWorkspaceRepository.getWorkspaceMembers(workspaceId)
+                .stream()
+                .map(userAcceptance -> {
+                    User member = (User) userAcceptance[0];
+                    Boolean accepted = (Boolean) userAcceptance[1];
+                    return UserWithAcceptance.builder()
+                            .user(member)
+                            .accepted(accepted)
+                            .build();
+                })
+                .toList();
     }
 
     public void inviteMember(MemberInvitationRequest request, Long workspaceId, User user) {

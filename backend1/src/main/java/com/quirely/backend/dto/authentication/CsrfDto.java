@@ -1,4 +1,4 @@
-package com.quirely.backend.dto;
+package com.quirely.backend.dto.authentication;
 
 public record CsrfDto(
         String csrfToken

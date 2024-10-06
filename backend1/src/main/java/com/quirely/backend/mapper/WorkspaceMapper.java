@@ -1,8 +1,8 @@
 package com.quirely.backend.mapper;
 
-import com.quirely.backend.dto.WorkspaceCreationRequest;
-import com.quirely.backend.dto.WorkspaceDetailDto;
-import com.quirely.backend.dto.WorkspaceDto;
+import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
+import com.quirely.backend.dto.workspace.WorkspaceDetailDto;
+import com.quirely.backend.dto.workspace.WorkspaceDto;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class WorkspaceMapper {
     }
 
     public WorkspaceDetailDto toDetailDto(Workspace workspace) {
-        return WorkspaceDetailDto.detailBuilder()
+        return WorkspaceDetailDto.builder()
                 .id(workspace.getId())
                 .name(workspace.getName())
                 .description(workspace.getDescription())

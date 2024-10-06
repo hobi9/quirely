@@ -1,9 +1,9 @@
 package com.quirely.backend.controller;
 
 import com.quirely.backend.constants.SessionConstants;
-import com.quirely.backend.dto.CsrfDto;
-import com.quirely.backend.dto.LoginRequest;
-import com.quirely.backend.dto.RegistrationRequest;
+import com.quirely.backend.dto.authentication.CsrfDto;
+import com.quirely.backend.dto.authentication.LoginRequest;
+import com.quirely.backend.dto.authentication.RegistrationRequest;
 import com.quirely.backend.dto.UserDto;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.mapper.UserMapper;

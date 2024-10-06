@@ -25,7 +25,7 @@ export type MemberState = 'Member' | 'Invited';
 
 const getMemberFilter = (state: MemberState) => {
   if (state === 'Member') return true;
-  return null;
+  return undefined;
 };
 
 function Page() {

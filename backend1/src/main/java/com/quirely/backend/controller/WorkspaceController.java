@@ -1,6 +1,10 @@
 package com.quirely.backend.controller;
 
 import com.quirely.backend.dto.*;
+import com.quirely.backend.dto.workspace.MemberInvitationRequest;
+import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
+import com.quirely.backend.dto.workspace.WorkspaceDetailDto;
+import com.quirely.backend.dto.workspace.WorkspaceDto;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
 import com.quirely.backend.mapper.UserMapper;
@@ -11,14 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @RestController
@@ -64,7 +66,6 @@ public class WorkspaceController {
     @Operation(summary = "Get workspace details", description = "Retrieves detailed information about a specific workspace.")
     public ResponseEntity<WorkspaceDetailDto> getWorkspace(@AuthenticationPrincipal User user, @PathVariable Long workspaceId) {
         Workspace workspace = workspaceService.getWorkspace(workspaceId, user.getId());
-        log.info(workspaceMapper.toDetailDto(workspace).toString());
         return ResponseEntity.ok(workspaceMapper.toDetailDto(workspace));
     }
 
@@ -103,8 +104,8 @@ public class WorkspaceController {
 
     @GetMapping("/{workspaceId}/members")
     @Operation(summary = "Get workspace members", description = "Retrieves all members of the specified workspace.")
-    public ResponseEntity<List<UserDto>> getWorkspaceMembers(@AuthenticationPrincipal User user, @PathVariable Long workspaceId) {
-        List<UserDto> members = workspaceService.getWorkspaceMembers(workspaceId, user.getId())
+    public ResponseEntity<List<UserAcceptanceDto>> getWorkspaceMembers(@AuthenticationPrincipal User user, @PathVariable Long workspaceId) {
+        List<UserAcceptanceDto> members = workspaceService.getWorkspaceMembers(workspaceId, user.getId())
                 .stream()
                 .map(userMapper::toDto)
                 .toList();

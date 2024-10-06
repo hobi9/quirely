@@ -1,5 +1,6 @@
-package com.quirely.backend.dto;
+package com.quirely.backend.model;
 
+import com.quirely.backend.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkspaceDto {
-    private Long id;
-    private String name;
-    private String description;
-    private String logoUrl;
+public class UserWithAcceptance {
+    private User user;
+    private Boolean accepted;
 }

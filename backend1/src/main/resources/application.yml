@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: backend
+  jackson:
+    default-property-inclusion: NON_NULL
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  liquibase:
+    change-log: classpath:/db/changelog/app-changelog.xml
+    default-schema: public
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
+      port: ${REDIS_PORT}
+  session:
+    redis:
+      flush-mode: on_save
+      namespace: ${REDIS_SESSION_NAMESPACE}
+    timeout: ${REDIS_SESSION_TIMEOUT}
+
+jwt:
+  email:
+    secret: ${JWT_EMAIL_SECRET}
+
+client:
+  base-url: ${CLIENT_BASE_URL}
+
+
