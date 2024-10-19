@@ -7,6 +7,7 @@ import com.quirely.backend.dto.workspace.WorkspaceDetailDto;
 import com.quirely.backend.dto.workspace.WorkspaceDto;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
+import com.quirely.backend.exception.types.InvalidFileUploadException;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.mapper.WorkspaceMapper;
 import com.quirely.backend.service.WorkspaceService;
@@ -137,11 +138,11 @@ public class WorkspaceController {
                                                          @AuthenticationPrincipal User user) throws IOException {
 
         if (multipartFile.isEmpty()) {
-            throw new IllegalArgumentException("File must not be empty");
+            throw new InvalidFileUploadException("File must not be empty");
         }
         String contentType = multipartFile.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException("Invalid content type: " + contentType); //TODO: handle it better
+            throw new InvalidFileUploadException("Invalid content type: " + contentType);
         }
 
         String url = workspaceService.uploadLogo(workspaceId, user.getId(), multipartFile);

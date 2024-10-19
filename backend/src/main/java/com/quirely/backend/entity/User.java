@@ -2,10 +2,7 @@ package com.quirely.backend.entity;
 
 import com.quirely.backend.utils.DateUtils;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,9 +35,11 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "owner")
     private List<Workspace> ownedWorkspaces;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "member")
     private List<MemberWorkspaceEntity> associatedWorkspaces;
 

@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum S3Prefix {
     WORKSPACE_LOGO("workspaces/logos/"),
-    AVATAR_URL("users/avatar/");
+    AVATAR_URL("users/avatars/");
 
     private final String prefix;
 

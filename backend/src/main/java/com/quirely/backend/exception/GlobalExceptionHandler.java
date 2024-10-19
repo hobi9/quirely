@@ -1,23 +1,25 @@
 package com.quirely.backend.exception;
 
+import com.quirely.backend.dto.ErrorDto;
+import com.quirely.backend.exception.types.ApiException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
-import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    //TODO: handle all exceptions correctly with a standard error object.
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> handleException(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ErrorDto> handleException(MethodArgumentNotValidException ex) {
+        log.info("Validation Exception", ex);
+        var errors = new HashMap<String, String>();
 
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
@@ -25,41 +27,19 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(new ErrorDto("Validation failed", errors));
     }
 
-    @ExceptionHandler(NonUniqueUserException.class)
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> handleException(NonUniqueUserException ex) {
-        Map<String, String> errors = new HashMap<>();
-
-        errors.put("message", "User with email" + ex.getEmail() + " already exists");
-        errors.put("key", "Non unique user");
-
-        return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorDto> handleException(ApiException ex) {
+        log.warn("API Exception", ex);
+        return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorDto(ex.getMessage(), ex.getErrors()));
     }
 
-    //TODO: remove hashmap, this is just temporary
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> handleException(UserNotFoundException ex) {
-        Map<String, String> errors = new HashMap<>();
-
-        errors.put("message", "User is not found");
-        errors.put("key", "User not found");
-
-        return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(IncorrectPasswordException.class)
-    public ResponseEntity<Map<String, String>> handleException(IncorrectPasswordException ex) {
-        Map<String, String> errors = new HashMap<>();
-
-        errors.put("message", "Incorrect password");
-        errors.put("key", "Incorrect password");
-
-
-        return new ResponseEntity<>(errors, HttpStatus.UNAUTHORIZED);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDto> handleException(Exception ex) {
+        log.error("Unhandled exception: ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDto("Internal server error"));
     }
 
 }

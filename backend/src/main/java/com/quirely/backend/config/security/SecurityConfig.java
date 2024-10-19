@@ -80,7 +80,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public FilterRegistrationBean<AuthenticationFilter> tenantFilterRegistration(AuthenticationFilter authenticationFilter) {
+    public FilterRegistrationBean<AuthenticationFilter> authenticationFilterRegistration(AuthenticationFilter authenticationFilter) {
         var registration = new FilterRegistrationBean<>(authenticationFilter);
         registration.setEnabled(false);
         return registration;

@@ -6,15 +6,13 @@ import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
 import com.quirely.backend.entity.MemberWorkspaceEntity;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
-import com.quirely.backend.exception.UserNotFoundException;
-import com.quirely.backend.exception.WorkspaceNotFoundException;
+import com.quirely.backend.exception.types.*;
 import com.quirely.backend.mapper.MemberWorkspaceMapper;
 import com.quirely.backend.mapper.WorkspaceMapper;
 import com.quirely.backend.model.UserWithAcceptance;
 import com.quirely.backend.repository.MemberWorkspaceRepository;
 import com.quirely.backend.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +24,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final MemberWorkspaceRepository memberWorkspaceRepository;
@@ -68,7 +65,7 @@ public class WorkspaceService {
         Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
                 .orElseThrow(WorkspaceNotFoundException::new);
         if (!workspace.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("You are not the owner of this workspace"); //TODO: change with custom exception
+            throw new NotWorkspaceOwnerException();
         }
         workspaceRepository.delete(workspace);
     }
@@ -97,7 +94,7 @@ public class WorkspaceService {
         MemberWorkspaceEntity membership = memberWorkspaceRepository.findById(key)
                 .orElseThrow(WorkspaceNotFoundException::new);
         if (membership.getAccepted() != null) {
-            throw new RuntimeException("You have already confirmed the invitation to this workspace."); //TODO: change with custom exception
+            throw new InvitationAlreadyConfirmedException();
         }
         membership.setAccepted(accepted);
         memberWorkspaceRepository.save(membership);
@@ -121,12 +118,12 @@ public class WorkspaceService {
 
     public void inviteMember(MemberInvitationRequest request, Long workspaceId, User user) {
         if (request.email().equalsIgnoreCase(user.getEmail())) {
-            throw new RuntimeException("You can't invite yourself.");  //TODO: change with custom exception
+            throw new SelfActionNotAllowedException("You can't invite yourself");
         }
         Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, user.getId())
                 .orElseThrow(WorkspaceNotFoundException::new);
         if (!workspace.getOwner().getId().equals(user.getId())) {
-            throw new RuntimeException("You are not the owner of this workspace"); //TODO: change with custom exception
+            throw new NotWorkspaceOwnerException();
         }
         User member = userService.findUserByEmail(request.email())
                 .orElseThrow(UserNotFoundException::new);
@@ -142,12 +139,12 @@ public class WorkspaceService {
 
     public void kickMember(Long workspaceId,Long memberId, Long userId) {
         if (memberId.equals(userId)) {
-            throw new RuntimeException("You can't kick yourself.");  //TODO: change with custom exception
+            throw new SelfActionNotAllowedException("You can't kick yourself.");
         }
         Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
                 .orElseThrow(WorkspaceNotFoundException::new);
         if (!workspace.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("You are not the owner of this workspace"); //TODO: change with custom exception
+            throw new NotWorkspaceOwnerException();
         }
         userService.findUserById(memberId)
                 .orElseThrow(UserNotFoundException::new);
@@ -159,7 +156,7 @@ public class WorkspaceService {
                 .orElseThrow(WorkspaceNotFoundException::new);
 
         if (!workspace.getOwner().getId().equals(userId)) {
-            throw new RuntimeException("You are not the owner of this workspace"); //TODO: change with custom exception
+            throw new NotWorkspaceOwnerException();
         }
         String oldLogoUrl = workspace.getLogoUrl();
 

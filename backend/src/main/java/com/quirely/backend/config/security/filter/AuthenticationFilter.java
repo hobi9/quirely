@@ -23,7 +23,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        Long userId = (Long) request.getSession().getAttribute(SessionConstants.SESSION_USER_ID_ATTRIBUTE);
+        var userId = (Long) request.getSession().getAttribute(SessionConstants.SESSION_USER_ID_ATTRIBUTE);
 
         if (userId != null) {
             var sessionAuthentication = new SessionAuthentication(userId);

@@ -51,11 +51,10 @@ function SignUp() {
       await signUp(data);
     } catch (error) {
       if (isAxiosError<ServerError<UserRegistration>>(error)) {
-        const { field, message } = error.response!.data;
-        if (field) {
-          setError(field, {
-            type: 'server',
-            message,
+        const { fields } = error.response!.data;
+        if (fields) {
+          Object.entries(fields).forEach(([key, value]) => {
+            setError(key as keyof UserRegistration, { message: value });
           });
         }
       }

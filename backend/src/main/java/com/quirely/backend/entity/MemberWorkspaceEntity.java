@@ -1,10 +1,7 @@
 package com.quirely.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -19,11 +16,13 @@ public class MemberWorkspaceEntity {
     private MemberWorkspacePK id;
 
     @ManyToOne
+    @ToString.Exclude
     @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private User member;
 
     @ManyToOne
+    @ToString.Exclude
     @MapsId("workspaceId")
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;

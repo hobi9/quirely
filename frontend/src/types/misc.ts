@@ -1,8 +1,6 @@
 export type ServerError<Schema> = {
-  statusCode: number;
-  error: string;
   message: string;
-  field?: keyof Schema;
+  fields?: Record<keyof Schema, string>;
 };
 
 export type UploadFileResponse = {
