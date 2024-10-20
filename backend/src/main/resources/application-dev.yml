@@ -23,6 +23,15 @@ spring:
     redis:
       namespace: quirely:session
     timeout: 2592000s
+  cloud:
+    aws:
+      credentials:
+        access-key: aws
+        secret-key: aws
+      s3:
+        region: eu-south-1
+        endpoint: http://localhost:4566
+        path-style-access-enabled: true
 
 s3:
   bucket:

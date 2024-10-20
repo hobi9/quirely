@@ -6,6 +6,7 @@ import com.quirely.backend.config.security.provider.SessionAuthProvider;
 import com.quirely.backend.constants.SessionConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.cors.CorsConfiguration;
@@ -36,7 +36,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilter authenticationFilter) throws Exception {
-        http.addFilterBefore(new SessionCookieRefreshFilter(), DisableEncodeUrlFilter.class);
+        http.addFilterBefore(new SessionCookieRefreshFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.cors(Customizer.withDefaults());
@@ -89,7 +89,8 @@ public class SecurityConfig {
     @Bean
     public CookieSerializer cookieSerializer() {
         var cookieSerializer = new DefaultCookieSerializer();
-        //cookieSerializer.setUseSecureCookie(true); //TODO: add support for it later
+        cookieSerializer.setUseSecureCookie(true);
+        cookieSerializer.setSameSite(Cookie.SameSite.STRICT.attributeValue());
         cookieSerializer.setCookieName(SessionConstants.SESSION_COOKIE_NAME);
         cookieSerializer.setCookieMaxAge(SessionConstants.SESSION_MAX_AGE);
         cookieSerializer.setCookiePath(SessionConstants.SESSION_COOKIE_PATH);

@@ -26,6 +26,7 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
+    @ToString.Exclude
     @Column(name = "password")
     private String password;
 
