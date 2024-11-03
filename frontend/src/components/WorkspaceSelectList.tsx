@@ -1,9 +1,9 @@
 import { ScrollArea } from './ui/scroll-area';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
-import defaultLogo from '../assets/workspace-default.png';
 import useWorkspaces from '@/hooks/useWorskpaces';
 import { Link } from '@tanstack/react-router';
+import WorkspaceImage from './ui/image/workspace-image';
 
 const WorkspaceSelectList = () => {
   const workspaces = useWorkspaces();
@@ -23,14 +23,8 @@ const WorkspaceSelectList = () => {
               params={{ workspaceId: workspace.id }}
             >
               <div className="flex h-full items-center justify-between">
-                <div className="flex items-center  gap-x-2">
-                  {
-                    <img
-                      src={workspace.logoUrl || defaultLogo}
-                      className="size-8 rounded-sm  object-cover"
-                      alt={`workspace ${workspace.name} logo`}
-                    />
-                  }
+                <div className="flex items-center gap-x-2">
+                  <WorkspaceImage workspace={workspace} className="size-8" />
                   <span className="max-w-72 overflow-hidden text-ellipsis">
                     {workspace.name}
                   </span>

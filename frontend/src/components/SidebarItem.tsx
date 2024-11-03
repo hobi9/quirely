@@ -7,8 +7,8 @@ import {
 } from './ui/accordion';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-import defaultLogo from '../assets/workspace-default.png';
 import { Link, useRouterState } from '@tanstack/react-router';
+import WorkspaceImage from './ui/image/workspace-image';
 
 type Props = {
   workspace: Workspace;
@@ -65,10 +65,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
         onClick={() => toggle(workspace.id)}
       >
         <div className="flex items-center gap-x-2">
-          <img
-            src={workspace.logoUrl || defaultLogo}
-            className="size-7 rounded-sm object-cover"
-          />
+          <WorkspaceImage workspace={workspace} className="size-7" />
           <span className="text-sm">{workspace.name}</span>
         </div>
       </AccordionTrigger>

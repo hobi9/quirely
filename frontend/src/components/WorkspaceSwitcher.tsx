@@ -2,11 +2,11 @@ import useWorkspaces from '@/hooks/useWorskpaces';
 import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
 import { ChevronsUpDown, Settings, Plus, ArrowRightLeft } from 'lucide-react';
 import { Button } from './ui/button';
-import defaultLogo from '../assets/workspace-default.png';
 import { ScrollArea } from './ui/scroll-area';
 import { useCurrentUser } from '@/hooks/auth';
 import useWorkspace from '@/hooks/useWorkspace';
 import { Link } from '@tanstack/react-router';
+import WorkspaceImage from './ui/image/workspace-image';
 
 const WorkspaceSwitcher = () => {
   const workspaces = useWorkspaces();
@@ -18,11 +18,8 @@ const WorkspaceSwitcher = () => {
       <PopoverTrigger className="group w-48 p-1">
         <div className="flex items-center justify-between gap-x-4 rounded-md transition group-hover:bg-blue-50 group-hover:opacity-75">
           <div className="flex items-center gap-x-2">
-            <div className="flex size-9 items-center justify-center overflow-hidden rounded-md text-slate-50">
-              <img
-                src={activeWorkspace.logoUrl || defaultLogo}
-                className="rounded-md object-cover"
-              />
+            <div className="flex items-center justify-center overflow-hidden rounded-md text-slate-50">
+              <WorkspaceImage workspace={activeWorkspace} className="size-9" />
             </div>
             <span className="max-w-28 overflow-hidden text-ellipsis text-nowrap">
               {activeWorkspace.name}
@@ -33,11 +30,8 @@ const WorkspaceSwitcher = () => {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex items-center gap-x-2">
-          <div className="flex size-11 items-center justify-center overflow-hidden rounded-md text-slate-50">
-            <img
-              src={activeWorkspace.logoUrl || defaultLogo}
-              className="rounded-md object-cover"
-            />
+          <div className="flex items-center justify-center overflow-hidden rounded-md text-slate-50">
+            <WorkspaceImage workspace={activeWorkspace} className="size-11" />
           </div>
           <div className="flex h-full flex-col text-ellipsis leading-none">
             <p className="w-52 overflow-hidden text-ellipsis whitespace-nowrap font-bold">
@@ -72,9 +66,9 @@ const WorkspaceSwitcher = () => {
                     >
                       <div className="flex w-full items-center justify-between pl-1">
                         <div className="flex items-center gap-x-1">
-                          <img
-                            src={workspace.logoUrl || defaultLogo}
-                            className="size-8 rounded-md object-cover"
+                          <WorkspaceImage
+                            workspace={workspace}
+                            className="size-8"
                           />
                           <span>{workspace.name}</span>
                         </div>

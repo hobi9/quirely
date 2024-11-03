@@ -13,7 +13,7 @@ export const createWorkspace = async (req: WorkspaceCreation) => {
 };
 
 export const updateWorkspace = async (req: WorkspaceCreation, id: number) => {
-  const response = await client.post<Workspace>(`/workspaces/${id}`, req);
+  const response = await client.put<Workspace>(`/workspaces/${id}`, req);
   return response.data;
 };
 

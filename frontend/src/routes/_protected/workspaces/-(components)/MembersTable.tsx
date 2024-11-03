@@ -1,4 +1,3 @@
-import defaultAvatar from '../../../../assets/defaultAvatar.svg';
 import { useCurrentUser } from '@/hooks/auth';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -12,17 +11,18 @@ import { Member } from '@/types/workspace';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/datatable';
 import { MemberState } from '../$workspaceId.settings.index';
+import AvatarImage from '@/components/ui/image/avatar-image';
 
 type MemberRoles = 'Owner' | 'Member' | 'Invitee';
 type MemberColumn = Member & { role: MemberRoles };
 
 const UserCell: React.FC<{ row: { original: MemberColumn } }> = ({ row }) => {
-  const { fullName, avatarUrl, id } = row.original;
+  const { fullName, id } = row.original;
   const currentUser = useCurrentUser()!;
   return (
     <div className="flex items-center gap-x-2 text-xs">
-      <img
-        src={avatarUrl || defaultAvatar}
+      <AvatarImage
+        user={row.original}
         className="size-10 rounded-full object-cover"
       />
       <div className="flex flex-col">

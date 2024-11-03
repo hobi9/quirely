@@ -9,10 +9,10 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import { Users, Settings, Menu } from 'lucide-react';
-import defaultWorkspaceLogo from '../../../assets/workspace-default.png';
 import { useState } from 'react';
 import useIsMobile from '@/hooks/useIsMobile';
 import Drawer from '@/components/Drawer';
+import WorkspaceImage from '@/components/ui/image/workspace-image';
 
 export const Route = createFileRoute(
   '/_protected/workspaces/$workspaceId/settings',
@@ -44,10 +44,7 @@ const SideBar = () => {
   return (
     <div className="w-60 basis-60 flex-col border-r px-5 py-9">
       <div className="flex items-center gap-x-4">
-        <img
-          src={workspace.logoUrl || defaultWorkspaceLogo}
-          className="size-8 rounded-md object-cover"
-        />
+        <WorkspaceImage workspace={workspace} className="size-8" />
         <span className="overflow-hidden text-ellipsis text-nowrap text-sm">
           {workspace?.name}
         </span>

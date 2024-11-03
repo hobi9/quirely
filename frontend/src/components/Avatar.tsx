@@ -1,4 +1,3 @@
-import defaultAvatar from '../assets/defaultAvatar.svg';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Settings, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
@@ -7,9 +6,10 @@ import { authQueryOptions, useCurrentUser } from '@/hooks/auth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { SIDEBAR_KEY } from '@/utils/constants';
+import AvatarImage from './ui/image/avatar-image';
 
 const Avatar = () => {
-  const { fullName, avatarUrl, email } = useCurrentUser()!;
+  const user = useCurrentUser()!;
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -23,24 +23,19 @@ const Avatar = () => {
   return (
     <Popover>
       <PopoverTrigger>
-        <img
-          src={avatarUrl || defaultAvatar}
-          alt={`${fullName}'s avatar`}
-          className="size-9 rounded-full transition hover:cursor-pointer hover:opacity-75"
+        <AvatarImage
+          user={user}
+          className="size-9 transition hover:cursor-pointer hover:opacity-75"
         />
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex items-center gap-x-2">
-          <img
-            src={avatarUrl || defaultAvatar}
-            alt={`${fullName}'s avatar`}
-            className="size-11 rounded-full object-cover"
-          />
+          <AvatarImage user={user} className="size-11" />
           <div className="flex h-full flex-col text-ellipsis leading-none">
             <p className="w-44 overflow-hidden text-ellipsis whitespace-nowrap font-bold">
-              {fullName}
+              {user.fullName}
             </p>
-            <p className="text-xs">{email}</p>
+            <p className="text-xs">{user.email}</p>
           </div>
         </div>
         <div className="mt-4">
