@@ -45,3 +45,7 @@ client:
   base-url: http://localhost:5173
 
 
+unsplash:
+  base-url: https://api.unsplash.com
+
+

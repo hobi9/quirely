@@ -24,9 +24,9 @@ public class LogginAspect {
         Class<?> targetClass = joinPoint.getTarget().getClass();
         Object[] args = joinPoint.getArgs();
 
-        log.info("Calling {}.{} with arguments: {}", targetClass.getSimpleName(), signature.getName(), Arrays.toString(args));
+        log.info("Calling {}.{} with arguments: {}", targetClass.getName(), signature.getName(), Arrays.toString(args));
         Object result = joinPoint.proceed();
-        log.info("Called {}.{} with result: {}", targetClass.getSimpleName(), signature.getName(), result);
+        log.info("Called {}.{} with result: {}", targetClass.getName(), signature.getName(), result);
         return result;
     }
 }

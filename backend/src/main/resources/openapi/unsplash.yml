@@ -1,0 +1,179 @@
+openapi: 3.0.0
+info:
+  title: Unsplash API
+  description: API for fetching photo details from Unsplash
+  version: 1.0.0
+paths:
+  /photos:
+    get:
+      summary: Get photos
+      description: Retrieves a list of photos with their details.
+      responses:
+        '200':
+          description: A list of photos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UnsplashPhoto'
+components:
+  schemas:
+    UnsplashPhoto:
+      type: object
+      properties:
+        id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        width:
+          type: integer
+        height:
+          type: integer
+        color:
+          type: string
+        blur_hash:
+          type: string
+        downloads:
+          type: integer
+        likes:
+          type: integer
+        liked_by_user:
+          type: boolean
+        description:
+          type: string
+        exif:
+          $ref: '#/components/schemas/Exif'
+        location:
+          $ref: '#/components/schemas/Location'
+        current_user_collections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Collection'
+        urls:
+          $ref: '#/components/schemas/Urls'
+        links:
+          $ref: '#/components/schemas/Links'
+        user:
+          $ref: '#/components/schemas/User'
+    Exif:
+      type: object
+      properties:
+        make:
+          type: string
+        model:
+          type: string
+        exposure_time:
+          type: string
+        aperture:
+          type: string
+        focal_length:
+          type: string
+        iso:
+          type: integer
+    Location:
+      type: object
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        position:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: float
+            longitude:
+              type: number
+              format: float
+    Collection:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+        last_collected_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        cover_photo:
+          type: object
+        user:
+          type: object
+    Urls:
+      type: object
+      properties:
+        raw:
+          type: string
+          format: uri
+        full:
+          type: string
+          format: uri
+        regular:
+          type: string
+          format: uri
+        small:
+          type: string
+          format: uri
+        thumb:
+          type: string
+          format: uri
+    Links:
+      type: object
+      properties:
+        self:
+          type: string
+          format: uri
+        html:
+          type: string
+          format: uri
+        download:
+          type: string
+          format: uri
+        download_location:
+          type: string
+          format: uri
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        username:
+          type: string
+        name:
+          type: string
+        portfolio_url:
+          type: string
+          format: uri
+        bio:
+          type: string
+        location:
+          type: string
+        total_likes:
+          type: integer
+        total_photos:
+          type: integer
+        total_collections:
+          type: integer
+        instagram_username:
+          type: string
+        twitter_username:
+          type: string
+        links:
+          $ref: '#/components/schemas/Links'

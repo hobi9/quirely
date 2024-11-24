@@ -103,17 +103,7 @@ public class WorkspaceService {
     public List<UserWithAcceptance> getWorkspaceMembers(Long workspaceId, Long userId) {
         workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
                 .orElseThrow(WorkspaceNotFoundException::new);
-        return memberWorkspaceRepository.getWorkspaceMembers(workspaceId)
-                .stream()
-                .map(userAcceptance -> {
-                    User member = (User) userAcceptance[0];
-                    Boolean accepted = (Boolean) userAcceptance[1];
-                    return UserWithAcceptance.builder()
-                            .user(member)
-                            .accepted(accepted)
-                            .build();
-                })
-                .toList();
+        return memberWorkspaceRepository.getWorkspaceMembers(workspaceId);
     }
 
     public void inviteMember(MemberInvitationRequest request, Long workspaceId, User user) {

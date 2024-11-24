@@ -52,4 +52,8 @@ jwt:
 client:
   base-url: ${CLIENT_BASE_URL}
 
+unsplash:
+  base-url: ${UNSPLASH_BASE_URL}
+  access-key: ${UNSPLASH_ACCESS_KEY}
+
 
