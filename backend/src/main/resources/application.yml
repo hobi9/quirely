@@ -30,7 +30,6 @@ spring:
       port: ${REDIS_PORT}
   session:
     redis:
-      flush-mode: on_save
       namespace: ${REDIS_SESSION_NAMESPACE}
     timeout: ${REDIS_SESSION_TIMEOUT}
   cloud:

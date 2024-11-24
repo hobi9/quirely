@@ -26,7 +26,7 @@ public class SessionCookieRefreshFilter extends OncePerRequestFilter {
     }
 
     private void updateCookie(HttpServletResponse response, Cookie existingCookie) {
-        Cookie newCookie = new Cookie(existingCookie.getName(), existingCookie.getValue());
+        var newCookie = new Cookie(existingCookie.getName(), existingCookie.getValue());
         newCookie.setMaxAge(SessionConstants.SESSION_MAX_AGE);
         newCookie.setPath(SessionConstants.SESSION_COOKIE_PATH);
         newCookie.setHttpOnly(true);
