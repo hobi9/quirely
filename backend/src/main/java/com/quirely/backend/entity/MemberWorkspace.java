@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "members_workspaces")
-public class MemberWorkspaceEntity {
+public class MemberWorkspace {
     @EmbeddedId
     private MemberWorkspacePK id;
 

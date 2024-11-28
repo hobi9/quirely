@@ -42,7 +42,7 @@ public class User {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "member")
-    private List<MemberWorkspaceEntity> associatedWorkspaces;
+    private List<MemberWorkspace> associatedWorkspaces;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

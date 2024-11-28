@@ -3,7 +3,7 @@ package com.quirely.backend.service;
 import com.quirely.backend.enums.S3Prefix;
 import com.quirely.backend.dto.workspace.MemberInvitationRequest;
 import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
-import com.quirely.backend.entity.MemberWorkspaceEntity;
+import com.quirely.backend.entity.MemberWorkspace;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
 import com.quirely.backend.exception.types.*;
@@ -37,7 +37,7 @@ public class WorkspaceService {
         Workspace workspace = workspaceMapper.toEntity(request, owner);
         workspace = workspaceRepository.save(workspace);
 
-        MemberWorkspaceEntity memberWorkspace = memberWorkspaceMapper.createEntity(owner, workspace, true);
+        MemberWorkspace memberWorkspace = memberWorkspaceMapper.createEntity(owner, workspace, true);
         memberWorkspaceRepository.save(memberWorkspace);
 
         return workspace;
@@ -75,7 +75,7 @@ public class WorkspaceService {
         Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
                 .orElseThrow(WorkspaceNotFoundException::new);
 
-        Optional<MemberWorkspaceEntity> newOwner = memberWorkspaceRepository.findNewOwner(userId, workspaceId);
+        Optional<MemberWorkspace> newOwner = memberWorkspaceRepository.findNewOwner(userId, workspaceId);
         if (newOwner.isEmpty()) {
             workspaceRepository.delete(workspace);
             return;
@@ -86,12 +86,12 @@ public class WorkspaceService {
     }
 
     public void confirmInvitation(Long workspaceId, Long userId, boolean accepted) {
-        MemberWorkspaceEntity.MemberWorkspacePK key = MemberWorkspaceEntity.MemberWorkspacePK
+        MemberWorkspace.MemberWorkspacePK key = MemberWorkspace.MemberWorkspacePK
                 .builder()
                 .workspaceId(workspaceId)
                 .memberId(userId)
                 .build();
-        MemberWorkspaceEntity membership = memberWorkspaceRepository.findById(key)
+        MemberWorkspace membership = memberWorkspaceRepository.findById(key)
                 .orElseThrow(WorkspaceNotFoundException::new);
         if (membership.getAccepted() != null) {
             throw new InvitationAlreadyConfirmedException();
@@ -118,9 +118,9 @@ public class WorkspaceService {
         User member = userService.findUserByEmail(request.email())
                 .orElseThrow(UserNotFoundException::new);
 
-        MemberWorkspaceEntity memberWorkspace = MemberWorkspaceEntity
+        MemberWorkspace memberWorkspace = MemberWorkspace
                 .builder()
-                .id(new MemberWorkspaceEntity.MemberWorkspacePK(member.getId(), workspace.getId()))
+                .id(new MemberWorkspace.MemberWorkspacePK(member.getId(), workspace.getId()))
                 .member(member)
                 .workspace(workspace)
                 .build();

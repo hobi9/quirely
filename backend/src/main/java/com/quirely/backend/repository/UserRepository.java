@@ -12,6 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.id != :userId AND u.email LIKE %:email% AND u.id NOT IN " +
-            "(SELECT mw.member.id FROM MemberWorkspaceEntity mw WHERE mw.workspace.id = :workspaceId and mw.accepted = true) order by u.fullName")
+            "(SELECT mw.member.id FROM MemberWorkspace mw WHERE mw.workspace.id = :workspaceId and mw.accepted = true) order by u.fullName")
     List<User> findUsersByFilter(Long userId, Long workspaceId, String email);
 }

@@ -36,7 +36,7 @@ public class Workspace {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "workspace")
-    private List<MemberWorkspaceEntity> members;
+    private List<MemberWorkspace> members;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
