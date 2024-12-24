@@ -1,21 +1,27 @@
 package com.quirely.backend.controller;
 
 import com.quirely.backend.dto.*;
+import com.quirely.backend.dto.board.BoardCreationRequest;
+import com.quirely.backend.dto.board.BoardDto;
 import com.quirely.backend.dto.workspace.MemberInvitationRequest;
 import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
 import com.quirely.backend.dto.workspace.WorkspaceDetailDto;
 import com.quirely.backend.dto.workspace.WorkspaceDto;
+import com.quirely.backend.entity.Board;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
 import com.quirely.backend.exception.types.InvalidFileUploadException;
+import com.quirely.backend.mapper.BoardMapper;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.mapper.WorkspaceMapper;
+import com.quirely.backend.service.BoardService;
 import com.quirely.backend.service.WorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/workspaces")
@@ -33,6 +40,8 @@ public class WorkspaceController {
     private final WorkspaceService workspaceService;
     private final WorkspaceMapper workspaceMapper;
     private final UserMapper userMapper;
+    private final BoardService boardService;
+    private final BoardMapper boardMapper;
 
     @PostMapping
     @Operation(summary = "Create a new workspace", description = "Creates a new workspace for the authenticated user.")
@@ -148,6 +157,24 @@ public class WorkspaceController {
         String url = workspaceService.uploadLogo(workspaceId, user.getId(), multipartFile);
 
         return ResponseEntity.ok().body(new UploadFileResponse(url));
+    }
+
+    @PostMapping("/{workspaceId}/boards")
+    @Operation(summary = "Create a board in a workspace", description = "Creates a new board within the specified workspace for the authenticated user.")
+    public ResponseEntity<BoardDto> createBoard(@RequestBody @Valid BoardCreationRequest request, @PathVariable Long workspaceId, @AuthenticationPrincipal User user) {
+        Board board = boardService.createBoard(request, workspaceId, user);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(boardMapper.toDto(board));
+    }
+
+    @GetMapping("/{workspaceId}/boards")
+    @Operation(summary = "Get all boards in a workspace", description = "Fetches all boards within the specified workspace for the authenticated user.")
+    public ResponseEntity<List<BoardDto>> getBoardsByWorkspace(@PathVariable Long workspaceId, @AuthenticationPrincipal User user) {
+        List<BoardDto> boards = boardService.getBoards(workspaceId, user)
+                .stream()
+                .map(boardMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(boards);
     }
 
 }

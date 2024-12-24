@@ -38,6 +38,10 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace")
     private List<MemberWorkspace> members;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "workspace")
+    private List<Board> associatedBoards;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

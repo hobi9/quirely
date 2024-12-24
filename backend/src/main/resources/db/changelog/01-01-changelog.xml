@@ -1,30 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd"
-        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
-    <changeSet id="1727815646933-1" author="obi">
-        <createSequence incrementBy="1" sequenceName="users_id_seq" startValue="1"/>
-    </changeSet>
-    <changeSet id="1727815646933-2" author="obi">
-        <createSequence incrementBy="1" sequenceName="workspaces_id_seq" startValue="1"/>
-    </changeSet>
-    <changeSet id="1727815646933-3" author="obi">
-        <createTable tableName="members_workspaces">
-            <column name="member_id" type="INT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="members_workspaces_pkey"/>
-            </column>
-            <column name="workspace_id" type="INT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="members_workspaces_pkey"/>
-            </column>
-            <column name="accepted" type="BOOLEAN"/>
-        </createTable>
-    </changeSet>
-    <changeSet id="1727815646933-4" author="obi">
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="hansonanozie (generated)" id="1735056321365-1">
         <createTable tableName="users">
-            <column autoIncrement="true" name="id" type="INT">
+            <column autoIncrement="true" name="id" startWith="81" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="users_pkey"/>
             </column>
             <column name="email" type="VARCHAR(254)">
@@ -33,57 +11,89 @@
             <column name="full_name" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="CLOB">
+            <column name="password" type="TEXT">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="timestamp">
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="TIMESTAMP(3) WITHOUT TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="timestamp"/>
+            <column name="updated_at" type="TIMESTAMP(3) WITHOUT TIME ZONE"/>
             <column defaultValueBoolean="false" name="is_verified" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="avatar_url" type="CLOB"/>
+            <column name="avatar_url" type="TEXT"/>
         </createTable>
     </changeSet>
-    <changeSet id="1727815646933-5" author="obi">
+    <changeSet author="hansonanozie (generated)" id="1735056321365-2">
         <createTable tableName="workspaces">
-            <column autoIncrement="true" name="id" type="INT">
+            <column autoIncrement="true" name="id" startWith="64" type="INTEGER">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="workspaces_pkey"/>
             </column>
             <column name="name" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="CLOB"/>
-            <column name="owner_id" type="INT">
+            <column name="description" type="TEXT"/>
+            <column name="owner_id" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="timestamp">
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="TIMESTAMP(3) WITHOUT TIME ZONE">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="timestamp"/>
-            <column name="logo_url" type="CLOB"/>
+            <column name="updated_at" type="TIMESTAMP(3) WITHOUT TIME ZONE"/>
+            <column name="logo_url" type="TEXT"/>
         </createTable>
     </changeSet>
-    <changeSet id="1727815646933-6" author="obi">
+    <changeSet author="hansonanozie (generated)" id="1735056321365-3">
+        <createTable tableName="boards">
+            <column autoIncrement="true" name="id" startWith="7" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="boards_pk"/>
+            </column>
+            <column name="image_url" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="TIMESTAMP(3) WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP(3) WITHOUT TIME ZONE"/>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(60)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="hansonanozie (generated)" id="1735056321365-4">
         <createIndex indexName="users_email_key" tableName="users" unique="true">
             <column name="email"/>
         </createIndex>
     </changeSet>
-    <changeSet id="1727815646933-7" author="obi">
-        <addForeignKeyConstraint baseColumnNames="member_id" baseTableName="members_workspaces"
-                                 constraintName="members_workspaces_member_id_fkey" onDelete="RESTRICT"
-                                 referencedColumnNames="id" referencedTableName="users"/>
+    <changeSet author="hansonanozie (generated)" id="1735056321365-5">
+        <createIndex indexName="boards_workspace__index" tableName="boards">
+            <column name="workspace_id"/>
+        </createIndex>
     </changeSet>
-    <changeSet id="1727815646933-8" author="obi">
-        <addForeignKeyConstraint baseColumnNames="workspace_id" baseTableName="members_workspaces"
-                                 constraintName="members_workspaces_workspace_id_fkey" onDelete="CASCADE"
-                                 referencedColumnNames="id" referencedTableName="workspaces"/>
+    <changeSet author="hansonanozie (generated)" id="1735056321365-6">
+        <createTable tableName="members_workspaces">
+            <column name="member_id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="members_workspaces_pkey"/>
+            </column>
+            <column name="workspace_id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="members_workspaces_pkey"/>
+            </column>
+            <column name="accepted" type="BOOLEAN"/>
+        </createTable>
     </changeSet>
-    <changeSet id="1727815646933-9" author="obi">
-        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="workspaces"
-                                 constraintName="workspaces_owner_id_fkey" onDelete="RESTRICT"
-                                 referencedColumnNames="id" referencedTableName="users"/>
+    <changeSet author="hansonanozie (generated)" id="1735056321365-7">
+        <addForeignKeyConstraint baseColumnNames="workspace_id" baseTableName="boards" constraintName="boards_workspaces_id_fk" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="workspaces" validate="true"/>
     </changeSet>
-
+    <changeSet author="hansonanozie (generated)" id="1735056321365-8">
+        <addForeignKeyConstraint baseColumnNames="member_id" baseTableName="members_workspaces" constraintName="members_workspaces_member_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="hansonanozie (generated)" id="1735056321365-9">
+        <addForeignKeyConstraint baseColumnNames="workspace_id" baseTableName="members_workspaces" constraintName="members_workspaces_workspace_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="workspaces" validate="true"/>
+    </changeSet>
+    <changeSet author="hansonanozie (generated)" id="1735056321365-10">
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="workspaces" constraintName="workspaces_owner_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
 </databaseChangeLog>
