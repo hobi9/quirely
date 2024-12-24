@@ -8,8 +8,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { ArrowRight, X } from 'lucide-react';
 import { useState } from 'react';
 import UpdateWorkspaceStep from './-(components)/UpdateWorkspaceStep';
-import defaultWorkspaceLogo from '../../../assets/workspace-default.png';
 import Dialog from '@/components/Dialog';
+import WorkspaceImage from '@/components/ui/image/workspace-image';
 
 export const Route = createFileRoute(
   '/_protected/workspaces/$workspaceId/settings/workspace-settings',
@@ -74,11 +74,7 @@ function Page() {
                 onClick={() => setIsShowUpdateForm(true)}
               >
                 <div className="flex items-center gap-x-4">
-                  <img
-                    src={workspace.logoUrl ?? defaultWorkspaceLogo}
-                    alt={`Workspace ${workspace.name} logo`}
-                    className="size-14 rounded-md object-cover"
-                  />
+                  <WorkspaceImage workspace={workspace} className="size-14" />
                   <span>{workspace.name}</span>
                 </div>
                 <ArrowRight

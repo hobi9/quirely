@@ -5,14 +5,18 @@ import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 import { Outlet, createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
+const paramSchema = z.object({
+  workspaceId: z.coerce.number(),
+});
+
 export const Route = createFileRoute('/_protected/workspaces/$workspaceId')({
-  parseParams: (params) => ({
-    workspaceId: z.number().int().parse(Number(params.workspaceId)),
-  }),
+  params: {
+    parse: paramSchema.parse,
+  },
   loader: async ({ params, context: { queryClient } }) => {
     const { workspaceId } = params;
 
-    await Promise.all([
+    return await Promise.all([
       queryClient.ensureQueryData(workspaceQueryOptions(workspaceId)),
       queryClient.ensureQueryData(workspacesQueryOption),
     ]);

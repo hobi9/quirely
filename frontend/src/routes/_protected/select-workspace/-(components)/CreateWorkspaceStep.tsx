@@ -56,8 +56,8 @@ const CreateWorkspaceStep = ({
     await queryClient.invalidateQueries(workspacesQueryOption);
     if (file) {
       try {
-        const { logoUrl } = await updateWorkspaceLogo(workspace.id, file);
-        workspace.logoUrl = logoUrl;
+        const { url } = await updateWorkspaceLogo(workspace.id, file);
+        workspace.logoUrl = url;
       } catch (error) {
         console.log('error'); // TODO: handle it better later
       }
