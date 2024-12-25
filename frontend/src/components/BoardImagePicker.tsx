@@ -54,7 +54,7 @@ const BoardImagePicker = ({
               )}
               <img
                 src={image.url}
-                alt={`Board image ${image.id}`}
+                alt={image.description}
                 className="size-full rounded-sm object-cover"
               />
             </label>

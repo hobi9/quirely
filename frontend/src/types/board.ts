@@ -3,7 +3,7 @@ export type BoardCreation = {
   imageUrl: string;
 };
 
-export type BoardImage = { id: string; url: string };
+export type BoardImage = { id: string; url: string; description: string };
 
 export type Board = {
   id: number;

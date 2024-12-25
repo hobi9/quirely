@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import useWorkspace from '@/hooks/useWorkspace';
 import WorkspaceImage from '@/components/ui/image/workspace-image';
 import { UserRound } from 'lucide-react';
@@ -31,16 +31,26 @@ function BoardsPage() {
         <UserRound className="size-6" />
         <span className="font-bold">Your boards</span>
       </div>
-      <div className="mt-4">
+      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {boards.map((board) => (
+          <Link
+            key={board.id}
+            to={'/boards/$boardId'}
+            params={{ boardId: board.id }}
+            style={{ backgroundImage: `url(${board.imageUrl})` }}
+            className="group relative aspect-video size-full overflow-hidden rounded-sm bg-cover bg-center bg-no-repeat"
+          >
+            <div className="absolute inset-0 bg-black/30 p-2 transition group-hover:bg-black/40">
+              <p className="relative font-semibold text-white">{board.title}</p>
+            </div>
+          </Link>
+        ))}
         <BoardCreationPopover side="right" sideOffset={10}>
-          <Button variant={'ghost'} className="aspect-video h-20">
+          <Button variant={'ghost'} className="aspect-video size-full border">
             <span className="text-sm">Create a new Board</span>
           </Button>
         </BoardCreationPopover>
       </div>
-      {boards.map((board) => (
-        <div key={board.id}>{board.title}</div>
-      ))}
     </div>
   );
 }

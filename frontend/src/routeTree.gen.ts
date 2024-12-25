@@ -21,6 +21,7 @@ import { Route as PublicAuthIndexImport } from './routes/_public/auth/index'
 import { Route as ProtectedSelectWorkspaceIndexImport } from './routes/_protected/select-workspace/index'
 import { Route as PublicAuthLayoutImport } from './routes/_public/auth/_layout'
 import { Route as ProtectedWorkspacesWorkspaceIdImport } from './routes/_protected/workspaces/$workspaceId'
+import { Route as ProtectedBoardsBoardIdImport } from './routes/_protected/boards/$boardId'
 import { Route as ProtectedWorkspacesWorkspaceIdIndexImport } from './routes/_protected/workspaces/$workspaceId.index'
 import { Route as PublicAuthLayoutRegisterImport } from './routes/_public/auth/_layout.register'
 import { Route as PublicAuthLayoutLoginImport } from './routes/_public/auth/_layout.login'
@@ -87,6 +88,12 @@ const ProtectedWorkspacesWorkspaceIdRoute =
     path: '/workspaces/$workspaceId',
     getParentRoute: () => ProtectedRoute,
   } as any)
+
+const ProtectedBoardsBoardIdRoute = ProtectedBoardsBoardIdImport.update({
+  id: '/boards/$boardId',
+  path: '/boards/$boardId',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 
 const ProtectedWorkspacesWorkspaceIdIndexRoute =
   ProtectedWorkspacesWorkspaceIdIndexImport.update({
@@ -166,6 +173,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexImport
       parentRoute: typeof PublicImport
+    }
+    '/_protected/boards/$boardId': {
+      id: '/_protected/boards/$boardId'
+      path: '/boards/$boardId'
+      fullPath: '/boards/$boardId'
+      preLoaderRoute: typeof ProtectedBoardsBoardIdImport
+      parentRoute: typeof ProtectedImport
     }
     '/_protected/workspaces/$workspaceId': {
       id: '/_protected/workspaces/$workspaceId'
@@ -296,11 +310,13 @@ const ProtectedWorkspacesWorkspaceIdRouteWithChildren =
   )
 
 interface ProtectedRouteChildren {
+  ProtectedBoardsBoardIdRoute: typeof ProtectedBoardsBoardIdRoute
   ProtectedWorkspacesWorkspaceIdRoute: typeof ProtectedWorkspacesWorkspaceIdRouteWithChildren
   ProtectedSelectWorkspaceIndexRoute: typeof ProtectedSelectWorkspaceIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedBoardsBoardIdRoute: ProtectedBoardsBoardIdRoute,
   ProtectedWorkspacesWorkspaceIdRoute:
     ProtectedWorkspacesWorkspaceIdRouteWithChildren,
   ProtectedSelectWorkspaceIndexRoute: ProtectedSelectWorkspaceIndexRoute,
@@ -354,6 +370,7 @@ export interface FileRoutesByFullPath {
   '': typeof PublicRouteWithChildren
   '/verify-email/$token': typeof VerifyEmailTokenRoute
   '/': typeof PublicIndexRoute
+  '/boards/$boardId': typeof ProtectedBoardsBoardIdRoute
   '/workspaces/$workspaceId': typeof ProtectedWorkspacesWorkspaceIdRouteWithChildren
   '/auth': typeof PublicAuthLayoutRouteWithChildren
   '/select-workspace': typeof ProtectedSelectWorkspaceIndexRoute
@@ -371,6 +388,7 @@ export interface FileRoutesByTo {
   '': typeof ProtectedRouteWithChildren
   '/verify-email/$token': typeof VerifyEmailTokenRoute
   '/': typeof PublicIndexRoute
+  '/boards/$boardId': typeof ProtectedBoardsBoardIdRoute
   '/auth': typeof PublicAuthIndexRoute
   '/select-workspace': typeof ProtectedSelectWorkspaceIndexRoute
   '/workspaces/$workspaceId/activity': typeof ProtectedWorkspacesWorkspaceIdActivityRoute
@@ -387,6 +405,7 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteWithChildren
   '/verify-email/$token': typeof VerifyEmailTokenRoute
   '/_public/': typeof PublicIndexRoute
+  '/_protected/boards/$boardId': typeof ProtectedBoardsBoardIdRoute
   '/_protected/workspaces/$workspaceId': typeof ProtectedWorkspacesWorkspaceIdRouteWithChildren
   '/_public/auth': typeof PublicAuthRouteWithChildren
   '/_public/auth/_layout': typeof PublicAuthLayoutRouteWithChildren
@@ -407,6 +426,7 @@ export interface FileRouteTypes {
     | ''
     | '/verify-email/$token'
     | '/'
+    | '/boards/$boardId'
     | '/workspaces/$workspaceId'
     | '/auth'
     | '/select-workspace'
@@ -423,6 +443,7 @@ export interface FileRouteTypes {
     | ''
     | '/verify-email/$token'
     | '/'
+    | '/boards/$boardId'
     | '/auth'
     | '/select-workspace'
     | '/workspaces/$workspaceId/activity'
@@ -437,6 +458,7 @@ export interface FileRouteTypes {
     | '/_public'
     | '/verify-email/$token'
     | '/_public/'
+    | '/_protected/boards/$boardId'
     | '/_protected/workspaces/$workspaceId'
     | '/_public/auth'
     | '/_public/auth/_layout'
@@ -482,6 +504,7 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected.tsx",
       "children": [
+        "/_protected/boards/$boardId",
         "/_protected/workspaces/$workspaceId",
         "/_protected/select-workspace/"
       ]
@@ -499,6 +522,10 @@ export const routeTree = rootRoute
     "/_public/": {
       "filePath": "_public/index.tsx",
       "parent": "/_public"
+    },
+    "/_protected/boards/$boardId": {
+      "filePath": "_protected/boards/$boardId.tsx",
+      "parent": "/_protected"
     },
     "/_protected/workspaces/$workspaceId": {
       "filePath": "_protected/workspaces/$workspaceId.tsx",
