@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class BoardMapper {
 
     public BoardImageDto toDto(BoardImage boardImage) {
-        return new BoardImageDto(boardImage.getId(), boardImage.getUrl());
+        return new BoardImageDto(boardImage.getId(), boardImage.getUrl(), boardImage.getDescription());
     }
 
     public Board toEntity(BoardCreationRequest boardCreationRequest, Workspace workspace) {

@@ -47,7 +47,7 @@ public class UnsplashService {
         return body
                 .stream()
                 .filter(Objects::nonNull)
-                .map(photo -> new BoardImage(photo.getId(), photo.getUrls().getThumb().toString()))
+                .map(photo -> new BoardImage(photo.getId(), photo.getUrls().getThumb().toString(), photo.getDescription()))
                 .toList();
     }
 }

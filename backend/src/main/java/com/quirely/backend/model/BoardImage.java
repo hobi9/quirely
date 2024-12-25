@@ -10,4 +10,5 @@ import java.io.Serializable;
 public class BoardImage implements Serializable {
     private String id;
     private String url;
+    private String description;
 }
