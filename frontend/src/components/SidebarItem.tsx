@@ -50,7 +50,7 @@ const SidebarItem = ({ workspace, isActive, isOpened, toggle }: Props) => {
       },
     },
   ];
-  //TODO: add skeleton
+
   return (
     <AccordionItem
       value={workspace.id.toString()}

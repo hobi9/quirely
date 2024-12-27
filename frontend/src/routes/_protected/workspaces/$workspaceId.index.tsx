@@ -3,10 +3,11 @@ import useWorkspace from '@/hooks/useWorkspace';
 import WorkspaceImage from '@/components/ui/image/workspace-image';
 import { UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import BoardCreationPopover from '@/components/BoardCreationPopover';
 import useWorkspaceBoards, {
   workspaceBoardsQueryOptions,
 } from '@/hooks/useWorkspaceBoards';
+import BoardCreationForm from './-(components)/BoardCreationForm';
+import FormPopover from '@/components/FormPopover';
 
 export const Route = createFileRoute('/_protected/workspaces/$workspaceId/')({
   component: BoardsPage,
@@ -45,11 +46,18 @@ function BoardsPage() {
             </div>
           </Link>
         ))}
-        <BoardCreationPopover side="right" sideOffset={10}>
+        <FormPopover
+          title="Create a new board"
+          side="right"
+          sideOffset={10}
+          formContent={(closeButtonRef) => (
+            <BoardCreationForm closeButtonRef={closeButtonRef} />
+          )}
+        >
           <Button variant={'ghost'} className="aspect-video size-full border">
             <span className="text-sm">Create a new Board</span>
           </Button>
-        </BoardCreationPopover>
+        </FormPopover>
       </div>
     </div>
   );
