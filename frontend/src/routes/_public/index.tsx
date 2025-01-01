@@ -11,29 +11,10 @@ export const Route = createFileRoute('/_public/')({
 function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="container mx-auto flex items-center justify-between px-4 py-6">
-        <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-full bg-primary"></div>
-          <span className="text-2xl font-bold">Quirely</span>
-        </div>
-        <nav>
-          <ul className="flex space-x-4">
-            <li>
-              <Link
-                to="/auth/login"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Login
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </header>
-
       <Navbar />
 
       <main>
-        <section className="py-20 text-center">
+        <section className="flex h-screen items-center justify-center py-20 text-center">
           <div className="container mx-auto px-4">
             <h1 className="mb-6 text-5xl font-bold">
               Organize Your Workspaces with Quirely
