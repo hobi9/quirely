@@ -17,6 +17,7 @@ import { Route as PublicImport } from './routes/_public'
 import { Route as ProtectedImport } from './routes/_protected'
 import { Route as PublicIndexImport } from './routes/_public/index'
 import { Route as VerifyEmailTokenImport } from './routes/verify-email.$token'
+import { Route as ProtectedVerifyEmailImport } from './routes/_protected/verify-email'
 import { Route as PublicAuthIndexImport } from './routes/_public/auth/index'
 import { Route as ProtectedSelectWorkspaceIndexImport } from './routes/_protected/select-workspace/index'
 import { Route as PublicAuthLayoutImport } from './routes/_public/auth/_layout'
@@ -62,6 +63,12 @@ const VerifyEmailTokenRoute = VerifyEmailTokenImport.update({
   id: '/verify-email/$token',
   path: '/verify-email/$token',
   getParentRoute: () => rootRoute,
+} as any)
+
+const ProtectedVerifyEmailRoute = ProtectedVerifyEmailImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 
 const PublicAuthIndexRoute = PublicAuthIndexImport.update({
@@ -159,6 +166,13 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof PublicImport
       parentRoute: typeof rootRoute
+    }
+    '/_protected/verify-email': {
+      id: '/_protected/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof ProtectedVerifyEmailImport
+      parentRoute: typeof ProtectedImport
     }
     '/verify-email/$token': {
       id: '/verify-email/$token'
@@ -310,12 +324,14 @@ const ProtectedWorkspacesWorkspaceIdRouteWithChildren =
   )
 
 interface ProtectedRouteChildren {
+  ProtectedVerifyEmailRoute: typeof ProtectedVerifyEmailRoute
   ProtectedBoardsBoardIdRoute: typeof ProtectedBoardsBoardIdRoute
   ProtectedWorkspacesWorkspaceIdRoute: typeof ProtectedWorkspacesWorkspaceIdRouteWithChildren
   ProtectedSelectWorkspaceIndexRoute: typeof ProtectedSelectWorkspaceIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedVerifyEmailRoute: ProtectedVerifyEmailRoute,
   ProtectedBoardsBoardIdRoute: ProtectedBoardsBoardIdRoute,
   ProtectedWorkspacesWorkspaceIdRoute:
     ProtectedWorkspacesWorkspaceIdRouteWithChildren,
@@ -368,6 +384,7 @@ const PublicRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '': typeof PublicRouteWithChildren
+  '/verify-email': typeof ProtectedVerifyEmailRoute
   '/verify-email/$token': typeof VerifyEmailTokenRoute
   '/': typeof PublicIndexRoute
   '/boards/$boardId': typeof ProtectedBoardsBoardIdRoute
@@ -386,6 +403,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof ProtectedRouteWithChildren
+  '/verify-email': typeof ProtectedVerifyEmailRoute
   '/verify-email/$token': typeof VerifyEmailTokenRoute
   '/': typeof PublicIndexRoute
   '/boards/$boardId': typeof ProtectedBoardsBoardIdRoute
@@ -403,6 +421,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_protected': typeof ProtectedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
+  '/_protected/verify-email': typeof ProtectedVerifyEmailRoute
   '/verify-email/$token': typeof VerifyEmailTokenRoute
   '/_public/': typeof PublicIndexRoute
   '/_protected/boards/$boardId': typeof ProtectedBoardsBoardIdRoute
@@ -424,6 +443,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
+    | '/verify-email'
     | '/verify-email/$token'
     | '/'
     | '/boards/$boardId'
@@ -441,6 +461,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
+    | '/verify-email'
     | '/verify-email/$token'
     | '/'
     | '/boards/$boardId'
@@ -456,6 +477,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_protected'
     | '/_public'
+    | '/_protected/verify-email'
     | '/verify-email/$token'
     | '/_public/'
     | '/_protected/boards/$boardId'
@@ -504,6 +526,7 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected.tsx",
       "children": [
+        "/_protected/verify-email",
         "/_protected/boards/$boardId",
         "/_protected/workspaces/$workspaceId",
         "/_protected/select-workspace/"
@@ -515,6 +538,10 @@ export const routeTree = rootRoute
         "/_public/",
         "/_public/auth"
       ]
+    },
+    "/_protected/verify-email": {
+      "filePath": "_protected/verify-email.tsx",
+      "parent": "/_protected"
     },
     "/verify-email/$token": {
       "filePath": "verify-email.$token.tsx"
