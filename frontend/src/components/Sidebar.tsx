@@ -32,7 +32,7 @@ const Sidebar = () => {
   return (
     <aside className="flex h-full flex-col">
       <div className="flex h-10 items-center justify-between px-1">
-        <span className="text-sm">Workspaces</span>
+        <span className="text-lg font-semibold">Workspaces</span>
         <Button variant={'ghost'} type="button" asChild>
           <Link to={'/select-workspace'}>
             <Plus className="size-4" />

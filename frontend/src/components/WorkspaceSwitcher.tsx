@@ -46,7 +46,12 @@ const WorkspaceSwitcher = () => {
           <Button variant={'ghost'} className="mb-1 w-full pl-0">
             <div className="flex w-full items-center gap-x-1 pl-1 text-slate-700">
               <Settings size={16} />
-              <span>Manage Workspace</span>
+              <Link
+                to="/workspaces/$workspaceId/settings/workspace-settings"
+                params={{ workspaceId: activeWorkspace.id }}
+              >
+                Manage Workspace
+              </Link>
             </div>
           </Button>
           <ScrollArea>
@@ -82,7 +87,7 @@ const WorkspaceSwitcher = () => {
           <Button variant={'ghost'} className="mt-1 w-full pl-0">
             <div className="flex w-full items-center gap-x-1 pl-1 text-slate-700">
               <Plus size={16} />
-              <span>Create Workspace</span>
+              <Link to="/select-workspace">Create Workspace</Link>
             </div>
           </Button>
         </div>

@@ -5,6 +5,8 @@ export type User = {
   avatarUrl: string;
 };
 
+export type FullUser = User & { isVerified: boolean };
+
 export type UserRegistration = Omit<User, 'id' | 'avatarUrl'> & {
   password: string;
   confirmPassword: string;

@@ -1,4 +1,4 @@
-import { User, UserLogin, UserRegistration } from '../types/user';
+import { FullUser, UserLogin, UserRegistration } from '../types/user';
 import { client } from '../lib/axios';
 
 export const signin = async (req: UserLogin) => {
@@ -10,7 +10,7 @@ export const signUp = async (req: UserRegistration) => {
 };
 
 export const getCurrentUser = async () => {
-  const response = await client.get<User | null>('/auth/me');
+  const response = await client.get<FullUser | null>('/auth/me');
   return response.data;
 };
 
@@ -25,9 +25,13 @@ export const getCsrf = async () => {
 };
 
 export const signOut = async () => {
-  return client.post<void>('/auth/signout');
+  return client.post<void>('/auth/sign-out');
 };
 
 export const verifyEmail = async (token: string) => {
   return client.put<void>(`/auth/verify/${token}`);
+};
+
+export const resendVerificationEmail = async () => {
+  return client.post<void>('/auth/resend-verification');
 };
