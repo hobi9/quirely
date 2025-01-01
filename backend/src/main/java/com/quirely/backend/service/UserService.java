@@ -82,6 +82,18 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void resendVerification(User user) {
+        if (user.isVerified()) {
+            throw new UserAlreadyVerifiedException();
+        }
+
+        try {
+            emailService.sendRegistrationEmail(user.getEmail(), user.getId());
+        } catch (Exception e) {
+            log.error("Error while sending registration email", e);
+        }
+    }
+
     public String uploadAvatar(User user, MultipartFile file) throws IOException {
         String oldAvatarUrl = user.getAvatarUrl();
 

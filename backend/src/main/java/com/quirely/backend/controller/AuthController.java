@@ -50,7 +50,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/signout")
+    @PostMapping("/sign-out")
     @Operation(summary = "User Logout", description = "Logs out the currently authenticated user and invalidates their session.")
     public ResponseEntity<Void> logout(HttpSession httpSession) {
         httpSession.invalidate();
@@ -74,12 +74,18 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/resend-verification")
+    @Operation(summary = "Resend Verification Email", description = "Resends the email verification link to the authenticated user.")
+    public ResponseEntity<Void> resendVerification(@AuthenticationPrincipal User user) {
+        userService.resendVerification(user);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/csrf-refresh")
     @Operation(summary = "Refresh CSRF Token", description = "Generates and returns a new CSRF token.")
     public ResponseEntity<CsrfDto> getCsrf(CsrfToken csrfToken) {
         var csrfDto = new CsrfDto(csrfToken.getToken());
         return ResponseEntity.ok(csrfDto);
     }
-
 
 }
