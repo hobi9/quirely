@@ -1,5 +1,6 @@
 package com.quirely.backend.mapper;
 
+import com.quirely.backend.dto.FullUserDto;
 import com.quirely.backend.dto.UserAcceptanceDto;
 import com.quirely.backend.dto.authentication.RegistrationRequest;
 import com.quirely.backend.dto.UserDto;
@@ -25,6 +26,15 @@ public class UserMapper {
                 .id(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
+    }
+
+    public FullUserDto toFullUserDto(User user) {
+        return FullUserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
                 .verified(user.isVerified())
                 .avatarUrl(user.getAvatarUrl())
                 .build();
@@ -35,7 +45,6 @@ public class UserMapper {
                 .id(userAcceptance.getUser().getId())
                 .email(userAcceptance.getUser().getEmail())
                 .fullName(userAcceptance.getUser().getFullName())
-                .verified(userAcceptance.getUser().isVerified())
                 .avatarUrl(userAcceptance.getUser().getAvatarUrl())
                 .accepted(userAcceptance.getAccepted())
                 .build();

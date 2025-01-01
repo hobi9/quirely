@@ -64,7 +64,7 @@ public class AuthController {
         if (user == null) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return ResponseEntity.ok(userMapper.toFullUserDto(user));
     }
 
     @PutMapping("/verify/{verificationToken}")
