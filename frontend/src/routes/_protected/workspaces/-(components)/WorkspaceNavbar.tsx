@@ -6,6 +6,7 @@ import WorkspaceSwitcher from '@/components/WorkspaceSwitcher';
 import Logo from '@/components/Logo';
 import BoardCreationForm from './BoardCreationForm';
 import FormPopover from '@/components/FormPopover';
+import WorkspaceInvitationNotification from '@/components/WorkspaceInvitationNotification';
 
 const WorkspaceNavbar = () => {
   return (
@@ -34,9 +35,8 @@ const WorkspaceNavbar = () => {
         </div>
         <div className="flex items-center gap-x-4">
           <WorkspaceSwitcher />
-          <div>
-            <Avatar />
-          </div>
+          <WorkspaceInvitationNotification />
+          <Avatar />
         </div>
       </div>
     </header>

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import FormPopover from '@/components/FormPopover';
 import BoardCreationForm from './BoardCreationForm';
+import WorkspaceInvitationNotification from '@/components/WorkspaceInvitationNotification';
 
 const BoardNavbar = () => {
   return (
@@ -28,9 +29,8 @@ const BoardNavbar = () => {
           </FormPopover>
         </div>
         <div className="flex items-center gap-x-4">
-          <div>
-            <Avatar />
-          </div>
+          <WorkspaceInvitationNotification />
+          <Avatar />
         </div>
       </div>
     </header>

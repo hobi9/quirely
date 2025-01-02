@@ -42,6 +42,11 @@ export const getWorkspaces = async () => {
   return response.data;
 };
 
+export const getPendingWorkspaces = async () => {
+  const response = await client.get<Workspace[]>('/workspaces/pending');
+  return response.data;
+};
+
 export const getWorkspace = async (id: number) => {
   const response = await client.get<WorkspaceDetail>(`/workspaces/${id}`);
   return response.data;
@@ -68,4 +73,17 @@ export const kickFromWorkspace = async ({
   memberId: number;
 }) => {
   return client.delete<void>(`/workspaces/${workspaceId}/members/${memberId}`);
+};
+
+export const acceptWorkspaceInvitation = async (
+  workspaceId: number,
+  accept: boolean,
+) => {
+  return client.patch<void>(
+    `/workspaces/${workspaceId}/confirm-invitation`,
+    null,
+    {
+      params: { accept },
+    },
+  );
 };
