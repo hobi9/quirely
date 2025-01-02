@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.LinkedList;
+
+import static com.quirely.backend.enums.Roles.VERIFIED;
 
 @Getter
 @Setter
@@ -20,7 +23,11 @@ public class SessionAuthentication implements Authentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        var authorities = new LinkedList<GrantedAuthority>();
+        if (user.isVerified()) {
+            authorities.add(new SimpleGrantedAuthority(VERIFIED.getValue()));
+        }
+        return authorities;
     }
 
     @Override

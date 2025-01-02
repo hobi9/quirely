@@ -27,6 +27,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static com.quirely.backend.enums.Roles.VERIFIED;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -60,7 +62,15 @@ public class SecurityConfig {
                         "/swagger-ui.html"
                 )
                 .permitAll()
-                .anyRequest().authenticated()
+
+                .requestMatchers(
+                        "api/v1/auth/csrf-refresh",
+                        "/api/v1/auth/sign-out"
+                )
+                .authenticated()
+
+                .anyRequest()
+                .hasAuthority(VERIFIED.getValue())
         );
 
         return http.build();
