@@ -56,6 +56,10 @@ public class WorkspaceService {
         return workspaceRepository.findWorkspacesByMemberAndAccepted(userId, accepted);
     }
 
+    public List<Workspace> getPendingWorkspaces(Long userId) {
+        return workspaceRepository.findPendingWorkspacesByMember(userId);
+    }
+
     public Workspace getWorkspace(Long workspaceId, Long userId) {
         return workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
                 .orElseThrow(WorkspaceNotFoundException::new);

@@ -83,7 +83,7 @@ public class WorkspaceController {
     @GetMapping("/pending")
     @Operation(summary = "Get pending workspaces", description = "Retrieves all workspaces the authenticated user has pending invitations for.")
     public ResponseEntity<List<WorkspaceDto>> getPendingWorkspaces(@AuthenticationPrincipal User user) {
-        List<WorkspaceDto> workspaces = workspaceService.getMemberWorkspaces(user.getId(), null)
+        List<WorkspaceDto> workspaces = workspaceService.getPendingWorkspaces(user.getId())
                 .stream()
                 .map(workspaceMapper::toDto)
                 .toList();
