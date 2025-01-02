@@ -12,5 +12,12 @@ export const Route = createFileRoute('/_protected')({
         },
       });
     }
+
+    if (!location.pathname.startsWith('/verify-email') && !user.isVerified) {
+      throw redirect({
+        to: '/verify-email',
+        replace: true,
+      });
+    }
   },
 });

@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_protected/verify-email')({
   component: VerifyEmailPage,
   beforeLoad: ({ context: { queryClient } }) => {
     const user = queryClient.getQueryData(authQueryOptions.queryKey)!;
+
     if (user.isVerified) {
       throw redirect({
         to: '/select-workspace',
