@@ -64,8 +64,9 @@ public class SecurityConfig {
                 .permitAll()
 
                 .requestMatchers(
-                        "api/v1/auth/csrf-refresh",
-                        "/api/v1/auth/sign-out"
+                        "/api/v1/auth/csrf-refresh",
+                        "/api/v1/auth/sign-out",
+                        "/api/v1/auth/resend-verification"
                 )
                 .authenticated()
 
