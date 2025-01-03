@@ -67,7 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(userMapper.toFullUserDto(user));
     }
 
-    @PutMapping("/verify/{verificationToken}")
+    @PostMapping("/verify/{verificationToken}")
     @Operation(summary = "Verify User Email", description = "Confirms a user's email address using a verification token.")
     public ResponseEntity<Void> verify(@PathVariable("verificationToken") @NotBlank String verificationToken) {
         userService.verifyUser(verificationToken);

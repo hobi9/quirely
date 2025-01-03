@@ -18,7 +18,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
     @Query("select w from Workspace w where  w.id = :workspaceId and w.owner.id = :ownerId")
     Optional<Workspace> findWorkspaceByIdAndOwner(Long workspaceId, Long ownerId);
 
-    @Query("select w from Workspace w join w.members m where m.member.id = :memberId and w.id = :workspaceId")
+    @Query("select w from Workspace w join w.members m where m.member.id = :memberId and w.id = :workspaceId and m.accepted = true")
     Optional<Workspace> findWorkspaceByIdAndMember(Long workspaceId, Long memberId);
 
 }

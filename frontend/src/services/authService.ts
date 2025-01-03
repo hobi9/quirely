@@ -29,7 +29,7 @@ export const signOut = async () => {
 };
 
 export const verifyEmail = async (token: string) => {
-  return client.put<void>(`/auth/verify/${token}`);
+  return client.post<void>(`/auth/verify/${token}`);
 };
 
 export const resendVerificationEmail = async () => {

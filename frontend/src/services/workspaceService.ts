@@ -21,7 +21,7 @@ export const updateWorkspaceLogo = async (id: number, file: File) => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await client.patch<UploadFileResponse>(
+  const response = await client.put<UploadFileResponse>(
     `/workspaces/${id}/logo`,
     formData,
   );

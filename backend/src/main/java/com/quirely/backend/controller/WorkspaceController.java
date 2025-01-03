@@ -141,7 +141,7 @@ public class WorkspaceController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping(value = "/{workspaceId}/logo", consumes = "multipart/form-data")
+    @PutMapping(value = "/{workspaceId}/logo", consumes = "multipart/form-data")
     @Operation(summary = "Upload workspace logo", description = "Uploads a new logo for the specified workspace. Only image files are accepted.")
     public ResponseEntity<UploadFileResponse> uploadLogo(@PathVariable Long workspaceId, @RequestParam("file") @NotNull MultipartFile multipartFile,
                                                          @AuthenticationPrincipal User user) throws IOException {
