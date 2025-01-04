@@ -2,6 +2,7 @@ package com.quirely.backend.service;
 
 import com.quirely.backend.dto.authentication.LoginRequest;
 import com.quirely.backend.dto.authentication.RegistrationRequest;
+import com.quirely.backend.dto.user.UpdateUserRequest;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.enums.S3Prefix;
 import com.quirely.backend.exception.types.*;
@@ -43,7 +44,9 @@ public class UserService {
             throw new NonUniqueUserException(request.email());
         }
 
-        User user = userRepository.save(userMapper.toEntity(request));
+        User entity = userMapper.toEntity(request);
+        entity.setPassword(passwordEncoder.encode(request.password()));
+        User user = userRepository.save(entity);
 
         try {
             emailService.sendRegistrationEmail(user.getEmail(), user.getId());
@@ -110,5 +113,21 @@ public class UserService {
 
     public List<User> findUserByFilters(Long userId, Long workspaceId, String email) {
         return userRepository.findUsersByFilter(userId, workspaceId, email.toLowerCase());
+    }
+
+    public User updateUser(UpdateUserRequest request, User user) {
+        user.setFullName(request.fullName().trim());
+
+        if (!request.email().toLowerCase().equals(user.getEmail())) {
+            user.setEmail(request.email().toLowerCase());
+            user.setVerified(false);
+            try {
+                emailService.sendRegistrationEmail(request.email(), user.getId());
+            } catch (Exception e) {
+                log.error("Error while sending registration email", e);
+            }
+        }
+
+        return userRepository.save(user);
     }
 }

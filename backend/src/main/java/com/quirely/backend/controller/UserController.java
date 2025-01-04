@@ -2,12 +2,14 @@ package com.quirely.backend.controller;
 
 import com.quirely.backend.dto.UploadFileResponse;
 import com.quirely.backend.dto.UserDto;
+import com.quirely.backend.dto.user.UpdateUserRequest;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.exception.types.InvalidFileUploadException;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,9 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    @PatchMapping(value = "/avatar", consumes = "multipart/form-data")
+    @PutMapping(value = "/avatar", consumes = "multipart/form-data")
     @Operation(summary = "Upload user avatar", description = "Uploads a new avatar for the authenticated user. Only image files are accepted.")
-    public ResponseEntity<UploadFileResponse> uploadAvatar(@RequestParam("avatar") @NotNull MultipartFile multipartFile,
+    public ResponseEntity<UploadFileResponse> uploadAvatar(@RequestParam("file") @NotNull MultipartFile multipartFile,
                                                            @AuthenticationPrincipal User user) throws IOException {
 
         if (multipartFile.isEmpty()) {
@@ -56,5 +58,11 @@ public class UserController {
                 .map(userMapper::toDto)
                 .toList();
         return ResponseEntity.ok(users);
+    }
+
+    @PutMapping
+    public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UpdateUserRequest request, @AuthenticationPrincipal User user) {
+        User updatedUser = userService.updateUser(request, user);
+        return ResponseEntity.ok(userMapper.toFullUserDto(updatedUser));
     }
 }
