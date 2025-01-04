@@ -14,7 +14,7 @@ const AvatarImage = ({ user, className }: Props) => {
       src={user.avatarUrl}
       defaultSrc={defaultAvatar}
       alt={`${user.fullName}'s avatar`}
-      className={cn('rounded-full object-cover', className)}
+      className={cn('overflow-hidden rounded-full object-cover', className)}
     />
   );
 };

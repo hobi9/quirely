@@ -13,10 +13,12 @@ import clsx from 'clsx';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { Upload, Loader2 } from 'lucide-react';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { workspaceQueryOptions } from '@/hooks/useWorkspace';
 import { workspacesQueryOption } from '@/hooks/useWorskpaces';
+import { FILE_MAX_SIZE_BYTES } from '@/utils/constants';
+import defaultLogo from '../../../../assets/workspace-default.png';
 
 type Props = {
   showInitialStep: () => void;
@@ -27,21 +29,6 @@ const createWorkspaceSchema: z.ZodType<WorkspaceCreation> = z.object({
   name: z.string().trim().min(1),
   description: z.string().optional(),
 });
-
-async function convertToBlob(url: string): Promise<File | null> {
-  try {
-    // Fetch the image file from the URL
-    const response = await fetch(url);
-    const blob = await response.blob();
-
-    // Create a File object from the blob
-    const fileName = url.substring(url.lastIndexOf('/') + 1);
-    return new File([blob], fileName, { type: blob.type });
-  } catch (error) {
-    console.error('Error converting URL to File:', error);
-    return null;
-  }
-}
 
 const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
   const {
@@ -56,18 +43,17 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
     },
   });
   const queryClient = useQueryClient();
-  const [file, setFile] = useState<File | null>();
-  const [isFileDirty, setIsFileDirty] = useState(false);
+  const [logo, setLogo] = useState<string>(workspace.logoUrl || defaultLogo);
+  const [fileLogo, setFileLogo] = useState<File | null>();
   const inputRef = useRef<HTMLInputElement>(null);
-  const maxSizeInBytes = 1_000_000;
 
   const submitForm: SubmitHandler<WorkspaceCreation> = async (data) => {
     const workspaceData = isDirty
       ? await updateWorkspace(data, workspace.id)
       : workspace;
-    if (file) {
+    if (fileLogo) {
       try {
-        await updateWorkspaceLogo(workspaceData.id, file);
+        await updateWorkspaceLogo(workspaceData.id, fileLogo);
       } catch (error) {
         console.log('error'); // TODO: handle it better later
       }
@@ -89,27 +75,21 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
 
     if (!selectedFile) return;
 
-    if (selectedFile.size > maxSizeInBytes) {
+    if (selectedFile.size > FILE_MAX_SIZE_BYTES) {
       alert('Selected file exceeds the maximum size of 1 MB.'); // TODO: add toaster instead
       return;
     }
 
-    setFile(selectedFile);
-    setIsFileDirty(true);
+    setLogo(URL.createObjectURL(selectedFile));
+    setFileLogo(selectedFile);
   };
 
   const handleFileReset = () => {
     if (!inputRef.current) return;
-    inputRef.current.value = '';
-    setFile(null);
-    setIsFileDirty(true);
-  };
 
-  useEffect(() => {
-    if (workspace.logoUrl) {
-      convertToBlob(workspace.logoUrl).then((res) => setFile(res));
-    }
-  }, [workspace.logoUrl]);
+    setLogo(workspace.logoUrl || defaultLogo);
+    setFileLogo(null);
+  };
 
   return (
     <>
@@ -126,7 +106,9 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
               name="logo"
             />
             <div className="flex size-14 items-center justify-center overflow-hidden rounded-md">
-              {!file ? (
+              {fileLogo ? (
+                <img src={logo} className="size-full object-cover" />
+              ) : (
                 <Button
                   type="button"
                   variant={'ghost'}
@@ -138,16 +120,11 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
                     className="transition group-hover:scale-125"
                   />
                 </Button>
-              ) : (
-                <img
-                  src={URL.createObjectURL(file)}
-                  className="size-full object-cover"
-                />
               )}
             </div>
             <div className="flex h-full flex-col justify-between">
               <span className="text-md">Workspace image</span>
-              {file && (
+              {fileLogo && (
                 <button
                   type="button"
                   className="w-fit text-sm text-red-500 hover:underline"
@@ -193,7 +170,7 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
             </Button>
             <Button
               className="min-w-40 text-xs uppercase"
-              disabled={isSubmitting || (!isDirty && !isFileDirty)}
+              disabled={isSubmitting || (!isDirty && !fileLogo)}
             >
               {isSubmitting ? (
                 <Loader2 size={16} className="animate-spin" />

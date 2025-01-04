@@ -11,4 +11,7 @@ export type UserRegistration = Omit<User, 'id' | 'avatarUrl'> & {
   password: string;
   confirmPassword: string;
 };
+
+export type UpdateUser = Pick<UserRegistration, 'fullName' | 'email'>;
+
 export type UserLogin = Omit<UserRegistration, 'fullName' | 'confirmPassword'>;

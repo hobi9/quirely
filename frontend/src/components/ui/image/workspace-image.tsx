@@ -14,7 +14,7 @@ const WorkspaceImage = ({ workspace, className }: Props) => {
       src={workspace.logoUrl}
       alt={`${workspace.name}'s logo`}
       defaultSrc={defaultWorkspaceLogo}
-      className={cn('rounded-md object-cover', className)}
+      className={cn('overflow-hidden rounded-md object-cover', className)}
     />
   );
 };

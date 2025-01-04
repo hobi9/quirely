@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { signOut } from '@/services/authService';
 import { authQueryOptions, useCurrentUser } from '@/hooks/auth';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { SIDEBAR_KEY } from '@/utils/constants';
 import AvatarImage from './ui/image/avatar-image';
 
@@ -39,11 +39,18 @@ const Avatar = () => {
           </div>
         </div>
         <div className="mt-4">
-          <Button variant={'ghost'} type="button" className="w-full p-0">
-            <div className="flex w-full items-center gap-x-1 text-slate-700">
-              <Settings size={16} />
-              <span>Manage Account</span>
-            </div>
+          <Button
+            variant={'ghost'}
+            type="button"
+            className="w-full p-0"
+            asChild
+          >
+            <Link to={'/user/settings'}>
+              <div className="flex w-full items-center gap-x-1 text-slate-700">
+                <Settings size={16} />
+                <span>Manage Account</span>
+              </div>
+            </Link>
           </Button>
           <Button
             variant={'ghost'}
