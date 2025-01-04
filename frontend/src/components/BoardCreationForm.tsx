@@ -46,8 +46,6 @@ const BoardCreationForm = ({ closeButtonRef }: Props) => {
     return null;
   });
   const queryClient = useQueryClient();
-  console.log('workspaceId', workspaceId);
-  console.log('pathname', pathname);
 
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
