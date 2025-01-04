@@ -7,8 +7,13 @@ import Logo from '@/components/Logo';
 import BoardCreationForm from './BoardCreationForm';
 import FormPopover from '@/components/FormPopover';
 import WorkspaceInvitationNotification from '@/components/WorkspaceInvitationNotification';
+import { useMatch } from '@tanstack/react-router';
 
-const WorkspaceNavbar = () => {
+const AuthenticatedNavbar = () => {
+  const pathname = useMatch({ strict: false, select: (s) => s.pathname });
+
+  const showWorkspaceFeatures = pathname.startsWith('/workspaces');
+
   return (
     <header className="fixed top-0 z-50 h-14 w-full bg-slate-50 shadow-md">
       <div className="flex h-full items-center justify-between px-5">
@@ -16,9 +21,11 @@ const WorkspaceNavbar = () => {
           <div className="hidden md:block">
             <Logo />
           </div>
-          <div className="mr-1 md:hidden">
-            <MobileSidebar />
-          </div>
+          {showWorkspaceFeatures && (
+            <div className="mr-1 md:hidden">
+              <MobileSidebar />
+            </div>
+          )}
           <FormPopover
             title="Create a new board"
             side="bottom"
@@ -34,7 +41,7 @@ const WorkspaceNavbar = () => {
           </FormPopover>
         </div>
         <div className="flex items-center gap-x-4">
-          <WorkspaceSwitcher />
+          {showWorkspaceFeatures && <WorkspaceSwitcher />}
           <WorkspaceInvitationNotification />
           <Avatar />
         </div>
@@ -43,4 +50,4 @@ const WorkspaceNavbar = () => {
   );
 };
 
-export default WorkspaceNavbar;
+export default AuthenticatedNavbar;

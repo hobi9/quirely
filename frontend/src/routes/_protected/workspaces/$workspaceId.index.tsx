@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import useWorkspaceBoards, {
   workspaceBoardsQueryOptions,
 } from '@/hooks/useWorkspaceBoards';
-import BoardCreationForm from './-(components)/BoardCreationForm';
+
 import FormPopover from '@/components/FormPopover';
+import BoardCreationForm from '@/components/BoardCreationForm';
 
 export const Route = createFileRoute('/_protected/workspaces/$workspaceId/')({
   component: BoardsPage,
