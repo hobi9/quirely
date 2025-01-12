@@ -34,7 +34,7 @@ public class UserService {
     }
 
     public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email.toLowerCase());
     }
 
     public void createUser(RegistrationRequest request) {
@@ -118,8 +118,15 @@ public class UserService {
     public User updateUser(UpdateUserRequest request, User user) {
         user.setFullName(request.fullName().trim());
 
-        if (!request.email().toLowerCase().equals(user.getEmail())) {
-            user.setEmail(request.email().toLowerCase());
+        String newEmail = request.email().toLowerCase();
+        if (!newEmail.equals(user.getEmail())) {
+            Optional<User> userByEmail = this.findUserByEmail(request.email());
+
+            if (userByEmail.isPresent()) {
+                throw new NonUniqueUserException(request.email());
+            }
+
+            user.setEmail(newEmail);
             user.setVerified(false);
             try {
                 emailService.sendRegistrationEmail(request.email(), user.getId());
