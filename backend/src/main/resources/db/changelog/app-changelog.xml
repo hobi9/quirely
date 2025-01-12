@@ -8,4 +8,5 @@ https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
 
     <include file="db/changelog/01-01-changelog.xml"/>
+    <include file="db/changelog/2025/01/12-01-changelog.xml"/>
 </databaseChangeLog>

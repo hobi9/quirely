@@ -4,6 +4,7 @@ import com.quirely.backend.dto.board.BoardCreationRequest;
 import com.quirely.backend.entity.Board;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
+import com.quirely.backend.exception.types.BoardNotFoundException;
 import com.quirely.backend.mapper.BoardMapper;
 import com.quirely.backend.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,10 @@ public class BoardService {
     public List<Board> getBoards(Long workspaceId, User user) {
         Workspace workspace = workspaceService.getWorkspace(workspaceId, user.getId());
         return boardRepository.findBoardsByWorkspaceAndMember(workspace.getId(), user.getId());
+    }
+
+    public Board getBoard(Long boardId, User user) {
+        return boardRepository.findBoardByWorkspaceAndMember(boardId, user.getId())
+                .orElseThrow(BoardNotFoundException::new);
     }
 }
