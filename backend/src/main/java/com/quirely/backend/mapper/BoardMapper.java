@@ -12,13 +12,14 @@ import org.springframework.stereotype.Component;
 public class BoardMapper {
 
     public BoardImageDto toDto(BoardImage boardImage) {
-        return new BoardImageDto(boardImage.getId(), boardImage.getUrl(), boardImage.getDescription());
+        return new BoardImageDto(boardImage.getId(), boardImage.getThumbnailUrl(), boardImage.getFullUrl(), boardImage.getDescription());
     }
 
     public Board toEntity(BoardCreationRequest boardCreationRequest, Workspace workspace) {
         return Board.builder()
                 .title(boardCreationRequest.title().trim())
-                .imageUrl(boardCreationRequest.imageUrl())
+                .thumbnailUrl(boardCreationRequest.thumbnailUrl())
+                .fulllUrl(boardCreationRequest.fullUrl())
                 .workspace(workspace)
                 .build();
     }
@@ -27,7 +28,8 @@ public class BoardMapper {
         return BoardDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
-                .imageUrl(board.getImageUrl())
+                .thumbnailUrl(board.getThumbnailUrl())
+                .fullUrl(board.getFulllUrl())
                 .build();
     }
 

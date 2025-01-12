@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class BoardDto {
     private Long id;
     private String title;
-    private String imageUrl;
+    private String thumbnailUrl;
+    private String fullUrl;
 }

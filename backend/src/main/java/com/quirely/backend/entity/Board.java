@@ -22,8 +22,11 @@ public class Board {
   @Column(name = "title")
   private String title;
 
-  @Column(name = "image_url")
-  private String imageUrl;
+  @Column(name = "thumbnail_url")
+  private String thumbnailUrl;
+
+  @Column(name = "full_url")
+  private String fulllUrl;
 
   @ManyToOne
   @ToString.Exclude

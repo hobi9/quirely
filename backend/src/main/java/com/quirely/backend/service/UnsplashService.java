@@ -31,7 +31,7 @@ public class UnsplashService {
 
     @Cacheable(value = BOARD_IMAGE_CACHE, key = "#root.methodName")
     public List<BoardImage> getBoardImages() {
-        List<UnsplashPhoto>body = restClient.get()
+        List<UnsplashPhoto> body = restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(RANDOM_PHOTOS_PATH)
                         .queryParam("collections", "317099")
@@ -40,14 +40,19 @@ public class UnsplashService {
                 )
                 .header(ACCEPT_VERSION_HEADER, ACCEPT_VERSION)
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
+                .body(new ParameterizedTypeReference<>() {
+                });
 
         Objects.requireNonNull(body);
-
         return body
                 .stream()
                 .filter(Objects::nonNull)
-                .map(photo -> new BoardImage(photo.getId(), photo.getUrls().getThumb().toString(), photo.getDescription()))
+                .map(photo -> BoardImage.builder()
+                        .id(photo.getId())
+                        .description(photo.getDescription())
+                        .thumbnailUrl(photo.getUrls().getThumb().toString())
+                        .fullUrl(photo.getUrls().getFull().toString())
+                        .build())
                 .toList();
     }
 }

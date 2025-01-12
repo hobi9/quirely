@@ -1,14 +1,15 @@
 package com.quirely.backend.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class BoardImage implements Serializable {
     private String id;
-    private String url;
+    private String thumbnailUrl;
+    private String fullUrl;
     private String description;
 }

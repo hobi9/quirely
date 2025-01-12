@@ -61,6 +61,7 @@ public class UserController {
     }
 
     @PutMapping
+    @Operation(summary = "Update user profile", description = "Updates the authenticated user's profile information.")
     public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UpdateUserRequest request, @AuthenticationPrincipal User user) {
         User updatedUser = userService.updateUser(request, user);
         return ResponseEntity.ok(userMapper.toFullUserDto(updatedUser));
