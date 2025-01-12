@@ -53,7 +53,7 @@ const BoardImagePicker = ({
                 </div>
               )}
               <img
-                src={image.url}
+                src={image.thumbnailUrl}
                 alt={image.description}
                 className="size-full rounded-sm object-cover"
               />

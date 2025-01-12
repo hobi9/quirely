@@ -23,3 +23,9 @@ export const getBoardsByWorkspace = async (workspaceId: number) => {
 
   return response.data;
 };
+
+export const getBoard = async (boardId: number) => {
+  const response = await client.get<Board>(`boards/${boardId}`);
+
+  return response.data;
+};

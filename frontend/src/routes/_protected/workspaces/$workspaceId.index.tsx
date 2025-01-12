@@ -39,7 +39,7 @@ function BoardsPage() {
             key={board.id}
             to={'/boards/$boardId'}
             params={{ boardId: board.id }}
-            style={{ backgroundImage: `url(${board.imageUrl})` }}
+            style={{ backgroundImage: `url(${board.thumbnailUrl})` }}
             className="group relative aspect-video size-full overflow-hidden rounded-sm bg-cover bg-center bg-no-repeat"
           >
             <div className="absolute inset-0 bg-black/30 p-2 transition group-hover:bg-black/40">

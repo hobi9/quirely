@@ -1,12 +1,19 @@
 export type BoardCreation = {
   title: string;
-  imageUrl: string;
+  thumbnailUrl: string;
+  fullUrl: string;
 };
 
-export type BoardImage = { id: string; url: string; description: string };
+export type BoardImage = {
+  id: string;
+  thumbnailUrl: string;
+  fullUrl: string;
+  description: string;
+};
 
 export type Board = {
   id: number;
   title: string;
-  imageUrl: string;
+  thumbnailUrl: string;
+  fullUrl: string;
 };

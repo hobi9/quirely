@@ -79,7 +79,11 @@ const BoardCreationForm = ({ closeButtonRef }: Props) => {
     }
 
     await createBoard(
-      { title, imageUrl: selectedImage!.url },
+      {
+        title,
+        thumbnailUrl: selectedImage!.thumbnailUrl,
+        fullUrl: selectedImage!.fullUrl,
+      },
       boardWorkspaceId,
     );
     setTitle('');
@@ -95,7 +99,7 @@ const BoardCreationForm = ({ closeButtonRef }: Props) => {
       <BoardImagePicker
         selectedImage={selectedImage}
         setSelectedImage={setSelectedImage}
-        errorMessage={errors.imageUrl}
+        errorMessage={errors.thumbnailUrl}
       />
       <div className="space-y-1">
         <div>
