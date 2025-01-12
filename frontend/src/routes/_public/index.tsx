@@ -12,7 +12,6 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
       <main>
         <section className="flex h-screen items-center justify-center py-20 text-center">
           <div className="container mx-auto px-4">

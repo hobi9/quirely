@@ -1,5 +1,6 @@
+import AuthenticatedNavbar from '@/components/AuthenticatedNavbar';
 import { authQueryOptions } from '@/hooks/auth';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: ({ location, context: { queryClient } }) => {
@@ -20,4 +21,15 @@ export const Route = createFileRoute('/_protected')({
       });
     }
   },
+
+  component: AuthenticationLayout,
 });
+
+function AuthenticationLayout() {
+  return (
+    <div className="h-screen">
+      <AuthenticatedNavbar />
+      <Outlet />
+    </div>
+  );
+}

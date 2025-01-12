@@ -119,10 +119,11 @@ const BoardCreationForm = ({ closeButtonRef }: Props) => {
           <div>
             <Label htmlFor="workspace">Workspace</Label>
             <Select
+              name="workspace"
               onValueChange={(value) => setWorkspaceId(Number(value))}
               defaultValue={String(workspaceId)}
             >
-              <SelectTrigger>
+              <SelectTrigger id="workspace">
                 <SelectValue placeholder="0" />
               </SelectTrigger>
               <SelectContent>

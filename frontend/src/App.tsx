@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 const router = createRouter({
   routeTree,
   context: { queryClient: undefined! },
+  notFoundMode: 'root',
 });
 
 declare module '@tanstack/react-router' {

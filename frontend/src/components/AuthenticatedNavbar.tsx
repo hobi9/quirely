@@ -8,9 +8,11 @@ import BoardCreationForm from './BoardCreationForm';
 import FormPopover from '@/components/FormPopover';
 import WorkspaceInvitationNotification from '@/components/WorkspaceInvitationNotification';
 import { useMatch } from '@tanstack/react-router';
+import { useCurrentUser } from '@/hooks/auth';
 
 const AuthenticatedNavbar = () => {
   const pathname = useMatch({ strict: false, select: (s) => s.pathname });
+  const user = useCurrentUser()!;
 
   const showWorkspaceFeatures = pathname.startsWith('/workspaces');
 
@@ -26,23 +28,25 @@ const AuthenticatedNavbar = () => {
               <MobileSidebar />
             </div>
           )}
-          <FormPopover
-            title="Create a new board"
-            side="bottom"
-            sideOffset={10}
-            formContent={(closeButtonRef) => (
-              <BoardCreationForm closeButtonRef={closeButtonRef} />
-            )}
-          >
-            <Button>
-              <span className="hidden md:block">Create</span>
-              <Plus className="md:hidden" size={16} />
-            </Button>
-          </FormPopover>
+          {user.isVerified && (
+            <FormPopover
+              title="Create a new board"
+              side="bottom"
+              sideOffset={10}
+              formContent={(closeButtonRef) => (
+                <BoardCreationForm closeButtonRef={closeButtonRef} />
+              )}
+            >
+              <Button>
+                <span className="hidden md:block">Create</span>
+                <Plus className="md:hidden" size={16} />
+              </Button>
+            </FormPopover>
+          )}
         </div>
         <div className="flex items-center gap-x-4">
           {showWorkspaceFeatures && <WorkspaceSwitcher />}
-          <WorkspaceInvitationNotification />
+          {user.isVerified && <WorkspaceInvitationNotification />}
           <Avatar />
         </div>
       </div>

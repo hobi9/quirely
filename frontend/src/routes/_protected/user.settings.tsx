@@ -1,4 +1,3 @@
-import AuthenticatedNavbar from '@/components/AuthenticatedNavbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -99,106 +98,101 @@ function RouteComponent() {
   };
 
   return (
-    <div className="h-screen">
-      <AuthenticatedNavbar />
-      <main className="flex h-full items-center justify-center px-2">
-        <div className="container max-w-2xl space-y-8 py-6">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage your account settings
-            </p>
-          </div>
+    <main className="flex h-full items-center justify-center px-2">
+      <div className="container max-w-2xl space-y-8 py-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your account settings
+          </p>
+        </div>
 
-          <hr />
+        <hr />
 
-          <form
-            onSubmit={handleSubmit(handleUpdateProfile)}
-            className="space-y-8"
-          >
+        <form
+          onSubmit={handleSubmit(handleUpdateProfile)}
+          className="space-y-8"
+        >
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold tracking-tight">Profile</h2>
+
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold tracking-tight">Profile</h2>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <span>Profile picture</span>
-                  <div className="flex items-center gap-4">
-                    {avatar ? (
-                      <div>
-                        <Input
-                          id="logo"
-                          accept=".jpg, .jpeg, .png"
-                          type="file"
-                          className="hidden"
-                          ref={inputRef}
-                          onChange={handleFileChange}
-                          name="logo"
-                        />
-                        <img
-                          src={avatar}
-                          className="size-20 overflow-hidden rounded-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <Loader2 className="size-20 animate-spin" />
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                      onClick={handleButtonClick}
-                    >
-                      {avatarFile ? 'Remove' : 'Upload'} image
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full name</Label>
-                  <Input
-                    id="fullName"
-                    placeholder="Enter your full name"
-                    {...register('fullName')}
-                    aria-invalid={!!errors.fullName}
-                  />
-                  <p className="text-xs text-red-500">
-                    {errors.fullName?.message}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    {...register('email')}
-                    aria-invalid={!!errors.email}
-                  />
-                  <p className="text-xs text-red-500">
-                    {errors.email?.message}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    This email will be used for notifications and login.
-                  </p>
+              <div className="space-y-2">
+                <span>Profile picture</span>
+                <div className="flex items-center gap-4">
+                  {avatar ? (
+                    <div>
+                      <Input
+                        id="logo"
+                        accept=".jpg, .jpeg, .png"
+                        type="file"
+                        className="hidden"
+                        ref={inputRef}
+                        onChange={handleFileChange}
+                        name="logo"
+                      />
+                      <img
+                        src={avatar}
+                        className="size-20 overflow-hidden rounded-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <Loader2 className="size-20 animate-spin" />
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={handleButtonClick}
+                  >
+                    {avatarFile ? 'Remove' : 'Upload'} image
+                  </Button>
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end gap-4">
-              <Button variant="outline" type="button" asChild>
-                <Link to="/select-workspace">Cancel</Link>
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting || (!isDirty && !avatarFile)}
-              >
-                {isSubmitting ? 'Updating...' : 'Update profile'}
-              </Button>
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full name</Label>
+                <Input
+                  id="fullName"
+                  placeholder="Enter your full name"
+                  {...register('fullName')}
+                  aria-invalid={!!errors.fullName}
+                />
+                <p className="text-xs text-red-500">
+                  {errors.fullName?.message}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  {...register('email')}
+                  aria-invalid={!!errors.email}
+                />
+                <p className="text-xs text-red-500">{errors.email?.message}</p>
+                <p className="text-sm text-muted-foreground">
+                  This email will be used for notifications and login.
+                </p>
+              </div>
             </div>
-          </form>
-        </div>
-      </main>
-    </div>
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <Button variant="outline" type="button" asChild>
+              <Link to="/select-workspace">Cancel</Link>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || (!isDirty && !avatarFile)}
+            >
+              {isSubmitting ? 'Updating...' : 'Update profile'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 }
