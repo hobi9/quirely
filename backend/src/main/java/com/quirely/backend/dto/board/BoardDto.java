@@ -14,4 +14,5 @@ public class BoardDto {
     private String title;
     private String thumbnailUrl;
     private String fullUrl;
+    private Long workspaceId;
 }

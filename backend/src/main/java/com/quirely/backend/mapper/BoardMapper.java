@@ -30,6 +30,7 @@ public class BoardMapper {
                 .title(board.getTitle())
                 .thumbnailUrl(board.getThumbnailUrl())
                 .fullUrl(board.getFulllUrl())
+                .workspaceId(board.getWorkspace().getId())
                 .build();
     }
 

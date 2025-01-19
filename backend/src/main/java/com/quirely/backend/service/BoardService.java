@@ -1,6 +1,7 @@
 package com.quirely.backend.service;
 
 import com.quirely.backend.dto.board.BoardCreationRequest;
+import com.quirely.backend.dto.board.BoardTitleUpdateRequest;
 import com.quirely.backend.entity.Board;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,5 +35,25 @@ public class BoardService {
     public Board getBoard(Long boardId, User user) {
         return boardRepository.findBoardByWorkspaceAndMember(boardId, user.getId())
                 .orElseThrow(BoardNotFoundException::new);
+    }
+
+    public Board updateBoard(BoardTitleUpdateRequest request, Long boardId, User user) {
+        Board board = boardRepository.findBoardByWorkspaceAndMember(boardId, user.getId())
+                .orElseThrow(BoardNotFoundException::new);
+
+        String newTitle = request.title().trim();
+        if (newTitle.equals(board.getTitle())) {
+            return board;
+        }
+
+        board.setTitle(newTitle);
+        return boardRepository.save(board);
+    }
+
+    public void deleteBoard(Long boardId, User user) {
+        Board board = boardRepository.findBoardByWorkspaceAndMember(boardId, user.getId())
+                .orElseThrow(BoardNotFoundException::new);
+
+        boardRepository.delete(board);
     }
 }

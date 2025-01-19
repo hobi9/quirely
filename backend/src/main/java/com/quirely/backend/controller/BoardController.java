@@ -2,6 +2,7 @@ package com.quirely.backend.controller;
 
 import com.quirely.backend.dto.board.BoardDto;
 import com.quirely.backend.dto.board.BoardImageDto;
+import com.quirely.backend.dto.board.BoardTitleUpdateRequest;
 import com.quirely.backend.entity.Board;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.mapper.BoardMapper;
@@ -13,10 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,10 +40,28 @@ public class BoardController {
 
     @GetMapping("/{boardId}")
     @Operation(summary = "Get board by ID", description = "Retrieves the details of a specific board by its ID for the authenticated user.")
-    public BoardDto getBoard(@PathVariable @NotNull Long boardId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<BoardDto> getBoard(@PathVariable @NotNull Long boardId, @AuthenticationPrincipal User user) {
         Board board = boardService.getBoard(boardId, user);
 
-        return boardMapper.toDto(board);
+        return ResponseEntity.ok(boardMapper.toDto(board));
     }
+
+    @PatchMapping("/{boardId}")
+    @Operation(summary = "Update board title", description = "Updates the title of a specific board for the authenticated user.")
+    public ResponseEntity<BoardDto> updateBoard(@PathVariable @NotNull Long boardId, @RequestBody BoardTitleUpdateRequest request,
+                                                @AuthenticationPrincipal User user) {
+        Board updatedBoard = boardService.updateBoard(request, boardId, user);
+
+        return ResponseEntity.ok(boardMapper.toDto(updatedBoard));
+    }
+
+    @DeleteMapping("/{boardId}")
+    @Operation(summary = "Delete board", description = "Deletes a specific board for the authenticated user.")
+    public ResponseEntity<Void> deleteBoard(@PathVariable @NotNull Long boardId, @AuthenticationPrincipal User user) {
+        boardService.deleteBoard(boardId, user);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
