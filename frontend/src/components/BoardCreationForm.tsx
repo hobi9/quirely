@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useMatch } from '@tanstack/react-router';
+import { useMatches } from '@tanstack/react-router';
 import { createWorkspace } from '@/services/workspaceService';
 import { useCurrentUser } from '@/hooks/auth';
 
@@ -27,7 +27,7 @@ const matchWorkspacePage = (pathname: string) =>
   pathname.match(/^\/workspaces\/([^/]+)/);
 
 const BoardCreationForm = ({ closeButtonRef }: Props) => {
-  const pathname = useMatch({ strict: false, select: (s) => s.pathname });
+  const { pathname } = useMatches().at(-1)!;
   const workspaces = useWorkspaces();
   const user = useCurrentUser()!;
   const [selectedImage, setSelectedImage] = useState<BoardImage | null>(null);

@@ -22,7 +22,7 @@ const WorkspaceInvitationNotification = () => {
       <PopoverContent>
         {isPending ? (
           <div>Loading...</div>
-        ) : pendingWorkspaces!.length == 0 ? (
+        ) : pendingWorkspaces!.length === 0 ? (
           <div>No new invitations</div>
         ) : (
           <ScrollArea>

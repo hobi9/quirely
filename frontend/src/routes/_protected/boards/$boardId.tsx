@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 import useBoard, { boardQueryOptions } from '@/hooks/useBoard';
+import BoardNavbar from './-(components)/BoardNavbar';
 
 const paramSchema = z.object({
   boardId: z.coerce.number(),
@@ -28,6 +29,7 @@ function RouteComponent() {
       style={{ backgroundImage: `url(${board.fullUrl})` }}
       className="relative h-full max-w-full overflow-hidden bg-cover bg-center bg-no-repeat"
     >
+      <BoardNavbar board={board} />
       <main className="mx-auto h-full w-full px-4 pt-24 xl:max-w-screen-2xl"></main>
     </div>
   );

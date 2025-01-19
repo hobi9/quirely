@@ -7,13 +7,12 @@ import Logo from '@/components/Logo';
 import BoardCreationForm from './BoardCreationForm';
 import FormPopover from '@/components/FormPopover';
 import WorkspaceInvitationNotification from '@/components/WorkspaceInvitationNotification';
-import { useMatch } from '@tanstack/react-router';
+import { useMatches } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/auth';
 
 const AuthenticatedNavbar = () => {
-  const pathname = useMatch({ strict: false, select: (s) => s.pathname });
+  const { pathname } = useMatches().at(-1)!;
   const user = useCurrentUser()!;
-
   const showWorkspaceFeatures = pathname.startsWith('/workspaces');
 
   return (

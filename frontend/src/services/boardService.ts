@@ -29,3 +29,15 @@ export const getBoard = async (boardId: number) => {
 
   return response.data;
 };
+
+export const deleteBoard = async (boardId: number) => {
+  await client.delete<void>(`boards/${boardId}`);
+};
+
+export const updateBoard = async (boardId: number, title: string) => {
+  const response = await client.patch<Board>(`boards/${boardId}`, {
+    title,
+  });
+
+  return response.data;
+};

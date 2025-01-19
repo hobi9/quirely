@@ -17,8 +17,8 @@ const WorkspaceInvitationItem: React.FC<{ workspace: Workspace }> = ({
       predicate: (query) => {
         const queryJson = JSON.stringify(query.queryKey);
         return (
-          queryJson == JSON.stringify(workspacesQueryOption.queryKey) ||
-          queryJson == JSON.stringify(pendingWorkspacesQueryOption.queryKey)
+          queryJson === JSON.stringify(workspacesQueryOption.queryKey) ||
+          queryJson === JSON.stringify(pendingWorkspacesQueryOption.queryKey)
         );
       },
     });

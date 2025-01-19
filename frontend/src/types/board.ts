@@ -1,8 +1,4 @@
-export type BoardCreation = {
-  title: string;
-  thumbnailUrl: string;
-  fullUrl: string;
-};
+export type BoardCreation = Omit<Board, 'id' | 'workspaceId'>;
 
 export type BoardImage = {
   id: string;
@@ -14,6 +10,5 @@ export type BoardImage = {
 export type Board = {
   id: number;
   title: string;
-  thumbnailUrl: string;
-  fullUrl: string;
-};
+  workspaceId: number;
+} & Pick<BoardImage, 'thumbnailUrl' | 'fullUrl'>;
