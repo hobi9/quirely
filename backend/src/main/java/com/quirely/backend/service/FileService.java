@@ -1,7 +1,6 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.enums.S3Prefix;
-import io.awspring.cloud.s3.S3Resource;
+import com.quirely.backend.enums.S3Resource;
 import io.awspring.cloud.s3.S3Template;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -29,29 +28,29 @@ public class FileService {
         }
     }
 
-    public String uploadFile(MultipartFile file, S3Prefix prefix) throws IOException {
+    public String uploadFile(MultipartFile file, S3Resource s3Resource) throws IOException {
         String originalFilename= file.getOriginalFilename();
         var fileExtension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        var objectKey = prefix.getPrefix() + UUID.randomUUID() + fileExtension;
+        var objectKey = s3Resource.getPrefix() + UUID.randomUUID() + fileExtension;
 
         log.info("Uploading file {}", objectKey);
-        S3Resource upload = s3Template.upload(bucket, objectKey, file.getInputStream());
+        io.awspring.cloud.s3.S3Resource upload = s3Template.upload(bucket, objectKey, file.getInputStream());
         log.info("Uploaded file to S3: {}", upload.getURL());
 
         return upload.getURL().toString();
     }
 
-    public void deleteFile(String fileUrl, S3Prefix prefix) {
-        String key = extractObjectKeyFromUrl(fileUrl, prefix);
+    public void deleteFile(String fileUrl, S3Resource s3Resource) {
+        String key = extractObjectKeyFromUrl(fileUrl, s3Resource);
         log.info("Deleting file {}", key);
         s3Template.deleteObject(bucket, key);
         log.info("Deleted file from S3: {}", key);
     }
 
-    private String extractObjectKeyFromUrl(String fileUrl, S3Prefix prefix) {
+    private String extractObjectKeyFromUrl(String fileUrl, S3Resource prefix) {
         var prefixIndex = fileUrl.indexOf(String.format("/%s", prefix.getPrefix()));
         if (prefixIndex == -1) {
             throw new IllegalArgumentException("File URL does not contain the specified prefix");

@@ -1,6 +1,6 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.enums.S3Prefix;
+import com.quirely.backend.enums.S3Resource;
 import com.quirely.backend.dto.workspace.MemberInvitationRequest;
 import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
 import com.quirely.backend.entity.MemberWorkspace;
@@ -154,12 +154,12 @@ public class WorkspaceService {
         }
         String oldLogoUrl = workspace.getLogoUrl();
 
-        String logoUrl = fileService.uploadFile(file, S3Prefix.WORKSPACE_LOGO);
+        String logoUrl = fileService.uploadFile(file, S3Resource.WORKSPACE_LOGO);
         workspace.setLogoUrl(logoUrl);
         workspaceRepository.save(workspace);
 
         if (StringUtils.isNotBlank(oldLogoUrl)) {
-            fileService.deleteFile(oldLogoUrl, S3Prefix.WORKSPACE_LOGO);
+            fileService.deleteFile(oldLogoUrl, S3Resource.WORKSPACE_LOGO);
         }
 
         return logoUrl;

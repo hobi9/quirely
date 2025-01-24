@@ -4,7 +4,7 @@ import com.quirely.backend.dto.authentication.LoginRequest;
 import com.quirely.backend.dto.authentication.RegistrationRequest;
 import com.quirely.backend.dto.user.UpdateUserRequest;
 import com.quirely.backend.entity.User;
-import com.quirely.backend.enums.S3Prefix;
+import com.quirely.backend.enums.S3Resource;
 import com.quirely.backend.exception.types.*;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.repository.UserRepository;
@@ -100,12 +100,12 @@ public class UserService {
     public String uploadAvatar(User user, MultipartFile file) throws IOException {
         String oldAvatarUrl = user.getAvatarUrl();
 
-        String avatarUrl = fileService.uploadFile(file, S3Prefix.AVATAR_URL);
+        String avatarUrl = fileService.uploadFile(file, S3Resource.AVATAR);
         user.setAvatarUrl(avatarUrl);
         userRepository.save(user);
 
         if (StringUtils.isNotBlank(oldAvatarUrl)) {
-            fileService.deleteFile(oldAvatarUrl, S3Prefix.AVATAR_URL);
+            fileService.deleteFile(oldAvatarUrl, S3Resource.AVATAR);
         }
 
         return avatarUrl;
