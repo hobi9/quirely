@@ -82,7 +82,7 @@ function SignUp() {
               {...register('fullName')}
               className={cn(
                 errors.fullName &&
-                  'ring ring-red-200 focus-visible:ring-red-200',
+                  'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.fullName?.message}</p>
@@ -95,7 +95,7 @@ function SignUp() {
               aria-invalid={!!errors.email}
               {...register('email')}
               className={cn(
-                errors.email && 'ring ring-red-200 focus-visible:ring-red-200',
+                errors.email && 'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.email?.message}</p>
@@ -109,7 +109,7 @@ function SignUp() {
               {...register('password')}
               className={cn(
                 errors.password &&
-                  'ring ring-red-200 focus-visible:ring-red-200',
+                  'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.password?.message}</p>
@@ -123,7 +123,7 @@ function SignUp() {
               {...register('confirmPassword')}
               className={cn(
                 errors.confirmPassword &&
-                  'ring ring-red-200 focus-visible:ring-red-200',
+                  'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">

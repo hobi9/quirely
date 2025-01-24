@@ -82,7 +82,7 @@ function LoginPage() {
               autoComplete="email"
               {...register('email')}
               className={cn(
-                errors.email && 'ring ring-red-200 focus-visible:ring-red-200',
+                errors.email && 'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.email?.message}</p>
@@ -96,7 +96,7 @@ function LoginPage() {
               {...register('password')}
               className={cn(
                 errors.password &&
-                  'ring ring-red-200 focus-visible:ring-red-200',
+                  'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.password?.message}</p>

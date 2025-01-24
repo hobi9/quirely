@@ -25,7 +25,7 @@ export const Route = createFileRoute('/_protected/workspaces/$workspaceId')({
 
 function WorkspacePage() {
   return (
-    <main className="mx-auto h-full w-full px-4 pt-24 xl:max-w-screen-2xl">
+    <main className="mx-auto h-full w-full px-4 pt-24 xl:max-w-(--breakpoint-2xl)">
       <div className="flex h-full gap-x-4">
         <div className="hidden h-full w-64 shrink-0 md:block">
           <Sidebar />

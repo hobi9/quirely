@@ -23,8 +23,8 @@ const SelectWorkspaceStep = ({ showNextStep }: Props) => {
         <WorkspaceSelectList />
         <div
           className="mt-3 flex w-full items-center text-sm text-slate-400 
-            before:w-5 before:flex-grow before:border-t-[0.5px] before:border-slate-400 before:content-['']
-            after:w-5 after:flex-grow after:border-t-[0.5px] after:border-slate-400 after:content-['']"
+            before:w-5 before:grow before:border-t-[0.5px] before:border-slate-400 before:content-['']
+            after:w-5 after:grow after:border-t-[0.5px] after:border-slate-400 after:content-['']"
         >
           <span className="px-5 text-slate-600">or</span>
         </div>

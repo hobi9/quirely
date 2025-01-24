@@ -42,7 +42,7 @@ const Sidebar = () => {
 
       <Accordion
         type="multiple"
-        className="flex-grow space-y-0 overflow-y-hidden"
+        className="grow space-y-0 overflow-y-hidden"
         defaultValue={Object.keys(opened)}
       >
         <ScrollArea className="h-full">

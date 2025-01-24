@@ -30,7 +30,7 @@ function RouteComponent() {
       className="relative h-full max-w-full overflow-hidden bg-cover bg-center bg-no-repeat"
     >
       <BoardNavbar board={board} />
-      <main className="mx-auto h-full w-full px-4 pt-24 xl:max-w-screen-2xl"></main>
+      <main className="mx-auto h-full w-full px-4 pt-24 xl:max-w-(--breakpoint-2xl)"></main>
     </div>
   );
 }

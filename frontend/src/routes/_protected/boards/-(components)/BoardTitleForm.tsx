@@ -63,7 +63,7 @@ const BoardTitleForm: React.FC<{ board: Board }> = ({ board }) => {
           value={inputTitle}
           onChange={(e) => setInputTitle(e.target.value)}
           ref={inputRef}
-          className="h-7 rounded-sm border-none bg-transparent px-[7px] py-1 text-lg font-bold focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0"
+          className="h-7 rounded-sm border-none bg-transparent px-[7px] py-1 text-lg font-bold focus-visible:outline-hidden focus-visible:ring-transparent focus-visible:ring-offset-0"
         />
       </form>
     );

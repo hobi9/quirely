@@ -148,7 +148,7 @@ const CreateWorkspaceStep = ({
               aria-invalid={!!errors.name}
               {...register('name')}
               className={clsx(
-                errors.name && 'ring ring-red-200 focus-visible:ring-red-200',
+                errors.name && 'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.name?.message}</p>
