@@ -49,6 +49,7 @@ function RouteComponent() {
     try {
       if (avatarFile) {
         await updateAvatar(avatarFile);
+        setAvatarFile(null);
       }
 
       const updatedUser = await updateUser(data);
