@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1737842956810-15" author="hansonanozie">
+        <addColumn tableName="lists">
+            <column name="task_list_order" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1737842956810-16" author="hansonanozie">
+        <addNotNullConstraint columnName="task_list_order" tableName="lists"/>
+    </changeSet>
+    <changeSet id="1737842956810-17" author="hansonanozie">
+        <addColumn tableName="tasks">
+            <column name="task_order" type="INT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1737842956810-18" author="hansonanozie">
+        <addNotNullConstraint columnName="task_order" tableName="tasks"/>
+    </changeSet>
+    <changeSet id="1737842956810-21" author="hansonanozie">
+        <dropColumn columnName="order" tableName="lists"/>
+    </changeSet>
+    <changeSet id="1737842956810-22" author="hansonanozie">
+        <dropColumn columnName="order" tableName="tasks"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -19,7 +19,7 @@ public class BoardMapper {
         return Board.builder()
                 .title(boardCreationRequest.title().trim())
                 .thumbnailUrl(boardCreationRequest.thumbnailUrl())
-                .fulllUrl(boardCreationRequest.fullUrl())
+                .fullUrl(boardCreationRequest.fullUrl())
                 .workspace(workspace)
                 .build();
     }
@@ -29,7 +29,7 @@ public class BoardMapper {
                 .id(board.getId())
                 .title(board.getTitle())
                 .thumbnailUrl(board.getThumbnailUrl())
-                .fullUrl(board.getFulllUrl())
+                .fullUrl(board.getFullUrl())
                 .workspaceId(board.getWorkspace().getId())
                 .build();
     }

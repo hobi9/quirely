@@ -3,15 +3,21 @@ package com.quirely.backend.controller;
 import com.quirely.backend.dto.board.BoardDto;
 import com.quirely.backend.dto.board.BoardImageDto;
 import com.quirely.backend.dto.board.BoardTitleUpdateRequest;
+import com.quirely.backend.dto.task.TaskListCreationRequest;
+import com.quirely.backend.dto.task.TaskListDto;
 import com.quirely.backend.entity.Board;
+import com.quirely.backend.entity.TaskList;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.mapper.BoardMapper;
+import com.quirely.backend.mapper.TaskListMapper;
 import com.quirely.backend.service.BoardService;
+import com.quirely.backend.service.TaskListService;
 import com.quirely.backend.service.UnsplashService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +32,8 @@ public class BoardController {
     private final UnsplashService unsplashService;
     private final BoardMapper boardMapper;
     private final BoardService boardService;
+    private final TaskListService taskListService;
+    private final TaskListMapper taskListMapper;
 
     @GetMapping("/images")
     @Operation(summary = "Get board images", description = "Retrieves a list of board images from an external Unsplash service.")
@@ -61,6 +69,16 @@ public class BoardController {
         boardService.deleteBoard(boardId, user);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{boardId}/lists")
+    @Operation(summary = "Create a task list", description = "Creates a new task list within a specific board for the authenticated user.")
+    public ResponseEntity<TaskListDto> createTaskList(@PathVariable @NotNull Long boardId, @RequestBody TaskListCreationRequest request,
+                                                      @AuthenticationPrincipal User user) {
+        TaskList taskList = taskListService.createTaskList(request, boardId, user);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(taskListMapper.toDto(taskList));
     }
 
 

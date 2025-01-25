@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,33 +20,36 @@ public class Board {
   @Column(name = "id")
   private Long id;
 
-  @Column(name = "title")
+  @Column(name = "title", nullable = false, length = 60)
   private String title;
 
-  @Column(name = "thumbnail_url")
+  @Column(name = "thumbnail_url", nullable = false)
   private String thumbnailUrl;
 
-  @Column(name = "full_url")
-  private String fulllUrl;
+  @Column(name = "full_url", nullable = false)
+  private String fullUrl;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   @ToString.Exclude
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
 
-  @Column(name = "created_at", updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "updated_at", insertable = false)
   private LocalDateTime updatedAt;
 
+  @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<TaskList> taskLists;
+
   @PrePersist
-  protected void onCreate() {
+  private void onCreate() {
     createdAt = DateUtils.getCurrentDateTime();
   }
 
   @PreUpdate
-  protected void onUpdate() {
+  private void onUpdate() {
     updatedAt = DateUtils.getCurrentDateTime();
   }
 

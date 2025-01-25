@@ -2,45 +2,40 @@ package com.quirely.backend.entity;
 
 import com.quirely.backend.utils.DateUtils;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "workspaces")
-public class Workspace {
+@NoArgsConstructor
+@Table(name = "lists")
+public class TaskList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "title", nullable = false, length = 50)
+    private String title;
 
-    @Column(name = "description")
-    private String description;
+    @PositiveOrZero
+    @Column(name = "task_list_order", nullable = false)
+    private int order;
 
-    @Column(name = "logo_url")
-    private String logoUrl;
-
+    @ToString.Exclude
     @ManyToOne(optional = false)
-    @ToString.Exclude
-    @JoinColumn(name = "owner_id")
-    private User owner;
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberWorkspace> members;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Board> associatedBoards;
+    @OneToMany(mappedBy = "list", orphanRemoval = true)
+    private List<Task> tasks;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -57,4 +52,5 @@ public class Workspace {
     private void onUpdate() {
         updatedAt = DateUtils.getCurrentDateTime();
     }
+
 }

@@ -15,13 +15,13 @@ public class MemberWorkspace {
     @EmbeddedId
     private MemberWorkspacePK id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @ToString.Exclude
     @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private User member;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @ToString.Exclude
     @MapsId("workspaceId")
     @JoinColumn(name = "workspace_id")
@@ -36,9 +36,9 @@ public class MemberWorkspace {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberWorkspacePK implements Serializable {
-        @Column(name = "member_id")
+        @Column(name = "member_id", nullable = false)
         private Long memberId;
-        @Column(name = "workspace_id")
+        @Column(name = "workspace_id", nullable = false)
         private Long workspaceId;
     }
 }
