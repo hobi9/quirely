@@ -6,7 +6,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,6 +27,10 @@ public class TaskList {
     @PositiveOrZero
     @Column(name = "task_list_order", nullable = false)
     private int order;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private int version;
 
     @ToString.Exclude
     @ManyToOne(optional = false)

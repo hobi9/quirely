@@ -71,7 +71,7 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{boardId}/lists")
+    @PostMapping("/{boardId}/task-lists")
     @Operation(summary = "Create a task list", description = "Creates a new task list within a specific board for the authenticated user.")
     public ResponseEntity<TaskListDto> createTaskList(@PathVariable @NotNull Long boardId, @RequestBody TaskListCreationRequest request,
                                                       @AuthenticationPrincipal User user) {
@@ -79,6 +79,17 @@ public class BoardController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(taskListMapper.toDto(taskList));
+    }
+
+    @GetMapping("/{boardId}/task-lists")
+    @Operation(summary = "Get task lists for a board", description = "Retrieves all task lists associated with a specific board for the authenticated user.")
+    public ResponseEntity<List<TaskListDto>> getTaskLists(@PathVariable @NotNull Long boardId, @AuthenticationPrincipal User user) {
+        List<TaskListDto> taskLists = taskListService.getTaskLists(boardId, user)
+                .stream()
+                .map(taskListMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(taskLists);
     }
 
 
