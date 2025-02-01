@@ -21,4 +21,7 @@ public interface TaskListRepository extends JpaRepository<TaskList, Long> {
 
     @Query("select t from TaskList t  where t.id != :taskListId and t.order >= :newOrder and t.order < :oldOrder and t.board.id = :boardId")
     List<TaskList> getTaskListsForRightShift(Long taskListId, Long boardId, int oldOrder, int newOrder);
+
+    @Query("select t from TaskList t where t.id != :taskListId and t.order > :listOrder and t.board.id = :boardId")
+    List<TaskList> getFollowingTaskLists(Long taskListId, Long boardId, int listOrder);
 }

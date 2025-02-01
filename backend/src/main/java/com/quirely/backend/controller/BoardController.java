@@ -15,6 +15,7 @@ import com.quirely.backend.service.TaskListService;
 import com.quirely.backend.service.UnsplashService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,7 @@ public class BoardController {
 
     @PatchMapping("/{boardId}")
     @Operation(summary = "Update board title", description = "Updates the title of a specific board for the authenticated user.")
-    public ResponseEntity<BoardDto> updateBoard(@PathVariable @NotNull Long boardId, @RequestBody BoardTitleUpdateRequest request,
+    public ResponseEntity<BoardDto> updateBoard(@PathVariable @NotNull Long boardId, @RequestBody @Valid BoardTitleUpdateRequest request,
                                                 @AuthenticationPrincipal User user) {
         Board updatedBoard = boardService.updateBoard(request, boardId, user);
 
@@ -73,7 +74,7 @@ public class BoardController {
 
     @PostMapping("/{boardId}/task-lists")
     @Operation(summary = "Create a task list", description = "Creates a new task list within a specific board for the authenticated user.")
-    public ResponseEntity<TaskListDto> createTaskList(@PathVariable @NotNull Long boardId, @RequestBody TaskListCreationRequest request,
+    public ResponseEntity<TaskListDto> createTaskList(@PathVariable @NotNull Long boardId, @RequestBody @Valid TaskListCreationRequest request,
                                                       @AuthenticationPrincipal User user) {
         TaskList taskList = taskListService.createTaskList(request, boardId, user);
 
