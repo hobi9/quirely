@@ -6,8 +6,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.4.2</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.quirely</groupId>
@@ -20,10 +20,10 @@
     <properties>
         <java.version>23</java.version>
         <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
-        <springdoc-openapi.version>2.8.1</springdoc-openapi.version>
-        <spring-cloud-aws.version>3.2.1</spring-cloud-aws.version>
+        <springdoc-openapi.version>2.8.4</springdoc-openapi.version>
+        <spring-cloud-aws.version>3.3.0</spring-cloud-aws.version>
         <maven.compiler.proc>full</maven.compiler.proc>
-        <openapi-generator-maven-plugin.version>7.10.0</openapi-generator-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>7.11.0</openapi-generator-maven-plugin.version>
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
     </properties>
 
