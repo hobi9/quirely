@@ -67,7 +67,7 @@ const ListOptions: React.FC<{ list: List; handleAddTask: () => void }> = ({
           className="size-full justify-start rounded-none p-2 px-5 text-sm font-normal"
           variant={'ghost'}
         >
-          Add card
+          Add Task
         </Button>
         <Button
           onClick={handleCloneList}

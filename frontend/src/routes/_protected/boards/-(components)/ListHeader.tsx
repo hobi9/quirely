@@ -5,7 +5,10 @@ import { useRef, useState } from 'react';
 import { useEventListener } from 'usehooks-ts';
 import ListOptions from './ListOptions';
 
-const ListHeader: React.FC<{ list: List }> = ({ list }) => {
+const ListHeader: React.FC<{ list: List; handleAddTask: () => void }> = ({
+  list,
+  handleAddTask,
+}) => {
   const [title, setTitle] = useState(list.title);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -83,7 +86,7 @@ const ListHeader: React.FC<{ list: List }> = ({ list }) => {
           {title}
         </div>
       )}
-      <ListOptions list={list} handleAddTask={() => {}} />
+      <ListOptions list={list} handleAddTask={handleAddTask} />
     </div>
   );
 };
