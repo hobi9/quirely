@@ -1,4 +1,4 @@
-package com.quirely.backend.dto.task;
+package com.quirely.backend.dto.tasklist;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;

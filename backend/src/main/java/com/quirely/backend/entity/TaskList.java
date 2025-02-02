@@ -37,7 +37,9 @@ public class TaskList {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @OneToMany(mappedBy = "list", orphanRemoval = true)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "list", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    @OrderBy("order ASC")
     private List<Task> tasks;
 
     @Column(name = "created_at", nullable = false, updatable = false)
