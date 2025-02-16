@@ -3,6 +3,7 @@ package com.quirely.backend.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class JwtUtils {
 
     public static <T> T parseJwt(String jwt, String secret, Class<T> payloadClass) {
         try {
-            String subject = Jwts.parser()
+            String subject = Jwts.parser()  
                     .verifyWith(createKey(secret))
                     .build()
                     .parseSignedClaims(jwt).getPayload().getSubject();

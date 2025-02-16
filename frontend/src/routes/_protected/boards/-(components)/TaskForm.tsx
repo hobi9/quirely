@@ -28,7 +28,7 @@ const TaskForm = forwardRef<HTMLTextAreaElement, Props>(
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        disableEditing;
+        disableEditing();
       }
     };
 

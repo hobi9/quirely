@@ -48,6 +48,7 @@ const ListForm = () => {
     }
 
     const createdList = await createList(boardId, { title });
+    console.log('boardId', boardId);
     await queryClient.invalidateQueries(boardListsQueryOptions(boardId));
     toast({
       description: (

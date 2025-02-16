@@ -54,16 +54,10 @@ public class TaskListService {
             Long boardId = taskList.getBoard().getId();
             int numberOfTaskListsInBoard = taskListRepository.countTaskListByBoardId(boardId);
             int newOrder = Math.min(request.order(), numberOfTaskListsInBoard - 1);
-
+            System.out.println("HEREEE");
             if (newOrder > oldOrder) {
                 List<TaskList> taskListsForLeftShift = taskListRepository.getTaskListsForLeftShift(taskListId, boardId, oldOrder, newOrder);
                 taskListsForLeftShift.forEach(taskListForLeftShift -> taskListForLeftShift.setOrder(taskListForLeftShift.getOrder() - 1));
-                try {
-                    log.info("Updating task list for left shift");
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
                 taskListRepository.saveAll(taskListsForLeftShift);
             } else if (newOrder < oldOrder) {
                 List<TaskList> taskListsForRightShift = taskListRepository.getTaskListsForRightShift(taskListId, boardId, oldOrder, newOrder);

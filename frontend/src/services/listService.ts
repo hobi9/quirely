@@ -1,5 +1,5 @@
 import { client } from '@/lib/axios';
-import { List, ListCreation } from '@/types/list';
+import { List, ListCreation, ListUpdate } from '@/types/list';
 
 export const getListsByBoardId = async (boardId: number) => {
   const response = await client.get<List[]>(`boards/${boardId}/task-lists`);
@@ -16,7 +16,7 @@ export const createList = async (boardId: number, list: ListCreation) => {
   return response.data;
 };
 
-export const updateList = async (listId: number, list: List) => {
+export const updateList = async (listId: number, list: ListUpdate) => {
   const response = await client.put<List>(`task-lists/${listId}`, list);
 
   return response.data;

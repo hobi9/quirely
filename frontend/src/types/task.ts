@@ -5,4 +5,5 @@ export type TaskCreation = {
 
 export type Task = {
   id: number;
+  order: number;
 } & TaskCreation;

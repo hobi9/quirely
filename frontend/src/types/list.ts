@@ -9,3 +9,5 @@ export type List = {
 export type ListCreation = {
   title: string;
 };
+
+export type ListUpdate = Omit<List, 'id' | 'tasks'>;
