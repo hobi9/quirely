@@ -29,6 +29,7 @@ public class Task {
     @Column(name = "task_order", nullable = false)
     private int order;
 
+    @ToString.Exclude
     @ManyToOne(optional = false)
     @JoinColumn(name = "list_id", nullable = false)
     private TaskList list;
