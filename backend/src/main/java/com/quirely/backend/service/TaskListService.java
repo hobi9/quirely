@@ -1,7 +1,5 @@
 package com.quirely.backend.service;
 
-import com.quirely.backend.dto.task.TaskCreationRequest;
-import com.quirely.backend.dto.task.TaskUpdateRequest;
 import com.quirely.backend.dto.tasklist.TaskListCreationRequest;
 import com.quirely.backend.dto.tasklist.TaskListUpdateRequest;
 import com.quirely.backend.entity.Board;
@@ -10,13 +8,10 @@ import com.quirely.backend.entity.TaskList;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.exception.types.ListNotFoundException;
 import com.quirely.backend.repository.TaskListRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 

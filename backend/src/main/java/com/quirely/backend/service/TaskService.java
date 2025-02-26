@@ -1,6 +1,7 @@
 package com.quirely.backend.service;
 
 import com.quirely.backend.dto.task.TaskCreationRequest;
+import com.quirely.backend.dto.task.TaskReorderRequest;
 import com.quirely.backend.dto.task.TaskUpdateRequest;
 import com.quirely.backend.entity.Task;
 import com.quirely.backend.entity.TaskList;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +35,11 @@ public class TaskService {
     }
 
     @Transactional
-    public Task updateTask(TaskUpdateRequest request, Long taskId, Long userId) {
+    public Task reorderTask(TaskReorderRequest request, Long taskId, Long userId) {
         Long newTaskListId = request.taskListId();
         TaskList taskList = taskListService.getTaskList(newTaskListId, userId);
         Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
                 .orElseThrow(TaskNotFoundException::new);
-
-        task.setTitle(request.title().trim());
-        task.setDescription(request.description());
 
         Long oldTaskListId = task.getList().getId();
         int oldOrder = task.getOrder();
@@ -88,5 +85,16 @@ public class TaskService {
         taskRepository.saveAll(affectedTasks);
         return task;
     }
+
+    public Task updateTask(TaskUpdateRequest request, Long taskId, Long userId) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
+                .orElseThrow(TaskNotFoundException::new);
+
+        task.setTitle(request.title().trim());
+        task.setDescription(request.description());
+        return taskRepository.save(task);
+    }
+
+
 
 }

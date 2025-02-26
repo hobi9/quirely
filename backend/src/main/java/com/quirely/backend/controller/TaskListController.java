@@ -2,7 +2,6 @@ package com.quirely.backend.controller;
 
 import com.quirely.backend.dto.task.TaskCreationRequest;
 import com.quirely.backend.dto.task.TaskDto;
-import com.quirely.backend.dto.task.TaskUpdateRequest;
 import com.quirely.backend.dto.tasklist.TaskListDto;
 import com.quirely.backend.dto.tasklist.TaskListUpdateRequest;
 import com.quirely.backend.entity.Task;
