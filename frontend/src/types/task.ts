@@ -8,4 +8,4 @@ export type Task = {
   order: number;
 } & TaskCreation;
 
-export type TaskUpdate = Omit<Task, 'id'> & { taskListId: number };
+export type TaskUpdate = Pick<Task, 'order'> & { taskListId: number };

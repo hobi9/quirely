@@ -4,7 +4,7 @@ import ListItem from './ListItem';
 import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { updateList } from '@/services/listService';
-import { updateTask } from '@/services/taskService';
+import { reorderTask } from '@/services/taskService';
 
 const reorder = <T extends unknown>(
   list: T[],
@@ -91,9 +91,7 @@ const ListContainer: React.FC<{ lists: List[] }> = ({ lists }) => {
         sourceList.tasks = reorderedCards;
         setOrderedLists(newOrderedData);
         const task = sourceList.tasks[destination.index]!;
-        await updateTask(task.id, {
-          title: task.title,
-          description: task.description,
+        await reorderTask(task.id, {
           order: destination.index,
           taskListId: sourceList.id,
         });
@@ -113,9 +111,7 @@ const ListContainer: React.FC<{ lists: List[] }> = ({ lists }) => {
         });
         setOrderedLists(newOrderedData);
         const task = destinationList.tasks[destination.index]!;
-        await updateTask(task.id, {
-          title: task.title,
-          description: task.description,
+        await reorderTask(task.id, {
           order: destination.index,
           taskListId: destinationList.id,
         });
