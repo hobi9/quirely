@@ -8,6 +8,7 @@ import com.quirely.backend.entity.TaskList;
 import com.quirely.backend.exception.types.TaskNotFoundException;
 import com.quirely.backend.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,6 +96,37 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    @Transactional
+    public void deleteTask(Long taskId, Long userId) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
+                .orElseThrow(TaskNotFoundException::new);
+        Long taskListId = task.getList().getId();
 
+
+        int numberOfTasksInTaskList = taskRepository.countTasksByListId(task.getList().getId());
+
+        List<Task> taskListsForRightShift = taskRepository.getTasksForRightShift(taskId, taskListId, task.getOrder(), numberOfTasksInTaskList);
+        taskListsForRightShift.forEach(tl -> tl.setOrder(numberOfTasksInTaskList - 1));
+
+
+        taskRepository.delete(task);
+        taskRepository.saveAll(taskListsForRightShift);
+    }
+
+    public Task duplicateTask(Long taskId, Long userId) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
+                .orElseThrow(TaskNotFoundException::new);
+
+        int numberOfTasksInTaskList = taskRepository.countTasksByListId(task.getList().getId());
+
+        var clone = new Task();
+        BeanUtils.copyProperties(task, clone);
+
+        clone.setId(null);
+        task.setOrder(numberOfTasksInTaskList);
+        task.setUpdatedAt(null);
+
+        return taskRepository.save(clone);
+    }
 
 }
