@@ -45,7 +45,12 @@ const ListItem: React.FC<{ index: number; list: List }> = ({ list, index }) => {
                   )}
                 >
                   {list.tasks.map((task, index) => (
-                    <TaskItem key={task.id} task={task} index={index} />
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      list={list}
+                      index={index}
+                    />
                   ))}
                   {provided.placeholder}
                 </ol>

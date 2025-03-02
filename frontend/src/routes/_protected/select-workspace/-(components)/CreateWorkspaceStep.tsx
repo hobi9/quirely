@@ -22,6 +22,7 @@ import { Upload, Loader2 } from 'lucide-react';
 import { ChangeEvent, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { workspacesQueryOption } from '@/hooks/useWorskpaces';
+import { useToast } from '@/hooks/use-toast';
 
 type Props = {
   showNextStep: () => void;
@@ -50,6 +51,7 @@ const CreateWorkspaceStep = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const maxSizeInBytes = 1_000_000;
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const submitForm: SubmitHandler<WorkspaceCreation> = async (data) => {
     const workspace = await createWorkspace(data);
@@ -59,7 +61,12 @@ const CreateWorkspaceStep = ({
         const { url } = await updateWorkspaceLogo(workspace.id, file);
         workspace.logoUrl = url;
       } catch (error) {
-        console.log('error'); // TODO: handle it better later
+        toast({
+          title: 'Error',
+          description: 'Failed to upload workspace image.',
+          variant: 'destructive',
+        });
+        return;
       }
     }
     setWorkspace(workspace);
@@ -77,7 +84,11 @@ const CreateWorkspaceStep = ({
     if (!selectedFile) return;
 
     if (selectedFile.size > maxSizeInBytes) {
-      alert('Selected file exceeds the maximum size of 1 MB.'); // TODO: add toaster instead
+      toast({
+        title: 'Error',
+        description: 'Selected file exceeds the maximum size of 1 MB.',
+        variant: 'destructive',
+      });
       return;
     }
 

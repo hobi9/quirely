@@ -10,6 +10,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authQueryOptions } from '@/hooks/auth';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { signin } from '@/services/authService';
 import { ServerError } from '@/types/misc';
@@ -45,6 +46,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const submitForm: SubmitHandler<UserLogin> = async (data) => {
     try {
@@ -58,7 +60,10 @@ function LoginPage() {
           });
         }
       }
-      //TODO: add toaster or some kind of notification
+      toast({
+        title: 'Sign in failed',
+        description: 'Please check your email and password and try again.',
+      });
       return;
     }
 
@@ -82,7 +87,8 @@ function LoginPage() {
               autoComplete="email"
               {...register('email')}
               className={cn(
-                errors.email && 'ring-3 ring-red-200 focus-visible:ring-red-200',
+                errors.email &&
+                  'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.email?.message}</p>

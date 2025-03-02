@@ -10,7 +10,7 @@ export const authQueryOptions = queryOptions({
   queryFn: async () => {
     const user = await getCurrentUser();
     if (user) {
-      await getCsrf(); //TODO: should be done in a separate query
+      await getCsrf();
     }
     return user;
   },

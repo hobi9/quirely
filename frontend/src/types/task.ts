@@ -1,6 +1,6 @@
 export type TaskCreation = {
   title: string;
-  description: string;
+  description?: string;
 };
 
 export type Task = {

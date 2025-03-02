@@ -19,6 +19,7 @@ import { workspaceQueryOptions } from '@/hooks/useWorkspace';
 import { workspacesQueryOption } from '@/hooks/useWorskpaces';
 import { FILE_MAX_SIZE_BYTES } from '@/utils/constants';
 import defaultLogo from '../../../../assets/workspace-default.png';
+import { useToast } from '@/hooks/use-toast';
 
 type Props = {
   showInitialStep: () => void;
@@ -46,6 +47,7 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
   const [logo, setLogo] = useState<string>(workspace.logoUrl || defaultLogo);
   const [fileLogo, setFileLogo] = useState<File | null>();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const submitForm: SubmitHandler<WorkspaceCreation> = async (data) => {
     const workspaceData = isDirty
@@ -55,7 +57,12 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
       try {
         await updateWorkspaceLogo(workspaceData.id, fileLogo);
       } catch (error) {
-        console.log('error'); // TODO: handle it better later
+        toast({
+          title: 'Error updating workspace image',
+          description: 'An error occurred while updating the workspace image.',
+          variant: 'destructive',
+        });
+        return;
       }
     }
     await Promise.all([
@@ -76,7 +83,11 @@ const UpdateWorkspaceStep = ({ showInitialStep, workspace }: Props) => {
     if (!selectedFile) return;
 
     if (selectedFile.size > FILE_MAX_SIZE_BYTES) {
-      alert('Selected file exceeds the maximum size of 1 MB.'); // TODO: add toaster instead
+      toast({
+        title: 'Error',
+        description: 'Selected file exceeds the maximum size of 1 MB.',
+        variant: 'destructive',
+      });
       return;
     }
 

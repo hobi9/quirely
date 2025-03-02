@@ -1,3 +1,4 @@
+import TaskModal from '@/components/modals/task-modal';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 import { queryClient } from '@/lib/queryClient';
@@ -18,6 +19,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     <>
       <Outlet />
       <Toaster />
+      <TaskModal />
       <TanStackRouterDevtools />
     </>
   ),
@@ -30,7 +32,7 @@ function NotFoundComponent() {
       <main className="space-y-4 text-center">
         <h1 className="animate-bounce text-8xl font-bold">404</h1>
         <h2 className="text-2xl font-semibold">Page not found</h2>
-        <p className="max-w-md text-muted-foreground">
+        <p className="text-muted-foreground max-w-md">
           Sorry, we couldn't find the page you're looking for. Please check the
           URL or return home.
         </p>

@@ -55,10 +55,18 @@ function RouteComponent() {
       const updatedUser = await updateUser(data);
 
       if (updatedUser.email !== user.email) {
-        location.reload(); //TODO: need to see if i need to invalidate boards too
+        await queryClient.invalidateQueries(authQueryOptions);
+        toast({
+          title: 'Email Updated',
+          description: 'Please login again with your new email address.',
+        });
+        return;
       }
-      await queryClient.invalidateQueries(authQueryOptions);
-      await queryClient.invalidateQueries({ queryKey: ['workspaces'] }); //TODO: need to see if i need to invalidate boards too
+      // Handle normal profile updates
+      await Promise.all([
+        queryClient.invalidateQueries(authQueryOptions),
+        queryClient.invalidateQueries({ queryKey: ['workspaces'] }),
+      ]);
       toast({
         title: 'Profile updated',
         description: 'Your profile has been updated successfully.',
@@ -79,7 +87,11 @@ function RouteComponent() {
     if (!selectedFile) return;
 
     if (selectedFile.size > FILE_MAX_SIZE_BYTES) {
-      alert('Selected file exceeds the maximum size of 1 MB.'); // TODO: add toaster instead
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Selected file exceeds the maximum size of 1 MB.',
+      });
       return;
     }
 
@@ -103,7 +115,7 @@ function RouteComponent() {
       <div className="container max-w-2xl space-y-8 py-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Manage your account settings
           </p>
         </div>
@@ -174,7 +186,7 @@ function RouteComponent() {
                   aria-invalid={!!errors.email}
                 />
                 <p className="text-xs text-red-500">{errors.email?.message}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   This email will be used for notifications and login.
                 </p>
               </div>

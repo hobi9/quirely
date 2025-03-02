@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { signUp } from '@/services/authService';
 import { ServerError } from '@/types/misc';
@@ -45,10 +46,15 @@ function SignUp() {
     resolver: zodResolver(SignUpSchema),
   });
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const submitForm: SubmitHandler<UserRegistration> = async (data) => {
     try {
       await signUp(data);
+      toast({
+        title: 'Registration successful',
+        description: 'You have successfully registered. Please sign in.',
+      });
     } catch (error) {
       if (isAxiosError<ServerError<UserRegistration>>(error)) {
         const { fields } = error.response!.data;
@@ -58,7 +64,10 @@ function SignUp() {
           });
         }
       }
-      //TODO: add toaster or some kind of notification
+      toast({
+        title: 'Registration failed',
+        description: 'Please try again.',
+      });
       return;
     }
 
@@ -95,7 +104,8 @@ function SignUp() {
               aria-invalid={!!errors.email}
               {...register('email')}
               className={cn(
-                errors.email && 'ring-3 ring-red-200 focus-visible:ring-red-200',
+                errors.email &&
+                  'ring-3 ring-red-200 focus-visible:ring-red-200',
               )}
             />
             <p className="text-xs text-red-500">{errors.email?.message}</p>

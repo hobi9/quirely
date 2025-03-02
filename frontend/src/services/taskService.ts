@@ -18,3 +18,15 @@ export const updateTask = async (taskId: number, task: TaskCreation) => {
 
   return response.data;
 };
+
+export const deleteTask = async (taskId: number) => {
+  const response = await client.delete<void>(`tasks/${taskId}`);
+
+  return response.data;
+};
+
+export const duplicateTask = async (taskId: number) => {
+  const response = await client.post<void>(`tasks/${taskId}/duplicate`);
+
+  return response.data;
+};
