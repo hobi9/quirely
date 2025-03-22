@@ -3,12 +3,17 @@ import { useTaskModal } from '@/hooks/useTaskModal';
 import TaskModalHeader from './TaskModalHeader';
 import TaskModalDescription from './TaskModalDescription';
 import TaskModalActions from './TaskModalActions';
+import { useShallow } from 'zustand/react/shallow';
 
 const TaskModal = () => {
-  const task = useTaskModal((state) => state.task);
-  const list = useTaskModal((state) => state.list);
-  const isOpen = useTaskModal((state) => state.isOpen);
-  const closeModal = useTaskModal((state) => state.close);
+  const { task, list, isOpen, closeModal } = useTaskModal(
+    useShallow((state) => ({
+      task: state.task,
+      list: state.list,
+      isOpen: state.isOpen,
+      closeModal: state.close,
+    })),
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>

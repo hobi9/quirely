@@ -1,4 +1,4 @@
-import useBoardCreationImages from '@/hooks/useGetBoardCreationImages';
+import useBoardCreationImages from '@/hooks/useBoardCreationImages';
 import { cn } from '@/lib/utils';
 import { BoardImage } from '@/types/board';
 import { Check, Loader2 } from 'lucide-react';
