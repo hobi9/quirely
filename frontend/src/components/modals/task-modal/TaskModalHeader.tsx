@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { boardListsQueryOptions } from '@/hooks/useBoardLists';
+import { taskActivitiesQueryOptions } from '@/hooks/useTaskActivities';
 import { updateTask } from '@/services/taskService';
 import { List } from '@/types/list';
 import { Task } from '@/types/task';
@@ -28,11 +29,15 @@ const TaskModalHeader: React.FC<{ task: Task; list: List }> = ({
     if (title === task.title) return;
 
     await updateTask(task.id, { title });
-    await queryClient.invalidateQueries(boardListsQueryOptions(boardId));
-    toast({
-      title: 'Task updated',
-      description: `Task "${title}" has been updated.`,
-    });
+    await Promise.all([
+      queryClient.invalidateQueries(taskActivitiesQueryOptions(task.id)),
+      queryClient.invalidateQueries(boardListsQueryOptions(boardId)),
+    ]);
+    taskActivitiesQueryOptions(task.id),
+      toast({
+        title: 'Task updated',
+        description: `Task "${title}" has been updated.`,
+      });
   };
 
   return (

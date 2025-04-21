@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { boardListsQueryOptions } from '@/hooks/useBoardLists';
+import { taskActivitiesQueryOptions } from '@/hooks/useTaskActivities';
 import { updateTask } from '@/services/taskService';
 
 import { Task } from '@/types/task';
@@ -50,7 +51,11 @@ const TaskModalDescription: React.FC<{ task: Task }> = ({ task }) => {
       title: task.title,
     });
 
-    await queryClient.invalidateQueries(boardListsQueryOptions(boardId));
+    await Promise.all([
+      queryClient.invalidateQueries(boardListsQueryOptions(boardId)),
+      queryClient.invalidateQueries(taskActivitiesQueryOptions(task.id)),
+    ]);
+
     disableEditing();
   };
 

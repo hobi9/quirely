@@ -1,5 +1,5 @@
 import { client } from '@/lib/axios';
-import { UploadFileResponse } from '@/types/misc';
+import { Activity, UploadFileResponse } from '@/types/misc';
 import {
   WorkspaceCreation,
   Workspace,
@@ -86,4 +86,9 @@ export const acceptWorkspaceInvitation = async (
       params: { accept },
     },
   );
+};
+
+export const getWorkspaceActivities = async (id: number) => {
+  const response = await client.get<Activity[]>(`/workspaces/${id}/activities`);
+  return response.data;
 };

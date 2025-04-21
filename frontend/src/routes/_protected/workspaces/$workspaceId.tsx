@@ -30,7 +30,7 @@ function WorkspacePage() {
         <div className="hidden h-full w-64 shrink-0 md:block">
           <Sidebar />
         </div>
-        <div className="w-full">
+        <div className="size-full">
           <Outlet />
         </div>
       </div>

@@ -5,3 +5,5 @@ export const client = axios.create({
   withCredentials: true,
   timeout: 30_000,
 });
+
+client.defaults.headers.common['x-request-id'] = crypto.randomUUID();

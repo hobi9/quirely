@@ -26,7 +26,12 @@ function BoardsPage() {
     <div>
       <div className="mb-4 flex items-center gap-x-4">
         <WorkspaceImage workspace={workspace} className="size-[60px]" />
-        <p className="text-xl font-semibold">{workspace.name}</p>
+        <div>
+          <p className="text-xl font-semibold">{workspace.name}</p>
+          <p className="text-muted-foreground text-sm">
+            {workspace.description}
+          </p>
+        </div>
       </div>
       <hr className="border-t-2 border-gray-300/50 pt-4" />
       <div className="flex items-center gap-x-2">

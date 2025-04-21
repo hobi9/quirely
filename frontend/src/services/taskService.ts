@@ -1,4 +1,5 @@
 import { client } from '@/lib/axios';
+import { Activity } from '@/types/misc';
 import { Task, TaskCreation, TaskUpdate } from '@/types/task';
 
 export const createTask = async (listId: number, task: TaskCreation) => {
@@ -27,6 +28,12 @@ export const deleteTask = async (taskId: number) => {
 
 export const duplicateTask = async (taskId: number) => {
   const response = await client.post<void>(`tasks/${taskId}/duplicate`);
+
+  return response.data;
+};
+
+export const getTaskActivities = async (taskId: number) => {
+  const response = await client.get<Activity[]>(`tasks/${taskId}/activities`);
 
   return response.data;
 };
