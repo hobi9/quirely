@@ -40,6 +40,17 @@ spring:
       s3:
         region: ${AWS_S3_REGION}
 
+logging:
+  structured:
+    format:
+      console: com.quirely.backend.config.StructuredLogging
+  level:
+    org.zalando.logbook.Logbook: TRACE
+
+logbook:
+  filter:
+    enabled: false
+
 s3:
   bucket:
     name: ${BUCKET_NAME}

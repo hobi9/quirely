@@ -1,6 +1,7 @@
 package com.quirely.backend.config.security;
 
 import com.quirely.backend.config.security.filter.AuthenticationFilter;
+import com.quirely.backend.config.security.filter.RequestMetadataFilter;
 import com.quirely.backend.config.security.filter.SessionCookieRefreshFilter;
 import com.quirely.backend.config.security.provider.SessionAuthProvider;
 import com.quirely.backend.constants.SessionConstants;
@@ -18,12 +19,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.zalando.logbook.Logbook;
+import org.zalando.logbook.servlet.LogbookFilter;
 
 import java.util.List;
 
@@ -37,7 +41,9 @@ public class SecurityConfig {
     private String clientBaseUrl;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilter authenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilter authenticationFilter, Logbook logbook) throws Exception {
+        http.addFilterBefore(new RequestMetadataFilter(), WebAsyncManagerIntegrationFilter.class);
+        http.addFilterBefore(new LogbookFilter(logbook), WebAsyncManagerIntegrationFilter.class);
         http.addFilterBefore(new SessionCookieRefreshFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -51,8 +57,7 @@ public class SecurityConfig {
                 )
         );
 
-        http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers(
                         "/api/v1/auth/register",
                         "/api/v1/auth/login",
                         "/api/v1/auth/me",

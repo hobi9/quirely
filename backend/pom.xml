@@ -25,6 +25,7 @@
         <maven.compiler.proc>full</maven.compiler.proc>
         <openapi-generator-maven-plugin.version>7.11.0</openapi-generator-maven-plugin.version>
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <logbook-spring-boot-starter.version>3.11.0</logbook-spring-boot-starter.version>
     </properties>
 
     <dependencies>
@@ -117,6 +118,11 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>${jackson-databind-nullable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-spring-boot-starter</artifactId>
+            <version>${logbook-spring-boot-starter.version}</version>
         </dependency>
     </dependencies>
 

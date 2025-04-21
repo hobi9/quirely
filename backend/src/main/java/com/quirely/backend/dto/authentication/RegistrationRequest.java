@@ -7,4 +7,13 @@ public record RegistrationRequest(
         @NotBlank @Email String email,
         @NotBlank @Size(min = 8, max = 254) String password
 ) {
+
+    @Override
+    public String toString() {
+        return "RegistrationRequest{" +
+                "fullName='" + fullName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + "[REDACTED]" + '\'' +
+                '}';
+    }
 }
