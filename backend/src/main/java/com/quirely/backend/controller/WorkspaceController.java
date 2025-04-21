@@ -11,6 +11,7 @@ import com.quirely.backend.entity.Board;
 import com.quirely.backend.entity.User;
 import com.quirely.backend.entity.Workspace;
 import com.quirely.backend.exception.types.InvalidFileUploadException;
+import com.quirely.backend.mapper.ActivityMapper;
 import com.quirely.backend.mapper.BoardMapper;
 import com.quirely.backend.mapper.UserMapper;
 import com.quirely.backend.mapper.WorkspaceMapper;
@@ -42,6 +43,7 @@ public class WorkspaceController {
     private final UserMapper userMapper;
     private final BoardService boardService;
     private final BoardMapper boardMapper;
+    private final ActivityMapper activityMapper;
 
     @PostMapping
     @Operation(summary = "Create a new workspace", description = "Creates a new workspace for the authenticated user.")
@@ -175,6 +177,16 @@ public class WorkspaceController {
                 .map(boardMapper::toDto)
                 .toList();
         return ResponseEntity.ok(boards);
+    }
+
+    @GetMapping("/{workspaceId}/activities")
+    @Operation(summary = "Get workspace activities", description = "Retrieves all activity logs related to the specified workspace.")
+    public ResponseEntity<List<ActivityDto>> getActivitiesByWorkspace(@PathVariable Long workspaceId, @AuthenticationPrincipal User user) {
+        List<ActivityDto> activities = workspaceService.getActivities(workspaceId, user.getId())
+                .stream()
+                .map(activityMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(activities);
     }
 
 }

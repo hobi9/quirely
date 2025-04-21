@@ -58,7 +58,7 @@ public class TaskListController {
     @PostMapping("/{taskListId}/tasks")
     @Operation(summary = "Create a task", description = "Creates a new task within a specific task list")
     public ResponseEntity<TaskDto> createTask(@PathVariable Long taskListId, @RequestBody @Valid TaskCreationRequest request, @AuthenticationPrincipal User user) {
-        Task task = taskService.createTask(request, taskListId, user.getId());
+        Task task = taskService.createTask(request, taskListId, user);
 
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(taskMapper.toDto(task));

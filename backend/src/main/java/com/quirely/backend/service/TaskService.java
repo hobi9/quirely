@@ -3,8 +3,12 @@ package com.quirely.backend.service;
 import com.quirely.backend.dto.task.TaskCreationRequest;
 import com.quirely.backend.dto.task.TaskReorderRequest;
 import com.quirely.backend.dto.task.TaskUpdateRequest;
+import com.quirely.backend.entity.Activity;
 import com.quirely.backend.entity.Task;
 import com.quirely.backend.entity.TaskList;
+import com.quirely.backend.entity.User;
+import com.quirely.backend.enums.ActivityAction;
+import com.quirely.backend.enums.ActivityEntityType;
 import com.quirely.backend.exception.types.TaskNotFoundException;
 import com.quirely.backend.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +24,12 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskListService taskListService;
+    private final ActivityService activityService;
 
-    public Task createTask(TaskCreationRequest request, Long taskListId, Long userId) {
-        TaskList taskList = taskListService.getTaskList(taskListId, userId);
+    public Task createTask(TaskCreationRequest request, Long taskListId, User user) {
+        TaskList taskList = taskListService.getTaskList(taskListId, user.getId());
 
-        return taskRepository.save(
+        Task createdTask = taskRepository.save(
                 Task.builder()
                         .title(request.title().trim())
                         .list(taskList)
@@ -33,6 +38,8 @@ public class TaskService {
                         .build()
         );
 
+        activityService.createActivity(taskList.getBoard().getWorkspace(), ActivityAction.CREATE, ActivityEntityType.TASK, user, createdTask.getTitle(), createdTask.getId());
+        return createdTask;
     }
 
     @Transactional
@@ -87,18 +94,22 @@ public class TaskService {
         return task;
     }
 
-    public Task updateTask(TaskUpdateRequest request, Long taskId, Long userId) {
-        Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
+    public Task updateTask(TaskUpdateRequest request, Long taskId, User user) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, user.getId())
                 .orElseThrow(TaskNotFoundException::new);
 
         task.setTitle(request.title().trim());
         task.setDescription(request.description());
-        return taskRepository.save(task);
+
+
+        Task updatedTask = taskRepository.save(task);
+        activityService.createActivity(updatedTask.getList().getBoard().getWorkspace(), ActivityAction.UPDATE, ActivityEntityType.TASK, user, updatedTask.getTitle(), updatedTask.getId());
+        return updatedTask;
     }
 
     @Transactional
-    public void deleteTask(Long taskId, Long userId) {
-        Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
+    public void deleteTask(Long taskId, User user) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, user.getId())
                 .orElseThrow(TaskNotFoundException::new);
         Long taskListId = task.getList().getId();
 
@@ -111,10 +122,11 @@ public class TaskService {
 
         taskRepository.delete(task);
         taskRepository.saveAll(taskListsForRightShift);
+        activityService.createActivity(task.getList().getBoard().getWorkspace(), ActivityAction.DELETE, ActivityEntityType.TASK, user, task.getTitle(), task.getId());
     }
 
-    public Task duplicateTask(Long taskId, Long userId) {
-        Task task = taskRepository.findTaskByIdAndMember(taskId, userId)
+    public Task duplicateTask(Long taskId, User user) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, user.getId())
                 .orElseThrow(TaskNotFoundException::new);
 
         int numberOfTasksInTaskList = taskRepository.countTasksByListId(task.getList().getId());
@@ -126,7 +138,17 @@ public class TaskService {
         task.setOrder(numberOfTasksInTaskList);
         task.setUpdatedAt(null);
 
-        return taskRepository.save(clone);
+        Task clonedTask = taskRepository.save(clone);
+        activityService.createActivity(task.getList().getBoard().getWorkspace(), ActivityAction.CREATE, ActivityEntityType.TASK, user, clonedTask.getTitle(), clonedTask.getId());
+        return clonedTask;
+    }
+
+    public List<Activity> getTaskActivities(Long taskId, User user) {
+        Task task = taskRepository.findTaskByIdAndMember(taskId, user.getId())
+                .orElseThrow(TaskNotFoundException::new);
+
+
+        return activityService.findByEntityIdAndEntityType(task.getId(), ActivityEntityType.TASK, 3);
     }
 
 }

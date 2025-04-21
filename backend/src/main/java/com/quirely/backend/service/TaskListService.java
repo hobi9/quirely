@@ -6,6 +6,8 @@ import com.quirely.backend.entity.Board;
 import com.quirely.backend.entity.Task;
 import com.quirely.backend.entity.TaskList;
 import com.quirely.backend.entity.User;
+import com.quirely.backend.enums.ActivityAction;
+import com.quirely.backend.enums.ActivityEntityType;
 import com.quirely.backend.exception.types.ListNotFoundException;
 import com.quirely.backend.repository.TaskListRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +23,20 @@ import java.util.List;
 public class TaskListService {
     private final BoardService boardService;
     private final TaskListRepository taskListRepository;
+    public final ActivityService activityService;
 
     public TaskList createTaskList(TaskListCreationRequest request, Long boardId, User user) {
         Board board = boardService.getBoard(boardId, user);
 
-        return taskListRepository.save(TaskList.builder()
+        TaskList taskList = taskListRepository.save(TaskList.builder()
                 .board(board)
                 .title(request.title().trim())
                 .order(taskListRepository.countTaskListByBoardId(boardId))
                 .build()
         );
+
+        activityService.createActivity(board.getWorkspace(), ActivityAction.CREATE, ActivityEntityType.LIST, user, taskList.getTitle(), taskList.getId());
+        return taskList;
     }
 
     public List<TaskList> getTaskLists(Long boardId, User user) {
@@ -66,7 +72,10 @@ public class TaskListService {
             }
             taskList.setOrder(newOrder);
         }
-        return taskListRepository.save(taskList);
+
+        TaskList updatedTaskList = taskListRepository.save(taskList);
+        activityService.createActivity(taskList.getBoard().getWorkspace(), ActivityAction.UPDATE, ActivityEntityType.LIST, user, updatedTaskList.getTitle(), updatedTaskList.getId());
+        return updatedTaskList;
     }
 
     @Transactional
@@ -78,6 +87,7 @@ public class TaskListService {
 
         taskListRepository.saveAll(followingTaskLists);
         taskListRepository.delete(taskList);
+        activityService.createActivity(taskList.getBoard().getWorkspace(), ActivityAction.DELETE, ActivityEntityType.LIST, user, taskList.getTitle(), taskList.getId());
     }
 
     @Transactional
@@ -105,7 +115,9 @@ public class TaskListService {
 
         taskListRepository.saveAll(followingTaskLists);
 
-        return taskListRepository.save(clonedTaskList);
+        TaskList savedTaskList = taskListRepository.save(clonedTaskList);
+        activityService.createActivity(taskList.getBoard().getWorkspace(), ActivityAction.CREATE, ActivityEntityType.LIST, user, savedTaskList.getTitle(), savedTaskList.getId());
+        return savedTaskList;
     }
 
 

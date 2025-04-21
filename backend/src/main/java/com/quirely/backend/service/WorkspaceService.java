@@ -1,5 +1,8 @@
 package com.quirely.backend.service;
 
+import com.quirely.backend.entity.Activity;
+import com.quirely.backend.enums.ActivityAction;
+import com.quirely.backend.enums.ActivityEntityType;
 import com.quirely.backend.enums.S3Resource;
 import com.quirely.backend.dto.workspace.MemberInvitationRequest;
 import com.quirely.backend.dto.workspace.WorkspaceCreationRequest;
@@ -31,6 +34,7 @@ public class WorkspaceService {
     private final FileService fileService;
     private final WorkspaceMapper workspaceMapper;
     private final MemberWorkspaceMapper memberWorkspaceMapper;
+    private final ActivityService activityService;
 
     @Transactional
     public Workspace createWorkspace(WorkspaceCreationRequest request, User owner) {
@@ -163,5 +167,12 @@ public class WorkspaceService {
         }
 
         return logoUrl;
+    }
+
+    public List<Activity> getActivities(Long workspaceId, Long userId) {
+        Workspace workspace = workspaceRepository.findWorkspaceByIdAndMember(workspaceId, userId)
+                .orElseThrow(WorkspaceNotFoundException::new);
+
+        return activityService.findByWorkspaceId(workspace.getId());
     }
 }

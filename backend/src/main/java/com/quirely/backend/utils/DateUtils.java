@@ -13,4 +13,8 @@ public class DateUtils {
     public static LocalDateTime getCurrentDateTime() {
         return ZonedDateTime.now(ZONE_ID).toLocalDateTime();
     }
+
+    public static Long toTimestamp(LocalDateTime localDateTime) {
+        return localDateTime.atZone(ZONE_ID).toInstant().toEpochMilli();
+    }
 }

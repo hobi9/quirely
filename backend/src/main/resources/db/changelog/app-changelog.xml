@@ -14,4 +14,9 @@ https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <include file="db/changelog/2025/01/25-03-changelog.xml"/>
     <include file="db/changelog/2025/01/25-04-changelog.xml"/>
     <include file="db/changelog/2025/01/26-01-changelog.xml"/>
+    <include file="db/changelog/2025/04/20-01-changelog.xml"/>
+    <include file="db/changelog/2025/04/20-02-changelog.xml"/>
+    <changeSet id="1745157411970-17" author="obi">
+        <dropColumn columnName="updated_at" tableName="activities"/>
+    </changeSet>
 </databaseChangeLog>
