@@ -20,7 +20,7 @@ public class LogbookConfig {
                         requestTo("/swagger-ui/**"),
                         requestTo("/swagger-ui.html")))
                 .bodyFilter(jsonPath("$.password").replace("[REDACTED]"))
-                .correlationId(_ ->  MDC.get(MDCKeys.REQUEST_ID))
+                .correlationId(req ->  MDC.get(MDCKeys.REQUEST_ID))
                 .build();
     }
 
