@@ -350,11 +350,6 @@ export class CdkInfraStack extends cdk.Stack {
       },
     );
 
-    // Outputs
-    new cdk.CfnOutput(this, "CloudFrontDomain", {
-      value: distribution.distributionDomainName,
-    });
-
     const beanstalkEnv = new elasticbeanstalk.CfnEnvironment(
       this,
       "QuirelyEnv",
@@ -455,7 +450,7 @@ export class CdkInfraStack extends cdk.Stack {
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "CLIENT_BASE_URL",
-            value: cdk.Fn.sub("https://${DistributionDomain}"),
+            value: `https://${distribution.distributionDomainName}`,
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
@@ -508,6 +503,11 @@ export class CdkInfraStack extends cdk.Stack {
           "method.request.path.proxy": true,
         },
       },
+    });
+
+    // Outputs
+    new cdk.CfnOutput(this, "CloudFrontDomain", {
+      value: distribution.distributionDomainName,
     });
 
     new cdk.CfnOutput(this, "FrontendBucketName", {
