@@ -16,6 +16,14 @@ import { Aws } from "aws-cdk-lib";
 export class CdkInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    const cloudFrontIpRangesParam = new cdk.CfnParameter(
+      this,
+      "cloudFrontIpRanges",
+      {
+        type: "String",
+        description: "Comma-separated list of CloudFront IP ranges",
+      },
+    );
 
     const stageNameParam = new cdk.CfnParameter(this, "stageName", {
       type: "String",
@@ -27,7 +35,18 @@ export class CdkInfraStack extends cdk.Stack {
       description: "Verified SES email identity",
     });
 
+    const cloudFrontIpRanges = cloudFrontIpRangesParam.valueAsString;
+    const stageName = stageNameParam.valueAsString;
     const sesEmail = sesEmailParam.valueAsString;
+
+    const ipRangesArray =
+      typeof cloudFrontIpRanges === "string"
+        ? cloudFrontIpRanges.split(",").filter((ip) => ip)
+        : cloudFrontIpRanges;
+
+    if (!ipRangesArray || ipRangesArray.length === 0) {
+      throw new Error("cloudFrontIpRanges must not be empty");
+    }
 
     // VPC for our services
     const vpc = new ec2.Vpc(this, "QuirelyVpc", {
@@ -118,6 +137,20 @@ export class CdkInfraStack extends cdk.Stack {
         allowAllOutbound: true, // ALB needs outbound access to forward traffic
       },
     );
+    const albSecurityGroup2 = new ec2.SecurityGroup(
+      this,
+      "QuirelyAlbSecurityGroup2",
+      {
+        vpc,
+        description: "Additional security group for Elastic Beanstalk ALB",
+        allowAllOutbound: true,
+      },
+    );
+
+    // Split CloudFront IP ranges
+    const half = Math.ceil(ipRangesArray.length / 2);
+    const cloudFrontIpRanges1 = ipRangesArray.slice(0, half);
+    const cloudFrontIpRanges2 = ipRangesArray.slice(half);
 
     dbSecurityGroup.addIngressRule(
       beanstalkSecurityGroup,
@@ -130,18 +163,34 @@ export class CdkInfraStack extends cdk.Stack {
       "Allow Redis from Beanstalk",
     );
 
-    albSecurityGroup.addIngressRule(
-      ec2.Peer.prefixList("pl-58a04531"),
-      ec2.Port.tcp(80),
-      `Allow HTTP from CloudFront IP range`,
-    );
+    // Add ingress rules for HTTP (port 80) to first security group
+    cloudFrontIpRanges1.forEach((ipRange, index) => {
+      albSecurityGroup.addIngressRule(
+        ec2.Peer.ipv4(ipRange),
+        ec2.Port.tcp(80),
+        `Allow HTTP from CloudFront IP range ${index + 1}`,
+      );
+    });
+
+    // Add ingress rules for HTTP (port 80) to second security group
+    cloudFrontIpRanges2.forEach((ipRange, index) => {
+      albSecurityGroup2.addIngressRule(
+        ec2.Peer.ipv4(ipRange),
+        ec2.Port.tcp(80),
+        `Allow HTTP from CloudFront IP range ${index + half + 1}`,
+      );
+    });
 
     beanstalkSecurityGroup.addIngressRule(
       albSecurityGroup,
       ec2.Port.tcp(80),
       "Allow HTTP from ALB",
     );
-
+    beanstalkSecurityGroup.addIngressRule(
+      albSecurityGroup2,
+      ec2.Port.tcp(80),
+      "Allow HTTP from ALB (second SG)",
+    );
     beanstalkSecurityGroup.addEgressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(443),
@@ -352,9 +401,12 @@ export class CdkInfraStack extends cdk.Stack {
             value: "application",
           },
           {
-            namespace: "aws:elb:loadbalancer",
+            namespace: "aws:elbv2:loadbalancer",
             optionName: "SecurityGroups",
-            value: albSecurityGroup.securityGroupId,
+            value: [
+              albSecurityGroup.securityGroupId,
+              albSecurityGroup2.securityGroupId,
+            ].join(","),
           },
           {
             namespace: "aws:elb:listener:80",
