@@ -148,7 +148,9 @@ export class CdkInfraStack extends cdk.Stack {
     );
 
     // Split CloudFront IP ranges
-    const half = Math.ceil(ipRangesArray.length / 2);
+    const maxIpRanges = 30; // Stay under 60 rules (split across two security groups)
+    const limitedIpRanges = ipRangesArray.slice(0, maxIpRanges);
+    const half = Math.ceil(limitedIpRanges.length / 2);
     const cloudFrontIpRanges1 = ipRangesArray.slice(0, half);
     const cloudFrontIpRanges2 = ipRangesArray.slice(half);
 
