@@ -102,7 +102,7 @@ export class CdkInfraStack extends cdk.Stack {
 
     // API Gateway (will be an origin for CloudFront)
     const api = new apigateway.RestApi(this, "QuirelyApi", {
-      restApiName: `quirely-api`.toLocaleLowerCase(),
+      restApiName: `quirely-api-${this.stackName}`.toLocaleLowerCase(),
       deployOptions: { stageName },
     });
 
