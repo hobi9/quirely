@@ -60,6 +60,12 @@ jobs:
           echo "BEANSTALK_ENV=$(cat cdk-infra/cdk-outputs.json | jq -r '.CdkInfraStack.BeanstalkEnvironmentName')" >> $GITHUB_ENV
           echo "DISTRIBUTION_ID=$(aws cloudformation describe-stacks --stack-name CdkInfraStack --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDomain'].OutputValue" --output text | cut -d'.' -f1)" >> $GITHUB_ENV
 
+      - name: Set CLIENT_BASE_URL in Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk update-environment \
+            --environment-name ${{ env.BEANSTALK_ENV }} \
+            --option-settings Namespace=aws:elasticbeanstalk:application:environment,Name=CLIENT_BASE_URL,Value=https://${{ env.CLOUDFRONT_DOMAIN }}
+
       - name: Build React frontend
         working-directory: ./frontend
         run: |

@@ -449,11 +449,6 @@ export class CdkInfraStack extends cdk.Stack {
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
-            optionName: "CLIENT_BASE_URL",
-            value: `https://${distribution.distributionDomainName}`,
-          },
-          {
-            namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "SMTP_HOST",
             value: `email-smtp.${Aws.REGION}.amazonaws.com`,
           },
