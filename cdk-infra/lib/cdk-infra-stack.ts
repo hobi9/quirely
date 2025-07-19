@@ -125,8 +125,7 @@ export class CdkInfraStack extends cdk.Stack {
       "Allow Redis from Beanstalk",
     );
 
-    const cloudFrontPrefixListId =
-      "com.amazonaws.global.cloudfront.origin-facing";
+    const cloudFrontPrefixListId = `com.amazonaws.${Aws.REGION}.cloudfront`;
 
     albSecurityGroup.addIngressRule(
       ec2.Peer.prefixList(cloudFrontPrefixListId),
