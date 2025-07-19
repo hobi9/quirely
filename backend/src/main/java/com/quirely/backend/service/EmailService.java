@@ -26,6 +26,8 @@ public class EmailService {
     private String clientBaseUrl;
     @Value("${jwt.email.secret}")
     private String jwtEmailSecret;
+    @Value("${mail.sesEmail}")
+    private String sesEmail;
 
     public void sendRegistrationEmail(String recipient, long userId) {
         String confirmationToken = createJwt(new EmailVerificationJwtPayload(userId), jwtEmailSecret, 86_400_000);
@@ -53,7 +55,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text, true);
-            helper.setFrom("no_reply@quirely.io"); // TODO: to change
+            helper.setFrom(sesEmail);
 
             javaMailSender.send(message);
         } catch (MessagingException e) {

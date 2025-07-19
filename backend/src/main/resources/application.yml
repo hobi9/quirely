@@ -1,4 +1,8 @@
 spring:
+  config:
+    import:
+      - "aws-secretsmanager:${DB_SECRET_ARN}"
+      - "aws-secretsmanager:${APP_SECRETS_ARN}"
   application:
     name: backend
   servlet:
@@ -34,9 +38,6 @@ spring:
     timeout: ${REDIS_SESSION_TIMEOUT}
   cloud:
     aws:
-      credentials:
-        access-key: ${AWS_ACCESS_KEY}
-        secret-key: ${AWS_SECRET_KEY}
       s3:
         region: ${AWS_S3_REGION}
 
@@ -58,6 +59,9 @@ s3:
 jwt:
   email:
     secret: ${JWT_EMAIL_SECRET}
+
+mail:
+  sesEmail: ${SES_EMAIL}
 
 client:
   base-url: ${CLIENT_BASE_URL}
