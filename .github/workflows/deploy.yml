@@ -36,10 +36,10 @@ jobs:
         working-directory: ./cdk-infra
         run: cdk bootstrap
 
-      - name: Fetch CloudFront IP Ranges (GLOBAL only, limited to 30)
+      - name: Fetch CloudFront IP Ranges (GLOBAL and eu-south-1)
         id: cloudfront-ips
         run: |
-          ips=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="CLOUDFRONT" and .region=="GLOBAL") | .ip_prefix' | head -n 30 | tr '\n' ',' | sed 's/,$//')
+          ips=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="CLOUDFRONT" and (.region=="GLOBAL" or .region=="eu-south-1")) | .ip_prefix' | tr '\n' ',' | sed 's/,$//')
           echo "ips=$ips" >> $GITHUB_OUTPUT
 
       - name: Deploy CDK stack
