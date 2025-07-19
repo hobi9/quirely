@@ -39,7 +39,7 @@ jobs:
       - name: Fetch CloudFront IP Ranges (GLOBAL only, limited to 30)
         id: cloudfront-ips
         run: |
-          ips=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="CLOUDFRONT" and .region=="GLOBAL") | .ip_prefix' | head -n 30 | tr '\n' ' ')
+          ips=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="CLOUDFRONT" and .region=="GLOBAL") | .ip_prefix' | head -n 30 | tr '\n' ',' | sed 's/,$//')
           echo "ips=$ips" >> $GITHUB_OUTPUT
 
       - name: Deploy CDK stack
@@ -93,4 +93,4 @@ jobs:
           aws elasticbeanstalk update-environment --environment-name ${{ env.BEANSTALK_ENV }} --version-label ${{ github.sha }}
 
 env:
-  AWS_REGION: eu-south-1
+  AWS_REGION: eu-central-1
