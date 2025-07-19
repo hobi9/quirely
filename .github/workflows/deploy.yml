@@ -36,10 +36,18 @@ jobs:
         working-directory: ./cdk-infra
         run: cdk bootstrap
 
+      - name: Fetch CloudFront IP Ranges (GLOBAL and eu-south-1)
+        id: cloudfront-ips
+        run: |
+          ips=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="CLOUDFRONT" and (.region=="GLOBAL" or .region=="eu-south-1")) | .ip_prefix' | tr '\n' ',' | sed 's/,$//')
+          echo "ips=$ips" >> $GITHUB_OUTPUT
+
       - name: Deploy CDK stack
         working-directory: ./cdk-infra
         run: |
           cdk deploy CdkInfraStack --require-approval never \
+            --parameters cloudFrontIpRanges='${{ steps.cloudfront-ips.outputs.ips }}' \
+            --parameters stageName=prod \
             --parameters sesEmail='${{ secrets.SES_EMAIL }}' \
             --outputs-file cdk-outputs.json
 
@@ -85,4 +93,4 @@ jobs:
           aws elasticbeanstalk update-environment --environment-name ${{ env.BEANSTALK_ENV }} --version-label ${{ github.sha }}
 
 env:
-  AWS_REGION: eu-south-1
+  AWS_REGION: eu-central-1
