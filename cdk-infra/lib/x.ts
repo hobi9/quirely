@@ -11,19 +11,26 @@ import * as ses from "aws-cdk-lib/aws-ses";
 import * as elasticbeanstalk from "aws-cdk-lib/aws-elasticbeanstalk";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import * as wafv2 from "aws-cdk-lib/aws-wafv2";
-import { Aws } from "aws-cdk-lib";
+
+type CdkInfraStackProps = {
+  cloudFrontIpRanges: string;
+  stageName: string;
+  sesEmail: string;
+} & cdk.StackProps;
 
 export class CdkInfraStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: CdkInfraStackProps) {
     super(scope, id, props);
+    const { cloudFrontIpRanges, stageName, sesEmail } = props;
 
-    const sesEmailParam = new cdk.CfnParameter(this, "sesEmail", {
-      type: "String",
-      description: "Verified SES email identity",
-    });
+    const ipRangesArray =
+      typeof cloudFrontIpRanges === "string"
+        ? cloudFrontIpRanges.split(",").filter((ip) => ip)
+        : cloudFrontIpRanges;
 
-    const sesEmail = sesEmailParam.valueAsString;
+    if (!ipRangesArray || ipRangesArray.length === 0) {
+      throw new Error("cloudFrontIpRanges must not be empty");
+    }
 
     // VPC for our services
     const vpc = new ec2.Vpc(this, "QuirelyVpc", {
@@ -45,14 +52,10 @@ export class CdkInfraStack extends cdk.Stack {
 
     // S3 bucket for user images
     const quirelyBucket = new s3.Bucket(this, "QuirelyBucket", {
+      bucketName:
+        `quirely-${this.stackName}-${this.account}-${this.region}`.toLocaleLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
-      blockPublicAccess: new s3.BlockPublicAccess({
-        blockPublicAcls: false,
-        ignorePublicAcls: false,
-        blockPublicPolicy: false, // Allow public policies
-        restrictPublicBuckets: false, // Allow public access
-      }),
     });
 
     // Bucket policy for public read access for user images
@@ -67,12 +70,16 @@ export class CdkInfraStack extends cdk.Stack {
 
     // S3 bucket for React frontend
     const frontendBucket = new s3.Bucket(this, "FrontendBucket", {
+      bucketName:
+        `quirely-frontend-${this.stackName}-${this.account}-${this.region}`.toLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
     // S3 bucket for atrifacts
     const artifactsBucket = new s3.Bucket(this, "ArtifactsBucket", {
+      bucketName:
+        `quirely-artifacts-${this.stackName}-${this.account}-${this.region}`.toLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
@@ -85,8 +92,8 @@ export class CdkInfraStack extends cdk.Stack {
 
     // API Gateway (will be an origin for CloudFront)
     const api = new apigateway.RestApi(this, "QuirelyApi", {
-      restApiName: `quirely-api`.toLocaleLowerCase(),
-      deployOptions: {},
+      restApiName: `quirely-api-${this.stackName}`.toLocaleLowerCase(),
+      deployOptions: { stageName },
     });
 
     // Security Groups
@@ -105,7 +112,6 @@ export class CdkInfraStack extends cdk.Stack {
       "QuirelyBeanstalkSecurityGroup",
       { vpc },
     );
-
     const albSecurityGroup = new ec2.SecurityGroup(
       this,
       "QuirelyAlbSecurityGroup",
@@ -115,6 +121,20 @@ export class CdkInfraStack extends cdk.Stack {
         allowAllOutbound: true, // ALB needs outbound access to forward traffic
       },
     );
+    const albSecurityGroup2 = new ec2.SecurityGroup(
+      this,
+      "QuirelyAlbSecurityGroup2",
+      {
+        vpc,
+        description: "Additional security group for Elastic Beanstalk ALB",
+        allowAllOutbound: true,
+      },
+    );
+
+    // Split CloudFront IP ranges
+    const half = Math.ceil(ipRangesArray.length / 2);
+    const cloudFrontIpRanges1 = ipRangesArray.slice(0, half);
+    const cloudFrontIpRanges2 = ipRangesArray.slice(half);
 
     dbSecurityGroup.addIngressRule(
       beanstalkSecurityGroup,
@@ -127,61 +147,39 @@ export class CdkInfraStack extends cdk.Stack {
       "Allow Redis from Beanstalk",
     );
 
-    // Allow HTTP traffic to ALB (WAF will handle CloudFront restriction)
-    albSecurityGroup.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(80),
-      "Allow HTTP traffic (restricted by WAF)",
-    );
+    // Add ingress rules for HTTP (port 80) to first security group
+    cloudFrontIpRanges1.forEach((ipRange, index) => {
+      albSecurityGroup.addIngressRule(
+        ec2.Peer.ipv4(ipRange),
+        ec2.Port.tcp(80),
+        `Allow HTTP from CloudFront IP range ${index + 1}`,
+      );
+    });
+
+    // Add ingress rules for HTTP (port 80) to second security group
+    cloudFrontIpRanges2.forEach((ipRange, index) => {
+      albSecurityGroup2.addIngressRule(
+        ec2.Peer.ipv4(ipRange),
+        ec2.Port.tcp(80),
+        `Allow HTTP from CloudFront IP range ${index + half + 1}`,
+      );
+    });
 
     beanstalkSecurityGroup.addIngressRule(
       albSecurityGroup,
       ec2.Port.tcp(80),
       "Allow HTTP from ALB",
     );
-
+    beanstalkSecurityGroup.addIngressRule(
+      albSecurityGroup2,
+      ec2.Port.tcp(80),
+      "Allow HTTP from ALB (second SG)",
+    );
     beanstalkSecurityGroup.addEgressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(443),
       "Allow HTTPS outbound to external APIs",
     );
-
-    // WAF Web ACL for ALB
-    const webAcl = new wafv2.CfnWebACL(this, "QuirelyWebAcl", {
-      scope: "REGIONAL", // Use REGIONAL for ALB (CLOUDFRONT for CloudFront)
-      defaultAction: { block: {} }, // Block all traffic by default
-      visibilityConfig: {
-        sampledRequestsEnabled: true,
-        cloudWatchMetricsEnabled: true,
-        metricName: "QuirelyWebAcl",
-      },
-      rules: [
-        {
-          name: "AllowCloudFront",
-          priority: 0,
-          statement: {
-            managedRuleGroupStatement: {
-              vendorName: "AWS",
-              name: "AWSManagedRulesAmazonIpReputationList",
-              // Optionally include CloudFront-specific IP set if available
-              // name: "AWSManagedRulesCloudFrontIpSet", // Check availability in your region
-            },
-          },
-          action: { allow: {} },
-          visibilityConfig: {
-            sampledRequestsEnabled: true,
-            cloudWatchMetricsEnabled: true,
-            metricName: "AllowCloudFront",
-          },
-        },
-      ],
-    });
-
-    // Associate WAF with ALB
-    new wafv2.CfnWebACLAssociation(this, "QuirelyWebAclAssociation", {
-      resourceArn: `arn:aws:elasticloadbalancing:${Aws.REGION}:${Aws.ACCOUNT_ID}:loadbalancer/app/quirely-${this.stackName}-alb/${cdk.Fn.ref("QuirelyEnv.LoadBalancer")}`,
-      webAclArn: webAcl.attrArn,
-    });
 
     // RDS PostgreSQL
     const dbInstance = new rds.DatabaseInstance(this, "QuirelyDatabase", {
@@ -278,7 +276,7 @@ export class CdkInfraStack extends cdk.Stack {
           JWT_EMAIL_SECRET: "generate-a-strong-random-string-here",
           UNSPLASH_ACCESS_KEY: "your-unsplash-key",
         }),
-        generateStringKey: "placeholder",
+        generateStringKey: "placeholder", // A dummy key to satisfy validation
       },
     });
     dbInstance.secret!.grantRead(beanstalkRole);
@@ -311,7 +309,7 @@ export class CdkInfraStack extends cdk.Stack {
         additionalBehaviors: {
           "/api/*": {
             origin: new origins.HttpOrigin(
-              `${api.restApiId}.execute-api.${Aws.REGION}.${this.urlSuffix}`,
+              `${api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
               {
                 // Pass the path to the API Gateway
                 originPath: `/${api.deploymentStage.stageName}`,
@@ -389,7 +387,10 @@ export class CdkInfraStack extends cdk.Stack {
           {
             namespace: "aws:elb:loadbalancer",
             optionName: "SecurityGroups",
-            value: albSecurityGroup.securityGroupId,
+            value: [
+              albSecurityGroup.securityGroupId,
+              albSecurityGroup2.securityGroupId,
+            ].join(","),
           },
           {
             namespace: "aws:elb:listener:80",
@@ -434,22 +435,22 @@ export class CdkInfraStack extends cdk.Stack {
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "AWS_S3_REGION",
-            value: Aws.REGION,
+            value: this.region,
+          },
+          {
+            namespace: "aws:elasticbeanstalk:application:environment",
+            optionName: "CLIENT_BASE_URL",
+            value: `https://${distribution.distributionDomainName}`,
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "SMTP_HOST",
-            value: `email-smtp.${Aws.REGION}.amazonaws.com`,
+            value: `email-smtp.${this.region}.amazonaws.com`,
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "SMTP_PORT",
             value: "587",
-          },
-          {
-            namespace: "aws:elasticbeanstalk:application:environment",
-            optionName: "SES_EMAIL",
-            value: sesEmail,
           },
 
           // Pass Secret ARNs to the application
@@ -493,7 +494,6 @@ export class CdkInfraStack extends cdk.Stack {
     new cdk.CfnOutput(this, "CloudFrontDomain", {
       value: distribution.distributionDomainName,
     });
-
     new cdk.CfnOutput(this, "FrontendBucketName", {
       value: frontendBucket.bucketName,
     });
