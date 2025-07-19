@@ -11,7 +11,6 @@ import * as ses from "aws-cdk-lib/aws-ses";
 import * as elasticbeanstalk from "aws-cdk-lib/aws-elasticbeanstalk";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import { cloudFrontIpRanges } from "./const";
 import { Aws } from "aws-cdk-lib";
 
 export class CdkInfraStack extends cdk.Stack {
@@ -126,13 +125,14 @@ export class CdkInfraStack extends cdk.Stack {
       "Allow Redis from Beanstalk",
     );
 
-    cloudFrontIpRanges.forEach((ip, index) => {
-      albSecurityGroup.addIngressRule(
-        ec2.Peer.ipv4(ip),
-        ec2.Port.tcp(80),
-        `Allow HTTP from CloudFront IP range ${index}`,
-      );
-    });
+    const cloudFrontPrefixListId =
+      "com.amazonaws.global.cloudfront.origin-facing";
+
+    albSecurityGroup.addIngressRule(
+      ec2.Peer.prefixList(cloudFrontPrefixListId),
+      ec2.Port.tcp(80),
+      `Allow HTTP from CloudFront IP range`,
+    );
 
     beanstalkSecurityGroup.addIngressRule(
       albSecurityGroup,
