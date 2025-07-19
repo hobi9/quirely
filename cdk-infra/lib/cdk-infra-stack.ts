@@ -70,6 +70,12 @@ export class CdkInfraStack extends cdk.Stack {
     const quirelyBucket = new s3.Bucket(this, "QuirelyBucket", {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
+      blockPublicAccess: new s3.BlockPublicAccess({
+        blockPublicAcls: false,
+        ignorePublicAcls: false,
+        blockPublicPolicy: false, // Allow public policies
+        restrictPublicBuckets: false, // Allow public access
+      }),
     });
 
     // Bucket policy for public read access for user images
