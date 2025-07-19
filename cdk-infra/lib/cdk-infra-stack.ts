@@ -20,7 +20,7 @@ export class CdkInfraStack extends cdk.Stack {
       this,
       "cloudFrontIpRanges",
       {
-        type: "String",
+        type: "List<String>",
         description: "Comma-separated list of CloudFront IP ranges",
       },
     );
@@ -35,16 +35,11 @@ export class CdkInfraStack extends cdk.Stack {
       description: "Verified SES email identity",
     });
 
-    const cloudFrontIpRanges = cloudFrontIpRangesParam.valueAsString;
+    const cloudFrontIpRanges = cloudFrontIpRangesParam.valueAsList;
     const stageName = stageNameParam.valueAsString;
     const sesEmail = sesEmailParam.valueAsString;
 
-    const ipRangesArray =
-      typeof cloudFrontIpRanges === "string"
-        ? cloudFrontIpRanges.split(",").filter((ip) => ip)
-        : cloudFrontIpRanges;
-
-    if (!ipRangesArray || ipRangesArray.length === 0) {
+    if (!cloudFrontIpRanges || cloudFrontIpRanges.length === 0) {
       throw new Error("cloudFrontIpRanges must not be empty");
     }
 
@@ -148,11 +143,9 @@ export class CdkInfraStack extends cdk.Stack {
     );
 
     // Split CloudFront IP ranges
-    const maxIpRanges = 30; // Stay under 60 rules (split across two security groups)
-    const limitedIpRanges = ipRangesArray.slice(0, maxIpRanges);
-    const half = Math.ceil(limitedIpRanges.length / 2);
-    const cloudFrontIpRanges1 = ipRangesArray.slice(0, half);
-    const cloudFrontIpRanges2 = ipRangesArray.slice(half);
+    const half = Math.ceil(cloudFrontIpRanges.length / 2);
+    const cloudFrontIpRanges1 = cloudFrontIpRanges.slice(0, half);
+    const cloudFrontIpRanges2 = cloudFrontIpRanges.slice(half);
 
     dbSecurityGroup.addIngressRule(
       beanstalkSecurityGroup,

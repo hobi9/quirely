@@ -46,7 +46,7 @@ jobs:
         working-directory: ./cdk-infra
         run: |
           cdk deploy CdkInfraStack --require-approval never \
-            --parameters cloudFrontIpRanges='${{ steps.cloudfront-ips.outputs.ips }}' \
+            --parameters cloudFrontIpRanges="${{ steps.cloudfront-ips.outputs.ips }}" \
             --parameters stageName=prod \
             --parameters sesEmail='${{ secrets.SES_EMAIL }}' \
             --outputs-file cdk-outputs.json
