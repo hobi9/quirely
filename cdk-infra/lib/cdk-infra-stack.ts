@@ -17,6 +17,19 @@ import { Aws } from "aws-cdk-lib";
 export class CdkInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    const cloudFrontIpRangesParam = new cdk.CfnParameter(
+      this,
+      "cloudFrontIpRanges",
+      {
+        type: "List<String>",
+        description: "Comma-separated list of CloudFront IP ranges",
+      },
+    );
+
+    const stageNameParam = new cdk.CfnParameter(this, "stageName", {
+      type: "String",
+      description: "Deployment stage name (e.g., dev, prod)",
+    });
 
     const sesEmailParam = new cdk.CfnParameter(this, "sesEmail", {
       type: "String",
