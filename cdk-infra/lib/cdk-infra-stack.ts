@@ -11,7 +11,7 @@ import * as ses from "aws-cdk-lib/aws-ses";
 import * as elasticbeanstalk from "aws-cdk-lib/aws-elasticbeanstalk";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import { Stack } from "aws-cdk-lib";
+import { Aws } from "aws-cdk-lib";
 
 export class CdkInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,8 +24,6 @@ export class CdkInfraStack extends cdk.Stack {
         description: "Comma-separated list of CloudFront IP ranges",
       },
     );
-
-    const stack = Stack.of(this);
 
     const stageNameParam = new cdk.CfnParameter(this, "stageName", {
       type: "String",
@@ -71,7 +69,7 @@ export class CdkInfraStack extends cdk.Stack {
     // S3 bucket for user images
     const quirelyBucket = new s3.Bucket(this, "QuirelyBucket", {
       bucketName:
-        `quirely-${this.stackName}-${this.account}-${this.region}`.toLocaleLowerCase(),
+        `quirely-${this.stackName}-${Aws.ACCOUNT_ID}-${Aws.REGION}`.toLocaleLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
@@ -89,7 +87,7 @@ export class CdkInfraStack extends cdk.Stack {
     // S3 bucket for React frontend
     const frontendBucket = new s3.Bucket(this, "FrontendBucket", {
       bucketName:
-        `quirely-frontend-${this.stackName}-${this.account}-${this.region}`.toLowerCase(),
+        `quirely-frontend-${this.stackName}-${Aws.ACCOUNT_ID}-${Aws.REGION}`.toLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
@@ -97,7 +95,7 @@ export class CdkInfraStack extends cdk.Stack {
     // S3 bucket for atrifacts
     const artifactsBucket = new s3.Bucket(this, "ArtifactsBucket", {
       bucketName:
-        `quirely-artifacts-${this.stackName}-${this.account}-${this.region}`.toLowerCase(),
+        `quirely-artifacts-${this.stackName}-${Aws.ACCOUNT_ID}-${Aws.REGION}`.toLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
@@ -327,7 +325,7 @@ export class CdkInfraStack extends cdk.Stack {
         additionalBehaviors: {
           "/api/*": {
             origin: new origins.HttpOrigin(
-              `${api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+              `${api.restApiId}.execute-api.${Aws.REGION}.${this.urlSuffix}`,
               {
                 // Pass the path to the API Gateway
                 originPath: `/${api.deploymentStage.stageName}`,
@@ -453,7 +451,7 @@ export class CdkInfraStack extends cdk.Stack {
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "AWS_S3_REGION",
-            value: this.region,
+            value: Aws.REGION,
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
@@ -463,7 +461,7 @@ export class CdkInfraStack extends cdk.Stack {
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "SMTP_HOST",
-            value: `email-smtp.${this.region}.amazonaws.com`,
+            value: `email-smtp.${Aws.REGION}.amazonaws.com`,
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
