@@ -450,7 +450,7 @@ export class CdkInfraStack extends cdk.Stack {
           {
             namespace: "aws:elasticbeanstalk:application:environment",
             optionName: "CLIENT_BASE_URL",
-            value: cdk.Fn.sub("https://${DistributionDomain}"),
+            value: `https://${distribution.distributionDomainName}`,
           },
           {
             namespace: "aws:elasticbeanstalk:application:environment",
