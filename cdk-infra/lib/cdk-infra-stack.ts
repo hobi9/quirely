@@ -401,7 +401,7 @@ export class CdkInfraStack extends cdk.Stack {
             value: "application",
           },
           {
-            namespace: "aws:elb:loadbalancer",
+            namespace: "aws:elbv2:loadbalancer",
             optionName: "SecurityGroups",
             value: [
               albSecurityGroup.securityGroupId,
