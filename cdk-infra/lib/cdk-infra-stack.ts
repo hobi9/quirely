@@ -68,8 +68,6 @@ export class CdkInfraStack extends cdk.Stack {
 
     // S3 bucket for user images
     const quirelyBucket = new s3.Bucket(this, "QuirelyBucket", {
-      bucketName:
-        `quirely-${this.stackName}-${Aws.ACCOUNT_ID}-${Aws.REGION}`.toLocaleLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
@@ -86,16 +84,12 @@ export class CdkInfraStack extends cdk.Stack {
 
     // S3 bucket for React frontend
     const frontendBucket = new s3.Bucket(this, "FrontendBucket", {
-      bucketName:
-        `quirely-frontend-${this.stackName}-${Aws.ACCOUNT_ID}-${Aws.REGION}`.toLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
     // S3 bucket for atrifacts
     const artifactsBucket = new s3.Bucket(this, "ArtifactsBucket", {
-      bucketName:
-        `quirely-artifacts-${this.stackName}-${Aws.ACCOUNT_ID}-${Aws.REGION}`.toLowerCase(),
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
