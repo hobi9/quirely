@@ -11,7 +11,6 @@ import * as ses from "aws-cdk-lib/aws-ses";
 import * as elasticbeanstalk from "aws-cdk-lib/aws-elasticbeanstalk";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import { Stack } from "aws-cdk-lib";
 
 export class CdkInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,8 +23,6 @@ export class CdkInfraStack extends cdk.Stack {
         description: "Comma-separated list of CloudFront IP ranges",
       },
     );
-
-    const stack = Stack.of(this);
 
     const stageNameParam = new cdk.CfnParameter(this, "stageName", {
       type: "String",
