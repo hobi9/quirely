@@ -350,11 +350,6 @@ export class CdkInfraStack extends cdk.Stack {
       },
     );
 
-    // Outputs
-    new cdk.CfnOutput(this, "CloudFrontDomain", {
-      value: distribution.distributionDomainName,
-    });
-
     const beanstalkEnv = new elasticbeanstalk.CfnEnvironment(
       this,
       "QuirelyEnv",
@@ -510,6 +505,10 @@ export class CdkInfraStack extends cdk.Stack {
       },
     });
 
+    // Outputs
+    new cdk.CfnOutput(this, "CloudFrontDomain", {
+      value: distribution.distributionDomainName,
+    });
     new cdk.CfnOutput(this, "FrontendBucketName", {
       value: frontendBucket.bucketName,
     });
